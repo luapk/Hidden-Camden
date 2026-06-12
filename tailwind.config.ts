@@ -11,14 +11,16 @@ const config: Config = {
       colors: {
         ink: '#161210',
         paper: '#F0E6D2',
+        camden: '#D8432F',
         'camden-red': '#D8432F',
         brass: '#C9933C',
         cream: '#EFE7D6',
         smoke: '#8A8077',
       },
       fontFamily: {
-        display: ['Anton', 'sans-serif'],
-        mono: ['Courier Prime', 'Courier New', 'monospace'],
+        display: ['var(--font-anton)', 'Anton', 'sans-serif'],
+        mono: ['var(--font-courier)', 'Courier Prime', 'Courier New', 'monospace'],
+        ticket: ['var(--font-courier)', 'Courier Prime', 'Courier New', 'monospace'],
       },
     },
   },

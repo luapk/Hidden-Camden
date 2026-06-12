@@ -69,7 +69,7 @@ export async function mintRedemptionCode(
       return {
         ok: false,
         status: 410,
-        message: "This one's expired — the tour bank keeps drinks for 7 days.",
+        message: "This one's expired. The tour bank keeps drinks for 7 days.",
       }
     }
     return { ok: false, status: 403, message: 'This voucher cannot be redeemed.' }
@@ -82,7 +82,7 @@ export async function mintRedemptionCode(
     return {
       ok: false,
       status: 410,
-      message: "This one's expired — the tour bank keeps drinks for 7 days.",
+      message: "This one's expired. The tour bank keeps drinks for 7 days.",
     }
   }
 
