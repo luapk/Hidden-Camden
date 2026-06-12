@@ -85,7 +85,10 @@ export default function RouteBuilder({ route: initial, venues, initialStops }: {
     if (j < 0 || j >= stops.length) return
     setStops((s) => {
       const next = [...s]
-      ;[next[i]!, next[j]!] = [{ ...next[j]!, position: i + 1 }, { ...next[i]!, position: j + 1 }]
+      const a = next[i]!
+      const b = next[j]!
+      next[i] = { ...b, position: i + 1 }
+      next[j] = { ...a, position: j + 1 }
       return next
     })
   }

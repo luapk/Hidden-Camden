@@ -1,0 +1,118 @@
+'use client'
+
+import { useCallback, useEffect, useState } from 'react'
+
+const STORAGE_KEY = 'cc-tour'
+
+export interface TourProgress {
+  unlockedStops: number[]
+  bankedStops: number[]
+  paid: boolean
+  currentStop: number
+}
+
+const DEFAULT_PROGRESS: TourProgress = {
+  unlockedStops: [],
+  bankedStops: [],
+  paid: false,
+  currentStop: 1,
+}
+
+/** Stops 1 and 2 are free; the paywall gates stop 3 onwards. */
+export const FREE_STOPS = 2
+
+export function isPaywalled(position: number, paid: boolean): boolean {
+  return position > FREE_STOPS && !paid
+}
+
+function load(): TourProgress {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return DEFAULT_PROGRESS
+    const parsed = JSON.parse(raw) as Partial<TourProgress>
+    return {
+      unlockedStops: Array.isArray(parsed.unlockedStops)
+        ? parsed.unlockedStops
+        : [],
+      bankedStops: Array.isArray(parsed.bankedStops) ? parsed.bankedStops : [],
+      paid: parsed.paid === true,
+      currentStop:
+        typeof parsed.currentStop === 'number' ? parsed.currentStop : 1,
+    }
+  } catch {
+    return DEFAULT_PROGRESS
+  }
+}
+
+export interface UseTourProgress extends TourProgress {
+  /** False until the localStorage read has happened on the client. */
+  hydrated: boolean
+  unlockStop: (n: number) => void
+  bankStop: (n: number) => void
+  markPaid: () => void
+  reset: () => void
+}
+
+/**
+ * localStorage-backed tour progress, keyed 'cc-tour'.
+ * Paywall rule: stops 1 and 2 are free; unlocking stop 3+ requires paid.
+ */
+export function useTourProgress(): UseTourProgress {
+  const [progress, setProgress] = useState<TourProgress>(DEFAULT_PROGRESS)
+  const [hydrated, setHydrated] = useState(false)
+
+  useEffect(() => {
+    setProgress(load())
+    setHydrated(true)
+  }, [])
+
+  const save = useCallback(
+    (updater: (p: TourProgress) => TourProgress) => {
+      setProgress((prev) => {
+        const next = updater(prev)
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+        } catch {
+          /* private mode or full storage: progress survives in memory */
+        }
+        return next
+      })
+    },
+    [],
+  )
+
+  const unlockStop = useCallback(
+    (n: number) =>
+      save((p) =>
+        p.unlockedStops.includes(n)
+          ? p
+          : {
+              ...p,
+              unlockedStops: [...p.unlockedStops, n].sort((a, b) => a - b),
+              currentStop: Math.max(p.currentStop, n),
+            },
+      ),
+    [save],
+  )
+
+  const bankStop = useCallback(
+    (n: number) =>
+      save((p) => ({
+        ...p,
+        unlockedStops: p.unlockedStops.includes(n)
+          ? p.unlockedStops
+          : [...p.unlockedStops, n].sort((a, b) => a - b),
+        bankedStops: p.bankedStops.includes(n)
+          ? p.bankedStops
+          : [...p.bankedStops, n].sort((a, b) => a - b),
+        currentStop: Math.max(p.currentStop, n + 1),
+      })),
+    [save],
+  )
+
+  const markPaid = useCallback(() => save((p) => ({ ...p, paid: true })), [save])
+
+  const reset = useCallback(() => save(() => DEFAULT_PROGRESS), [save])
+
+  return { ...progress, hydrated, unlockStop, bankStop, markPaid, reset }
+}

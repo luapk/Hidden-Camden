@@ -16,6 +16,10 @@ const config: Config = {
         brass: '#C9933C',
         cream: '#EFE7D6',
         smoke: '#8A8077',
+        electric: '#2563EB',
+        acid: '#84CC16',
+        hotpink: '#EC4899',
+        vividviolet: '#8B5CF6',
       },
       fontFamily: {
         display: ['var(--font-anton)', 'Anton', 'sans-serif'],
