@@ -113,10 +113,12 @@ async function seed() {
 
   if (!route) throw new Error('Failed to insert route')
 
-  // Route stops
+  // Route stops — each stop gets the reward that belongs to its venue
+  const rewardByVenue = Object.fromEntries(insertedRewards.map((r) => [r.venue_id, r.id]))
   const stopValues = insertedVenues.map((v, i) => ({
     route_id: route.id,
     venue_id: v.id,
+    reward_id: rewardByVenue[v.id]!,
     position: i + 1,
     is_free: i < 2, // stops 1 and 2 are free
   }))

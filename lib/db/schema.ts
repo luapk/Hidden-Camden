@@ -95,6 +95,9 @@ export const routeStops = pgTable('route_stops', {
   venue_id: text('venue_id')
     .references(() => venues.id)
     .notNull(),
+  reward_id: text('reward_id')
+    .references(() => rewards.id)
+    .notNull(),
   position: integer('position').notNull(),
   audio_url: text('audio_url'),
   transcript: text('transcript'),
@@ -192,6 +195,18 @@ export const staffUsers = pgTable('staff_users', {
 // ---------------------------------------------------------------------------
 // redemption_denials
 // ---------------------------------------------------------------------------
+export const routeVersions = pgTable('route_versions', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  route_id: text('route_id')
+    .references(() => routes.id)
+    .notNull(),
+  published_at: timestamp('published_at').notNull().defaultNow(),
+  paywall_after_stop: integer('paywall_after_stop').notNull(),
+  stops_snapshot: text('stops_snapshot').notNull(), // JSON.stringify(RouteStop[])
+})
+
 export const redemptionDenials = pgTable('redemption_denials', {
   id: text('id')
     .primaryKey()
@@ -226,6 +241,8 @@ export type StaffUser = typeof staffUsers.$inferSelect
 export type NewStaffUser = typeof staffUsers.$inferInsert
 export type RedemptionDenial = typeof redemptionDenials.$inferSelect
 export type NewRedemptionDenial = typeof redemptionDenials.$inferInsert
+export type RouteVersion = typeof routeVersions.$inferSelect
+export type NewRouteVersion = typeof routeVersions.$inferInsert
 
 // ---------------------------------------------------------------------------
 // Relations (required for db.query relational API)
@@ -249,11 +266,17 @@ export const rewardsRelations = relations(rewards, ({ one, many }) => ({
 
 export const routesRelations = relations(routes, ({ many }) => ({
   routeStops: many(routeStops),
+  versions: many(routeVersions),
+}))
+
+export const routeVersionsRelations = relations(routeVersions, ({ one }) => ({
+  route: one(routes, { fields: [routeVersions.route_id], references: [routes.id] }),
 }))
 
 export const routeStopsRelations = relations(routeStops, ({ one, many }) => ({
   route: one(routes, { fields: [routeStops.route_id], references: [routes.id] }),
   venue: one(venues, { fields: [routeStops.venue_id], references: [venues.id] }),
+  reward: one(rewards, { fields: [routeStops.reward_id], references: [rewards.id] }),
   vouchers: many(vouchers),
 }))
 
