@@ -10,7 +10,6 @@ import {
   CheckCircle,
   Pause,
   Play,
-  Sparkle,
   Wallet,
   X,
 } from '@phosphor-icons/react'
@@ -46,11 +45,11 @@ export default function StoryPlayer({
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 mx-auto max-w-md overflow-y-auto bg-white"
+      className="fixed inset-0 z-50 mx-auto max-w-md overflow-y-auto bg-night text-label-1"
       initial={{ y: '100%' }}
       animate={{ y: 0 }}
       exit={{ y: '100%' }}
-      transition={{ type: 'spring', stiffness: 300, damping: 32 }}
+      transition={{ type: 'spring', stiffness: 220, damping: 30 }}
       role="dialog"
       aria-label={gated ? 'Unlock the last five' : `Story: ${stop.name}`}
     >
@@ -125,7 +124,7 @@ function StoryBody({
   return (
     <div className="pb-10">
       {/* Banner */}
-      <div className="relative h-52 w-full">
+      <div className="relative h-60 w-full">
         <Image
           src={stop.image}
           alt={stop.name}
@@ -133,35 +132,40 @@ function StoryBody({
           priority
           sizes="448px"
           className="object-cover"
+          style={{ filter: 'grayscale(30%) contrast(1.05)' }}
         />
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(180deg, ${stop.accent}33 0%, ${stop.accent}E6 100%)`,
-          }}
-        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black" />
+        {/* Lime hairline along the banner's lower edge */}
+        <span className="absolute inset-x-0 bottom-0 h-px bg-acid" aria-hidden />
         <button
           onClick={onClose}
           aria-label="Close the story"
-          className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-ink shadow"
+          className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/40 text-label-1 backdrop-blur-xl"
         >
           <X size={18} weight="bold" />
         </button>
-        <div className="absolute inset-x-5 bottom-4">
-          <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-white/90">
+        {/* Ghost stop numeral */}
+        <span
+          className="pointer-events-none absolute right-3 top-10 font-grotesk text-[96px] font-bold leading-none text-white/10"
+          aria-hidden
+        >
+          {String(stop.position).padStart(2, '0')}
+        </span>
+        <div className="absolute inset-x-5 bottom-5">
+          <div className="font-grotesk text-[11px] uppercase tracking-[0.35em] text-acid">
             Stop {stop.position} · Unlocked
           </div>
-          <h2 className="mt-1 font-display text-3xl uppercase leading-[1.02] text-white">
+          <h2 className="mt-1.5 font-jost text-3xl font-bold uppercase leading-[1.02] tracking-tight text-label-1">
             {stop.name}
           </h2>
-          <p className="mt-0.5 text-[13px] text-white/85">{stop.subtitle}</p>
+          <p className="mt-1 text-[13px] text-label-2">{stop.subtitle}</p>
         </div>
       </div>
 
-      <div className="px-5 pt-5">
-        {/* Audio player */}
+      <div className="px-5">
+        {/* Audio transport on a glass strip over the banner edge */}
         {stop.audioUrl && audioState !== 'failed' ? (
-          <div className="rounded-2xl border border-ink/10 bg-white p-4 shadow-sm">
+          <div className="relative z-10 -mt-7 rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-2xl">
             <audio
               ref={audioRef}
               src={stop.audioUrl}
@@ -185,8 +189,7 @@ function StoryBody({
               <button
                 onClick={togglePlay}
                 aria-label={playing ? 'Pause the story' : 'Play the story'}
-                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white shadow-md"
-                style={{ backgroundColor: stop.accent }}
+                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-acid text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]"
               >
                 {playing ? (
                   <Pause size={24} weight="fill" />
@@ -204,31 +207,30 @@ function StoryBody({
                   onChange={(e) => seek(Number(e.target.value))}
                   aria-label="Seek"
                   className="w-full"
-                  style={{ accentColor: stop.accent }}
+                  style={{ accentColor: '#CCFF00' }}
                 />
-                <div className="mt-1 flex justify-between font-mono text-[11px] text-smoke">
+                <div className="mt-1 flex justify-between font-grotesk text-[11px] text-label-2">
                   <span>{clock(elapsed)}</span>
                   <span>{clock(duration)}</span>
                 </div>
               </div>
               <button
                 onClick={toggleRate}
-                className="shrink-0 rounded-full border border-ink/15 px-2.5 py-1 font-mono text-[12px] font-bold text-ink"
+                className="shrink-0 rounded-full border border-white/20 px-2.5 py-1 font-grotesk text-[12px] font-bold text-label-1"
               >
                 {rate}x
               </button>
             </div>
           </div>
         ) : (
-          <div className="rounded-2xl border border-ink/10 bg-ink/5 p-4">
-            <p className="font-mono text-[12px] text-ink">
+          <div className="mt-5 border border-white/10 bg-night-2 p-4">
+            <p className="font-grotesk text-[12px] text-label-2">
               Audio coming soon. Read the story below.
             </p>
             {!finished && (
               <button
                 onClick={() => setFinished(true)}
-                className="mt-3 w-full rounded-xl px-4 py-3 font-display text-[14px] uppercase tracking-[0.06em] text-white"
-                style={{ backgroundColor: stop.accent }}
+                className="mt-3 w-full bg-acid px-4 py-3 font-jost text-[14px] font-bold uppercase tracking-[0.08em] text-black"
               >
                 Mark as listened
               </button>
@@ -237,20 +239,24 @@ function StoryBody({
         )}
 
         {/* Transcript */}
-        <div className="mt-4 rounded-2xl border border-ink/10">
+        <div className="mt-4 border border-white/10 bg-night-1">
           <button
             onClick={() => setTranscriptOpen((o) => !o)}
             className="flex w-full items-center justify-between px-4 py-3 text-left"
             aria-expanded={transcriptOpen}
           >
-            <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-ink">
+            <span className="font-grotesk text-[11px] uppercase tracking-[0.25em] text-label-1">
               Transcript
             </span>
             <motion.span
               animate={{ rotate: transcriptOpen ? 180 : 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.25 }}
             >
-              <CaretDown size={16} weight="bold" color="#8A8077" />
+              <CaretDown
+                size={16}
+                weight="bold"
+                color={transcriptOpen ? '#CCFF00' : '#98989D'}
+              />
             </motion.span>
           </button>
           <AnimatePresence initial={false}>
@@ -259,10 +265,10 @@ function StoryBody({
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.25 }}
+                transition={{ duration: 0.3 }}
                 className="overflow-hidden"
               >
-                <p className="px-4 pb-4 text-[14px] leading-relaxed text-ink/85">
+                <p className="px-4 pb-4 text-[14px] leading-relaxed text-label-1/85">
                   {stop.transcript}
                 </p>
               </motion.div>
@@ -273,55 +279,51 @@ function StoryBody({
         {/* The bank moment */}
         <AnimatePresence>
           {finished && (
-            <motion.div
-              key="bank-card"
-              initial={{ rotateY: 90, opacity: 0 }}
-              animate={{ rotateY: 0, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-              className="relative mt-5 overflow-hidden rounded-2xl border-2 bg-white p-4"
-              style={{ borderColor: stop.accent }}
-            >
-              {justBanked && <SparkleBurst accent={stop.accent} />}
-              <div
-                className="font-mono text-[10px] uppercase tracking-[0.25em]"
-                style={{ color: stop.accent }}
+            <div key="bank-card" className="relative">
+              <motion.div
+                initial={{ opacity: 0, y: 24, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: 'spring', stiffness: 140, damping: 18 }}
+                className="mt-5 bg-acid p-4 text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]"
               >
-                {banked ? 'Reward banked' : 'Your reward'}
-              </div>
-              <div className="mt-1 flex items-center gap-2">
-                <BeerStein size={22} weight="fill" color={stop.accent} />
-                <span className="font-display text-xl uppercase leading-tight text-ink">
-                  {stop.rewardLabel}
-                </span>
-              </div>
-              <div className="mt-1 font-mono text-[11px] text-smoke">
-                {stop.rewardWindow} · keeps for 7 days
-              </div>
-
-              {banked ? (
-                <div className="mt-3 flex items-center justify-between gap-3">
-                  <span className="flex items-center gap-1.5 font-mono text-[12px] text-ink">
-                    <CheckCircle size={18} weight="fill" color={stop.accent} />
-                    Banked. Find it in your wallet.
-                  </span>
-                  <Link
-                    href="/wallet"
-                    className="flex shrink-0 items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 font-mono text-[11px] text-cream"
-                  >
-                    <Wallet size={14} weight="bold" />
-                    Wallet
-                  </Link>
+                <div className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-black/60">
+                  {banked ? 'Reward banked' : 'Your reward'}
                 </div>
-              ) : (
-                <button
-                  onClick={bank}
-                  className="mt-3 w-full rounded-xl px-4 py-3 font-display text-[15px] uppercase tracking-[0.06em] text-white"
-                  style={{ backgroundColor: stop.accent }}
-                >
-                  Bank reward
-                </button>
-              )}
-            </motion.div>
+                <div className="mt-1 flex items-center gap-2">
+                  <BeerStein size={22} weight="fill" color="#000000" />
+                  <span className="font-jost text-xl font-bold uppercase leading-tight tracking-tight">
+                    {stop.rewardLabel}
+                  </span>
+                </div>
+                <div className="mt-1 font-grotesk text-[11px] text-black/60">
+                  {stop.rewardWindow} · keeps for 7 days
+                </div>
+
+                {banked ? (
+                  <div className="mt-3 flex items-center justify-between gap-3">
+                    <span className="flex items-center gap-1.5 font-grotesk text-[12px] text-black">
+                      <CheckCircle size={18} weight="fill" color="#000000" />
+                      Banked. Find it in your wallet.
+                    </span>
+                    <Link
+                      href="/wallet"
+                      className="flex shrink-0 items-center gap-1.5 rounded-full bg-black px-3 py-1.5 font-grotesk text-[11px] uppercase tracking-[0.1em] text-acid"
+                    >
+                      <Wallet size={14} weight="bold" />
+                      Wallet
+                    </Link>
+                  </div>
+                ) : (
+                  <button
+                    onClick={bank}
+                    className="mt-3 w-full bg-black px-4 py-3 font-jost text-[15px] font-bold uppercase tracking-[0.08em] text-acid"
+                  >
+                    Bank reward
+                  </button>
+                )}
+              </motion.div>
+              {justBanked && <BauhausBurst />}
+            </div>
           )}
         </AnimatePresence>
       </div>
@@ -329,36 +331,43 @@ function StoryBody({
   )
 }
 
-/** A small confetti-ish burst of sparkles and dots. No extra deps. */
-function SparkleBurst({ accent }: { accent: string }) {
-  const particles = Array.from({ length: 10 }, (_, i) => ({
-    angle: (i / 10) * Math.PI * 2,
-    distance: 60 + (i % 3) * 26,
-    delay: i * 0.02,
-    sparkle: i % 3 === 0,
+/** Bauhaus confetti: tiny lime squares, circles, and triangles. No extra deps. */
+function BauhausBurst() {
+  const particles = Array.from({ length: 12 }, (_, i) => ({
+    angle: (i / 12) * Math.PI * 2,
+    distance: 70 + (i % 3) * 30,
+    delay: i * 0.025,
+    shape: i % 3, // 0 square, 1 circle, 2 triangle
   }))
 
   return (
-    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+    <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
       {particles.map((p, i) => (
         <motion.span
           key={i}
           className="absolute"
-          initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
+          initial={{ x: 0, y: 0, scale: 0, opacity: 1, rotate: 0 }}
           animate={{
             x: Math.cos(p.angle) * p.distance,
             y: Math.sin(p.angle) * p.distance,
-            scale: [0, 1.2, 0.6],
+            scale: [0, 1.2, 0.7],
             opacity: [1, 1, 0],
+            rotate: p.shape === 1 ? 0 : 135,
           }}
-          transition={{ duration: 0.9, delay: p.delay, ease: 'easeOut' }}
+          transition={{ duration: 1.1, delay: p.delay, ease: 'easeOut' }}
         >
-          {p.sparkle ? (
-            <Sparkle size={16} weight="fill" color={accent} />
+          {p.shape === 0 ? (
+            <span className="block h-2 w-2 bg-acid" />
+          ) : p.shape === 1 ? (
+            <span className="block h-2 w-2 rounded-full bg-acid" />
           ) : (
             <span
-              className="block h-2 w-2 rounded-full"
-              style={{ backgroundColor: accent }}
+              className="block h-0 w-0"
+              style={{
+                borderLeft: '5px solid transparent',
+                borderRight: '5px solid transparent',
+                borderBottom: '9px solid #CCFF00',
+              }}
             />
           )}
         </motion.span>

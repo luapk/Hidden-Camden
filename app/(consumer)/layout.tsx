@@ -6,8 +6,8 @@ export default function ConsumerLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-white text-ink">
-      <div className="mx-auto max-w-md px-4 pb-24 pt-5">{children}</div>
+    <div className="min-h-screen bg-night font-jost text-label-1">
+      <div className="mx-auto max-w-md px-4 pb-32 pt-5">{children}</div>
       <BottomNav />
     </div>
   )

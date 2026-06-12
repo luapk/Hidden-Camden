@@ -73,26 +73,26 @@ export default function HelpPage() {
   return (
     <main>
       <header>
-        <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-hotpink">
+        <div className="font-grotesk text-[10px] uppercase tracking-[0.35em] text-acid">
           Help
         </div>
-        <h1 className="mt-1 font-display text-3xl uppercase leading-none text-ink">
+        <h1 className="mt-2 font-jost text-4xl font-bold uppercase leading-[0.95] tracking-tight text-label-1">
           Sort it out
         </h1>
       </header>
 
       {/* Settings card */}
-      <section className="mt-5 rounded-2xl border border-ink/10 bg-white p-4 shadow-sm">
-        <h2 className="font-display text-lg uppercase text-ink">
+      <section className="mt-6 border border-white/10 bg-night-2 p-4">
+        <h2 className="font-jost text-lg font-bold uppercase tracking-tight text-label-1">
           Your tour, your way
         </h2>
 
-        <div className="mt-3">
-          <div className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-smoke">
+        <div className="mt-4">
+          <div className="flex items-center gap-1.5 font-grotesk text-[11px] uppercase tracking-[0.25em] text-label-2">
             <Globe size={14} weight="bold" />
             Language
           </div>
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-2.5 flex flex-wrap gap-2">
             {LANGS.map((l) => {
               const active = hydrated && l === lang
               return (
@@ -101,8 +101,8 @@ export default function HelpPage() {
                   onClick={() => pickLang(l)}
                   className={`rounded-full border px-3 py-1.5 text-[12.5px] font-medium transition-colors ${
                     active
-                      ? 'border-electric bg-electric text-white'
-                      : 'border-ink/15 bg-white text-ink'
+                      ? 'border-acid bg-acid text-black'
+                      : 'border-white/10 bg-night-3 text-label-1'
                   }`}
                 >
                   {l}
@@ -112,12 +112,12 @@ export default function HelpPage() {
           </div>
         </div>
 
-        <div className="mt-4">
-          <div className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-smoke">
+        <div className="mt-5">
+          <div className="flex items-center gap-1.5 font-grotesk text-[11px] uppercase tracking-[0.25em] text-label-2">
             <Waveform size={14} weight="bold" />
             Voice
           </div>
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-2.5 flex flex-wrap gap-2">
             {VOICES.map((v) => {
               const active = hydrated && v === voice
               return (
@@ -126,8 +126,8 @@ export default function HelpPage() {
                   onClick={() => pickVoice(v)}
                   className={`rounded-full border px-3 py-1.5 text-[12.5px] font-medium transition-colors ${
                     active
-                      ? 'border-camden bg-camden text-white'
-                      : 'border-ink/15 bg-white text-ink'
+                      ? 'border-acid bg-acid text-black'
+                      : 'border-white/10 bg-night-3 text-label-1'
                   }`}
                 >
                   {v}
@@ -137,35 +137,43 @@ export default function HelpPage() {
           </div>
         </div>
 
-        <p className="mt-3 font-mono text-[10.5px] text-smoke">
+        <p className="mt-4 font-grotesk text-[10.5px] text-label-3">
           More languages landing soon.
         </p>
       </section>
 
       {/* FAQ accordion */}
-      <section className="mt-6">
-        <h2 className="font-mono text-[11px] uppercase tracking-[0.25em] text-smoke">
+      <section className="mt-7">
+        <h2 className="font-grotesk text-[11px] uppercase tracking-[0.3em] text-label-2">
           Questions, answered
         </h2>
-        <div className="mt-3 divide-y divide-ink/10 rounded-2xl border border-ink/10 bg-white shadow-sm">
+        <div className="mt-3 border-t border-white/10">
           {FAQS.map((faq, i) => {
             const isOpen = open === i
             return (
-              <div key={faq.q}>
+              <div key={faq.q} className="border-b border-white/10">
                 <button
                   onClick={() => setOpen(isOpen ? null : i)}
                   aria-expanded={isOpen}
-                  className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left"
+                  className="flex w-full items-center justify-between gap-3 py-4 text-left"
                 >
-                  <span className="text-[14px] font-semibold text-ink">
+                  <span
+                    className={`text-[14px] font-semibold ${
+                      isOpen ? 'text-acid' : 'text-label-1'
+                    }`}
+                  >
                     {faq.q}
                   </span>
                   <motion.span
                     animate={{ rotate: isOpen ? 180 : 0 }}
-                    transition={{ duration: 0.2 }}
+                    transition={{ duration: 0.25 }}
                     className="shrink-0"
                   >
-                    <CaretDown size={16} weight="bold" color="#8A8077" />
+                    <CaretDown
+                      size={16}
+                      weight="bold"
+                      color={isOpen ? '#CCFF00' : '#5A5A5F'}
+                    />
                   </motion.span>
                 </button>
                 <AnimatePresence initial={false}>
@@ -174,10 +182,10 @@ export default function HelpPage() {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.22 }}
+                      transition={{ duration: 0.28 }}
                       className="overflow-hidden"
                     >
-                      <p className="px-4 pb-4 text-[13.5px] leading-relaxed text-ink/75">
+                      <p className="pb-4 text-[13.5px] leading-relaxed text-label-2">
                         {faq.a}
                       </p>
                     </motion.div>

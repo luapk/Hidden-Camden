@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Anton, Courier_Prime } from 'next/font/google'
+import { Anton, Courier_Prime, Jost, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 
 const anton = Anton({
@@ -16,6 +16,20 @@ const courierPrime = Courier_Prime({
   display: 'swap',
 })
 
+const jost = Jost({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-jost',
+  display: 'swap',
+})
+
+const spaceGrotesk = Space_Grotesk({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-grotesk',
+  display: 'swap',
+})
+
 export const metadata: Metadata = {
   title: 'Camden Crawl',
   description: 'A geofenced audio tour of Camden music venues.',
@@ -28,7 +42,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${anton.variable} ${courierPrime.variable}`}>
+      <body
+        className={`${anton.variable} ${courierPrime.variable} ${jost.variable} ${spaceGrotesk.variable}`}
+      >
         {children}
       </body>
     </html>

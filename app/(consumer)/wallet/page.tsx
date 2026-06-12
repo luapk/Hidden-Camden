@@ -35,13 +35,13 @@ export default function WalletPage() {
   return (
     <main>
       <header>
-        <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-camden">
+        <div className="font-grotesk text-[10px] uppercase tracking-[0.35em] text-acid">
           Your round
         </div>
-        <h1 className="mt-1 font-display text-3xl uppercase leading-none text-ink">
+        <h1 className="mt-2 font-jost text-4xl font-bold uppercase leading-[0.95] tracking-tight text-label-1">
           Wallet
         </h1>
-        <p className="mt-1.5 text-[13px] text-smoke">
+        <p className="mt-2 text-[13px] text-label-2">
           Drinks land here as you unlock venues. They keep for 7 days.
         </p>
       </header>
@@ -49,24 +49,25 @@ export default function WalletPage() {
       {loading ? (
         <div className="mt-8 space-y-3">
           {[0, 1].map((i) => (
-            <div key={i} className="h-28 animate-pulse rounded-2xl bg-ink/5" />
+            <div key={i} className="h-28 animate-pulse bg-white/5" />
           ))}
         </div>
       ) : banked.length === 0 ? (
         <motion.div
-          initial={{ opacity: 0, y: 14 }}
+          initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-12 flex flex-col items-center text-center"
+          transition={{ type: 'spring', stiffness: 120, damping: 22 }}
+          className="mt-14 flex flex-col items-center text-center"
         >
-          <span className="flex h-24 w-24 items-center justify-center rounded-full bg-electric/10">
-            <WalletIcon size={44} weight="fill" color="#2563EB" />
+          <span className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-acid">
+            <WalletIcon size={44} weight="fill" color="#CCFF00" />
           </span>
-          <p className="mt-5 max-w-[260px] text-[15px] leading-relaxed text-ink/80">
+          <p className="mt-6 max-w-[260px] text-[15px] leading-relaxed text-label-2">
             Nothing banked yet. The first pint is a ten minute walk away.
           </p>
           <Link
             href="/"
-            className="mt-5 rounded-xl bg-ink px-5 py-3 font-display text-[14px] uppercase tracking-[0.06em] text-cream"
+            className="mt-6 bg-acid px-6 py-3 font-jost text-[14px] font-bold uppercase tracking-[0.08em] text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]"
           >
             Start the tour
           </Link>
@@ -76,42 +77,50 @@ export default function WalletPage() {
           className="mt-6 space-y-3"
           initial="hidden"
           animate="show"
-          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07 } } }}
+          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
         >
           {banked.map((stop) => (
             <motion.li
               key={stop.position}
               variants={{
-                hidden: { opacity: 0, y: 16 },
+                hidden: { opacity: 0, y: 18 },
                 show: { opacity: 1, y: 0 },
               }}
+              transition={{ type: 'spring', stiffness: 120, damping: 22 }}
             >
-              <div
-                className="rounded-2xl border border-ink/10 bg-white p-4 shadow-sm"
-                style={{ borderLeft: `6px solid ${stop.accent}` }}
-              >
+              <div className="relative flex overflow-hidden border border-white/10 bg-night-2">
+                {/* Lime ticket rule */}
+                <span className="w-[3px] shrink-0 bg-acid" aria-hidden />
+                <div className="min-w-0 flex-1 p-4">
+                  <div className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-label-2">
+                    Banked · Stop{' '}
+                    <span style={{ color: stop.accent }}>{stop.position}</span>
+                  </div>
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <BeerStein size={22} weight="fill" color="#CCFF00" />
+                    <span className="font-jost text-xl font-bold uppercase leading-tight tracking-tight text-label-1">
+                      {stop.rewardLabel}
+                    </span>
+                  </div>
+                  <div className="mt-1 font-grotesk text-[11px] text-label-2">
+                    {stop.name} · {stop.rewardWindow}
+                  </div>
+                  <Link
+                    href={`/redeem/demo-${stop.position}`}
+                    className="mt-3 inline-block font-jost text-[14px] font-bold uppercase tracking-[0.1em] text-acid underline-offset-4 hover:underline"
+                  >
+                    Redeem at the bar
+                  </Link>
+                </div>
+                {/* Perforation dot column */}
                 <div
-                  className="font-mono text-[10px] uppercase tracking-[0.25em]"
-                  style={{ color: stop.accent }}
+                  className="flex shrink-0 flex-col items-center justify-center gap-2 border-l border-dashed border-white/10 px-2.5"
+                  aria-hidden
                 >
-                  Banked · Stop {stop.position}
+                  {[0, 1, 2, 3, 4].map((d) => (
+                    <span key={d} className="h-1 w-1 rounded-full bg-white/10" />
+                  ))}
                 </div>
-                <div className="mt-1.5 flex items-center gap-2">
-                  <BeerStein size={22} weight="fill" color={stop.accent} />
-                  <span className="font-display text-xl uppercase leading-tight text-ink">
-                    {stop.rewardLabel}
-                  </span>
-                </div>
-                <div className="mt-1 font-mono text-[11px] text-smoke">
-                  {stop.name} · {stop.rewardWindow}
-                </div>
-                <Link
-                  href={`/redeem/demo-${stop.position}`}
-                  className="mt-3 block w-full rounded-xl px-4 py-3 text-center font-display text-[14px] uppercase tracking-[0.06em] text-white"
-                  style={{ backgroundColor: stop.accent }}
-                >
-                  Redeem at the bar
-                </Link>
               </div>
             </motion.li>
           ))}

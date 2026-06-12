@@ -7,10 +7,9 @@ import { AnimatePresence, motion } from 'framer-motion'
 import {
   ArrowRight,
   BeerStein,
-  CheckCircle,
+  Check,
   Headphones,
   LockSimple,
-  Sparkle,
 } from '@phosphor-icons/react'
 import { haversineDistance } from '@/lib/geo'
 import { useGeofence, type GeoPosition } from '@/lib/geo/useGeofence'
@@ -21,7 +20,7 @@ import StoryPlayer from './StoryPlayer'
 const TourMap = dynamic(() => import('./TourMap'), {
   ssr: false,
   loading: () => (
-    <div className="flex h-full w-full items-center justify-center bg-ink/5 font-mono text-[11px] text-smoke">
+    <div className="flex h-full w-full items-center justify-center bg-night-1 font-grotesk text-[11px] uppercase tracking-[0.2em] text-label-3">
       Loading the map
     </div>
   ),
@@ -38,6 +37,11 @@ function formatRuntime(s: number): string {
 function formatDistance(m: number): string {
   if (m >= 1000) return `${(m / 1000).toFixed(1)}km away`
   return `${Math.round(m)}m away`
+}
+
+function distanceFigure(m: number): { value: string; unit: string } {
+  if (m >= 1000) return { value: (m / 1000).toFixed(1), unit: 'KM' }
+  return { value: String(Math.round(m)), unit: 'M' }
 }
 
 export default function TourScreen({ stops }: { stops: TourStop[] }) {
@@ -116,39 +120,64 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   return (
     <main>
       {/* Header */}
-      <header className="flex items-end justify-between">
-        <div>
-          <h1 className="font-display text-3xl uppercase leading-none tracking-tight text-ink">
-            Camden <span className="text-camden">Crawl</span>
-          </h1>
-          <p className="mt-1 text-[13px] text-smoke">
-            Seven rooms. Stories unlock when your feet arrive.
-          </p>
+      <header>
+        <div className="font-grotesk text-[10px] uppercase tracking-[0.35em] text-acid">
+          Walking tour · NW1
         </div>
-        <span className="rounded-full bg-ink px-3 py-1.5 font-mono text-[11px] text-cream">
-          {bankedCount} of {sorted.length} stops
-        </span>
+        <div className="mt-2 flex items-end justify-between gap-4">
+          <h1 className="font-jost text-4xl font-bold uppercase leading-[0.95] tracking-tight text-label-1">
+            Camden <span className="text-acid">Crawl</span>
+          </h1>
+          <div
+            className="shrink-0 font-grotesk text-3xl font-bold leading-none tracking-tight"
+            aria-label={`${bankedCount} of ${sorted.length} stops`}
+          >
+            <span className="text-acid">
+              {String(bankedCount).padStart(2, '0')}
+            </span>
+            <span className="text-label-3">
+              /{String(sorted.length).padStart(2, '0')}
+            </span>
+          </div>
+        </div>
+        <p className="mt-2 text-[13px] text-label-2">
+          Seven rooms. Stories unlock when your feet arrive.
+        </p>
+        {/* Bauhaus ornament */}
+        <div className="mt-3 flex items-center gap-2" aria-hidden>
+          <span className="h-2 w-2 rounded-full bg-acid" />
+          <span className="h-2 w-2 bg-label-1" />
+          <span
+            className="h-0 w-0"
+            style={{
+              borderLeft: '5px solid transparent',
+              borderRight: '5px solid transparent',
+              borderBottom: '9px solid #5A5A5F',
+            }}
+          />
+          <span className="h-px flex-1 bg-white/10" />
+        </div>
       </header>
 
       {/* Segmented progress bar */}
-      <div className="mt-3 flex gap-1.5" aria-hidden>
+      <div className="mt-3 flex gap-1" aria-hidden>
         {sorted.map((s) => (
           <motion.span
             key={s.position}
-            className="h-1.5 flex-1 rounded-full"
+            className="h-[3px] flex-1"
             initial={false}
             animate={{
               backgroundColor: bankedStops.includes(s.position)
-                ? s.accent
-                : '#E7E5E4',
+                ? '#CCFF00'
+                : 'rgba(255,255,255,0.1)',
             }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.7 }}
           />
         ))}
       </div>
 
       {/* Map */}
-      <div className="relative mt-4 h-[45vh] min-h-[280px] overflow-hidden rounded-3xl shadow-[0_8px_30px_rgba(22,18,16,0.12)]">
+      <div className="relative mt-4 h-[50vh] min-h-[280px] overflow-hidden rounded-2xl border border-white/10">
         <TourMap
           stops={sorted}
           userPosition={geo.position}
@@ -157,6 +186,9 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
           nextPosition={nextStop?.position ?? null}
           onSelectStop={setSelectedStop}
         />
+        <div className="pointer-events-none absolute left-3 top-3 rounded-full border border-white/10 bg-black/40 px-3 py-1.5 font-grotesk text-[11px] uppercase tracking-[0.2em] text-label-1 backdrop-blur-xl">
+          <span className="text-acid">{bankedCount}</span> of {sorted.length}
+        </div>
       </div>
 
       {/* Distance / dwell card for the next stop */}
@@ -171,11 +203,11 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
             onPlay={() => setActiveStory(nextStop)}
           />
         ) : hydrated ? (
-          <div className="rounded-2xl border-2 border-brass/40 bg-brass/5 p-4">
-            <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-brass">
+          <div className="border border-white/10 bg-night-2 p-4">
+            <div className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-acid">
               Tour complete
             </div>
-            <p className="mt-1.5 text-sm leading-relaxed text-ink">
+            <p className="mt-2 text-sm leading-relaxed text-label-1">
               A witch, a boxer, a lie about jazz, a pool table, a hiding place,
               and the night punk went overground. Your pin is waiting at
               Dingwalls. Wear it somewhere people will ask.
@@ -186,7 +218,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         {simEnabled && nextStop && (
           <button
             onClick={simulateArrival}
-            className="mt-2 font-mono text-[11px] text-smoke underline underline-offset-2"
+            className="mt-2 font-grotesk text-[11px] uppercase tracking-[0.15em] text-label-3 underline underline-offset-4"
           >
             Simulate arrival
           </button>
@@ -195,12 +227,12 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
 
       {/* Stop list */}
       <motion.ul
-        className="mt-5 space-y-3"
+        className="mt-6"
         initial="hidden"
         animate="show"
         variants={{
           hidden: {},
-          show: { transition: { staggerChildren: 0.07 } },
+          show: { transition: { staggerChildren: 0.08 } },
         }}
       >
         {sorted.map((stop) => {
@@ -208,7 +240,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
           const unlocked = unlockedStops.includes(stop.position)
           const isNext = stop.position === nextStop?.position
           return (
-            <StopCard
+            <StopRow
               key={stop.position}
               stop={stop}
               banked={banked}
@@ -246,32 +278,32 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         {unlockFlash && (
           <motion.div
             key="unlock-flash"
-            className="fixed inset-0 z-50 flex flex-col items-center justify-center px-8 text-center"
-            style={{ backgroundColor: unlockFlash.accent }}
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-acid px-8 text-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              initial={{ scale: 0.4, rotate: -20, opacity: 0 }}
-              animate={{ scale: 1, rotate: 0, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 16 }}
+              className="font-grotesk text-[120px] font-bold leading-none text-black"
+              initial={{ scale: 0.3, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 160, damping: 18 }}
             >
-              <Sparkle size={56} weight="fill" color="#FFFFFF" />
+              {String(unlockFlash.position).padStart(2, '0')}
             </motion.div>
             <motion.div
-              className="mt-4 font-mono text-[12px] uppercase tracking-[0.3em] text-white/90"
+              className="mt-4 font-grotesk text-[12px] uppercase tracking-[0.35em] text-black/70"
               initial={{ y: 16, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.1 }}
+              transition={{ delay: 0.12 }}
             >
               You have arrived. Stop {unlockFlash.position}
             </motion.div>
             <motion.h2
-              className="mt-2 font-display text-[40px] uppercase leading-[0.98] text-white"
-              initial={{ y: 24, opacity: 0, scale: 0.9 }}
+              className="mt-2 font-jost text-[38px] font-bold uppercase leading-[0.98] tracking-tight text-black"
+              initial={{ y: 24, opacity: 0, scale: 0.94 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
-              transition={{ delay: 0.18, type: 'spring', stiffness: 200, damping: 18 }}
+              transition={{ delay: 0.2, type: 'spring', stiffness: 160, damping: 20 }}
             >
               {unlockFlash.name}
             </motion.h2>
@@ -319,38 +351,53 @@ function DistanceCard({
       ? 0
       : Math.max(0, Math.min(1, (TOTAL_DISTANCE_SCALE_M - distanceM) / TOTAL_DISTANCE_SCALE_M))
 
+  const figure = distanceM !== null ? distanceFigure(distanceM) : null
+
   return (
-    <div
-      className="overflow-hidden rounded-2xl border border-ink/10 bg-white p-4 shadow-sm"
-      style={{ borderLeft: `5px solid ${stop.accent}` }}
-    >
-      <div className="flex items-baseline justify-between gap-3">
-        <div>
-          <div
-            className="font-mono text-[10px] uppercase tracking-[0.25em]"
-            style={{ color: stop.accent }}
-          >
-            Next up. Stop {stop.position}
+    <div className="relative overflow-hidden border border-white/10 bg-night-2 p-4">
+      {/* Thin per-stop identity rule */}
+      <span
+        className="absolute left-0 top-0 h-full w-[2px]"
+        style={{ backgroundColor: stop.accent }}
+        aria-hidden
+      />
+      <div className="flex items-end justify-between gap-3">
+        <div className="min-w-0">
+          <div className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-label-2">
+            Next up. Stop{' '}
+            <span style={{ color: stop.accent }}>{stop.position}</span>
           </div>
-          <div className="mt-0.5 text-[15px] font-semibold text-ink">
+          <div className="mt-1 truncate font-jost text-[17px] font-bold uppercase tracking-tight text-label-1">
             {stop.name}
           </div>
         </div>
-        <div className="shrink-0 font-mono text-[13px] font-bold text-ink">
-          {distanceM !== null ? formatDistance(distanceM) : '...'}
+        <div className="shrink-0 text-right">
+          {figure ? (
+            <div className="font-grotesk leading-none">
+              <span className="text-3xl font-bold text-acid">
+                {figure.value}
+              </span>
+              <span className="ml-1 text-sm font-medium text-acid/70">
+                {figure.unit}
+              </span>
+            </div>
+          ) : (
+            <span className="font-grotesk text-xl text-label-3">...</span>
+          )}
         </div>
       </div>
 
       {inside ? (
-        <div className="mt-3">
-          <div className="flex items-center gap-2 font-mono text-[12px] text-ink">
-            <Sparkle size={16} weight="fill" color={stop.accent} />
-            Stay put. Unlocking.
+        <div className="mt-4">
+          <div className="flex items-center justify-between font-grotesk text-[11px] uppercase tracking-[0.25em]">
+            <span className="text-acid">Stay put. Unlocking.</span>
+            <span className="text-label-2">
+              {Math.round(dwellProgress * 100)}%
+            </span>
           </div>
-          <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-ink/10">
+          <div className="mt-2 h-[2px] w-full bg-white/10">
             <motion.div
-              className="h-full rounded-full"
-              style={{ backgroundColor: stop.accent }}
+              className="h-full bg-acid shadow-[0_0_24px_rgba(204,255,0,0.25)]"
               initial={false}
               animate={{ width: `${Math.round(dwellProgress * 100)}%` }}
               transition={{ ease: 'linear', duration: 0.2 }}
@@ -358,28 +405,27 @@ function DistanceCard({
           </div>
           {dwellProgress >= 1 && (
             <motion.button
-              initial={{ scale: 0.92, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 140, damping: 20 }}
               onClick={onPlay}
-              className="mt-3 w-full rounded-xl px-4 py-3 font-display text-[15px] uppercase tracking-[0.06em] text-white"
-              style={{ backgroundColor: stop.accent }}
+              className="mt-4 w-full bg-acid px-4 py-3.5 font-jost text-[15px] font-bold uppercase tracking-[0.08em] text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]"
             >
               Play the story
             </motion.button>
           )}
         </div>
       ) : (
-        <div className="mt-3">
-          <div className="h-2.5 overflow-hidden rounded-full bg-ink/10">
+        <div className="mt-4">
+          <div className="h-[2px] w-full bg-white/10">
             <motion.div
-              className="h-full rounded-full"
-              style={{ backgroundColor: stop.accent }}
+              className="h-full bg-acid"
               initial={false}
               animate={{ width: `${Math.round(fill * 100)}%` }}
-              transition={{ type: 'spring', stiffness: 60, damping: 20 }}
+              transition={{ type: 'spring', stiffness: 50, damping: 22 }}
             />
           </div>
-          <p className="mt-2 font-mono text-[11px] text-smoke">
+          <p className="mt-2.5 font-grotesk text-[11px] leading-relaxed text-label-2">
             {distanceM === null
               ? permissionState === 'denied'
                 ? 'Location is off. Turn it on to unlock stops as you walk.'
@@ -392,7 +438,7 @@ function DistanceCard({
   )
 }
 
-function StopCard({
+function StopRow({
   stop,
   banked,
   unlocked,
@@ -413,50 +459,47 @@ function StopCard({
         hidden: { opacity: 0, y: 18 },
         show: { opacity: 1, y: 0 },
       }}
+      transition={{ type: 'spring', stiffness: 120, damping: 22 }}
+      className="border-b border-white/10 first:border-t"
     >
       <button
         onClick={onOpen}
-        className="flex w-full items-center gap-3 rounded-2xl border border-ink/10 bg-white p-3 text-left shadow-sm"
+        className="flex w-full items-center gap-4 py-4 text-left"
       >
-        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl">
-          <Image
-            src={stop.image}
-            alt={stop.name}
-            fill
-            sizes="56px"
-            className={`object-cover ${locked ? 'grayscale' : ''}`}
-          />
-          <span
-            className="absolute bottom-0.5 left-0.5 flex h-5 w-5 items-center justify-center rounded-full font-display text-[11px] text-white"
-            style={{ backgroundColor: locked ? '#9CA3AF' : stop.accent }}
-          >
-            {stop.position}
-          </span>
-        </div>
+        <span
+          className={`w-14 shrink-0 font-grotesk text-[44px] font-bold leading-none ${
+            isNext ? 'text-acid/40' : 'text-white/10'
+          }`}
+          aria-hidden
+        >
+          {String(stop.position).padStart(2, '0')}
+        </span>
         <div className="min-w-0 flex-1">
           <div
-            className={`truncate text-[14px] font-semibold ${
-              locked ? 'text-smoke' : 'text-ink'
+            className={`truncate font-jost text-[15px] font-bold uppercase tracking-tight ${
+              locked ? 'text-label-3' : 'text-label-1'
             }`}
           >
             {stop.name}
           </div>
-          <div className="mt-0.5 font-mono text-[11px] text-smoke">
-            {formatRuntime(stop.runtimeS)} story · {stop.rewardLabel}
+          <div className="mt-0.5 truncate font-grotesk text-[11px] text-label-2">
+            {formatRuntime(stop.runtimeS)} story ·{' '}
+            <span style={locked ? undefined : { color: stop.accent }}>
+              {stop.rewardLabel}
+            </span>
           </div>
         </div>
         <div className="shrink-0">
           {banked ? (
-            <span className="flex items-center gap-1">
-              <CheckCircle size={20} weight="fill" color={stop.accent} />
-              <BeerStein size={18} weight="fill" color={stop.accent} />
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-acid">
+              <Check size={14} weight="bold" color="#000000" />
             </span>
           ) : unlocked ? (
-            <Headphones size={20} weight="bold" color={stop.accent} />
+            <Headphones size={20} weight="bold" color="#CCFF00" />
           ) : isNext ? (
-            <ArrowRight size={20} weight="bold" color={stop.accent} />
+            <ArrowRight size={20} weight="bold" color="#CCFF00" />
           ) : (
-            <LockSimple size={18} weight="bold" color="#9CA3AF" />
+            <LockSimple size={16} weight="bold" color="rgba(255,255,255,0.3)" />
           )}
         </div>
       </button>
@@ -496,18 +539,18 @@ function StopSheet({
   return (
     <>
       <motion.div
-        className="fixed inset-0 z-40 bg-ink/40"
+        className="fixed inset-0 z-40 bg-black/70"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
       />
       <motion.div
-        className="fixed inset-x-0 bottom-0 z-50 mx-auto max-w-md overflow-hidden rounded-t-3xl bg-white"
+        className="fixed inset-x-0 bottom-0 z-50 mx-auto max-w-md overflow-hidden rounded-t-2xl border-t border-white/10 bg-night-1"
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
-        transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+        transition={{ type: 'spring', stiffness: 220, damping: 30 }}
         role="dialog"
         aria-label={stop.name}
       >
@@ -518,47 +561,43 @@ function StopSheet({
             fill
             sizes="448px"
             className="object-cover"
+            style={{ filter: 'grayscale(30%) contrast(1.05)' }}
           />
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(180deg, transparent 30%, ${stop.accent}CC)`,
-            }}
-          />
-          <span className="absolute left-4 top-4 rounded-full bg-white px-3 py-1 font-mono text-[11px] font-bold text-ink">
-            Stop {stop.position}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black" />
+          {/* Glass header chips over the venue image */}
+          <span className="absolute left-4 top-4 rounded-full border border-white/15 bg-black/40 px-3 py-1 font-grotesk text-[11px] font-bold uppercase tracking-[0.15em] text-label-1 backdrop-blur-xl">
+            Stop <span className="text-acid">{stop.position}</span>
           </span>
-          <span className="absolute right-4 top-4 rounded-full bg-ink/80 px-3 py-1 font-mono text-[11px] text-cream">
+          <span className="absolute right-4 top-4 rounded-full border border-white/15 bg-black/40 px-3 py-1 font-grotesk text-[11px] uppercase tracking-[0.15em] text-label-2 backdrop-blur-xl">
             {stateLabel}
           </span>
         </div>
         <div className="p-5 pb-8">
-          <h3 className="font-display text-2xl uppercase leading-tight text-ink">
+          <h3 className="font-jost text-2xl font-bold uppercase leading-tight tracking-tight text-label-1">
             {stop.name}
           </h3>
-          <p className="mt-0.5 text-[13px] text-smoke">{stop.subtitle}</p>
-          <div className="mt-3 flex items-center gap-2 text-[13px] text-ink">
-            <BeerStein size={18} weight="fill" color={stop.accent} />
+          <p className="mt-0.5 text-[13px] text-label-2">{stop.subtitle}</p>
+          <div className="mt-4 flex items-center gap-2 border-t border-white/10 pt-3 text-[13px] text-label-1">
+            <BeerStein size={18} weight="fill" color="#CCFF00" />
             <span className="font-medium">{stop.rewardLabel}</span>
-            <span className="font-mono text-[11px] text-smoke">
+            <span className="font-grotesk text-[11px] text-label-2">
               {stop.rewardWindow}
             </span>
           </div>
           {distance !== null && (
-            <div className="mt-2 font-mono text-[12px] text-smoke">
+            <div className="mt-2 font-grotesk text-[12px] text-label-2">
               {formatDistance(distance)}
             </div>
           )}
           {unlocked ? (
             <button
               onClick={onPlay}
-              className="mt-4 w-full rounded-xl px-4 py-3 font-display text-[15px] uppercase tracking-[0.06em] text-white"
-              style={{ backgroundColor: stop.accent }}
+              className="mt-5 w-full bg-acid px-4 py-3.5 font-jost text-[15px] font-bold uppercase tracking-[0.08em] text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]"
             >
               {banked ? 'Replay the story' : 'Play the story'}
             </button>
           ) : (
-            <p className="mt-4 rounded-xl bg-ink/5 px-4 py-3 font-mono text-[11px] text-smoke">
+            <p className="mt-5 border border-white/10 bg-night-3/80 px-4 py-3 font-grotesk text-[11px] leading-relaxed text-label-2">
               {isNext
                 ? 'Walk to the venue and the story unlocks itself.'
                 : 'Locked until you arrive. The route knows the way.'}

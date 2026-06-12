@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import {
   Layer,
   Map,
@@ -9,7 +9,7 @@ import {
   type MapRef,
 } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { CheckCircle, Crosshair, LockSimple } from '@phosphor-icons/react'
+import { Check, Crosshair, LockSimple } from '@phosphor-icons/react'
 import type { TourStop } from '@/lib/tour/launchRoute'
 import type { GeoPosition } from '@/lib/geo/useGeofence'
 
@@ -22,8 +22,8 @@ export interface TourMapProps {
   onSelectStop: (stop: TourStop) => void
 }
 
-const MAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty'
-const LOCKED_GREY = '#9CA3AF'
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+const ACID = '#CCFF00'
 
 export default function TourMap({
   stops,
@@ -70,6 +70,33 @@ export default function TourMap({
     })
   }
 
+  // Mute the stock Carto labels and road contrast so the basemap recedes
+  // and the acid route reads as the brightest thing on the canvas.
+  const handleLoad = useCallback(() => {
+    const map = mapRef.current?.getMap()
+    if (!map) return
+    try {
+      const layers = map.getStyle()?.layers ?? []
+      for (const layer of layers) {
+        try {
+          if (layer.type === 'symbol') {
+            map.setPaintProperty(layer.id, 'text-color', '#6A6A6F')
+            map.setPaintProperty(layer.id, 'text-halo-color', '#000000')
+          } else if (
+            layer.type === 'line' &&
+            /road|street|highway|motorway|bridge|tunnel/i.test(layer.id)
+          ) {
+            map.setPaintProperty(layer.id, 'line-opacity', 0.5)
+          }
+        } catch {
+          // Layer ids and paint props vary by style version. Skip silently.
+        }
+      }
+    } catch {
+      // Style not ready or shape changed. The stock dark style still works.
+    }
+  }, [])
+
   return (
     <div className="relative h-full w-full">
       <Map
@@ -80,16 +107,28 @@ export default function TourMap({
           fitBoundsOptions: { padding: 56 },
         }}
         style={{ width: '100%', height: '100%' }}
+        attributionControl={{ compact: true }}
+        onLoad={handleLoad}
       >
         <Source id="cc-route" type="geojson" data={routeLine}>
+          {/* Glow underlay */}
+          <Layer
+            id="cc-route-glow"
+            type="line"
+            layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+            paint={{
+              'line-color': ACID,
+              'line-width': 10,
+              'line-opacity': 0.12,
+            }}
+          />
           <Layer
             id="cc-route-line"
             type="line"
             layout={{ 'line-cap': 'round', 'line-join': 'round' }}
             paint={{
-              'line-color': '#D8432F',
-              'line-width': 4,
-              'line-opacity': 0.7,
+              'line-color': ACID,
+              'line-width': 3,
             }}
           />
         </Source>
@@ -99,7 +138,6 @@ export default function TourMap({
           const unlocked = unlockedStops.includes(stop.position)
           const isNext = stop.position === nextPosition
           const locked = !banked && !unlocked && !isNext
-          const background = locked ? LOCKED_GREY : stop.accent
 
           return (
             <Marker
@@ -114,13 +152,20 @@ export default function TourMap({
             >
               <button
                 aria-label={`Stop ${stop.position}: ${stop.name}`}
-                className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white font-display text-[13px] text-white shadow-md"
-                style={{ backgroundColor: background }}
+                className={`relative flex h-8 w-8 items-center justify-center rounded-full font-grotesk text-[13px] font-bold ${
+                  banked
+                    ? 'bg-acid text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]'
+                    : isNext
+                      ? 'cc-next-ring border-2 border-acid bg-black text-acid shadow-[0_0_24px_rgba(204,255,0,0.25)]'
+                      : unlocked
+                        ? 'border-2 border-acid/60 bg-black text-acid'
+                        : 'border-2 border-white/20 bg-black text-label-2'
+                }`}
               >
                 {banked ? (
-                  <CheckCircle size={17} weight="fill" />
+                  <Check size={15} weight="bold" />
                 ) : locked ? (
-                  <LockSimple size={14} weight="bold" />
+                  <LockSimple size={13} weight="bold" />
                 ) : (
                   stop.position
                 )}
@@ -137,7 +182,7 @@ export default function TourMap({
           >
             <div className="relative flex items-center justify-center">
               <span
-                className="absolute rounded-full bg-electric/10"
+                className="absolute rounded-full bg-acid/10"
                 style={{
                   width: Math.min(120, Math.max(28, userPosition.accuracy)),
                   height: Math.min(120, Math.max(28, userPosition.accuracy)),
@@ -153,9 +198,9 @@ export default function TourMap({
         onClick={recenter}
         disabled={!userPosition}
         aria-label="Recenter on your location"
-        className="absolute bottom-3 right-3 flex h-11 w-11 items-center justify-center rounded-full bg-white text-ink shadow-lg disabled:opacity-40"
+        className="absolute bottom-3 right-3 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/40 backdrop-blur-xl disabled:opacity-40"
       >
-        <Crosshair size={22} weight="bold" color="#2563EB" />
+        <Crosshair size={22} weight="bold" color={ACID} />
       </button>
     </div>
   )
