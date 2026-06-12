@@ -20,6 +20,9 @@ dist/
 tsconfig.tsbuildinfo
 *.tsbuildinfo
 
+# Claude Code internals
+.claude/
+
 # Misc
 .DS_Store
 *.pem
