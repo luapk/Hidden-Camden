@@ -7,8 +7,8 @@ import {
   real,
   uniqueIndex,
   index,
-  sql,
 } from 'drizzle-orm/pg-core'
+import { relations, sql } from 'drizzle-orm'
 
 // ---------------------------------------------------------------------------
 // venues
@@ -226,3 +226,50 @@ export type StaffUser = typeof staffUsers.$inferSelect
 export type NewStaffUser = typeof staffUsers.$inferInsert
 export type RedemptionDenial = typeof redemptionDenials.$inferSelect
 export type NewRedemptionDenial = typeof redemptionDenials.$inferInsert
+
+// ---------------------------------------------------------------------------
+// Relations (required for db.query relational API)
+// ---------------------------------------------------------------------------
+export const venuesRelations = relations(venues, ({ many }) => ({
+  rewards: many(rewards),
+  routeStops: many(routeStops),
+  staffUsers: many(staffUsers),
+  redemptions: many(redemptions),
+}))
+
+export const sponsorsRelations = relations(sponsors, ({ many }) => ({
+  rewards: many(rewards),
+}))
+
+export const rewardsRelations = relations(rewards, ({ one, many }) => ({
+  venue: one(venues, { fields: [rewards.venue_id], references: [venues.id] }),
+  sponsor: one(sponsors, { fields: [rewards.sponsor_id], references: [sponsors.id] }),
+  vouchers: many(vouchers),
+}))
+
+export const routesRelations = relations(routes, ({ many }) => ({
+  routeStops: many(routeStops),
+}))
+
+export const routeStopsRelations = relations(routeStops, ({ one, many }) => ({
+  route: one(routes, { fields: [routeStops.route_id], references: [routes.id] }),
+  venue: one(venues, { fields: [routeStops.venue_id], references: [venues.id] }),
+  vouchers: many(vouchers),
+}))
+
+export const vouchersRelations = relations(vouchers, ({ one, many }) => ({
+  reward: one(rewards, { fields: [vouchers.reward_id], references: [rewards.id] }),
+  routeStop: one(routeStops, { fields: [vouchers.route_stop_id], references: [routeStops.id] }),
+  redemptions: many(redemptions),
+}))
+
+export const redemptionsRelations = relations(redemptions, ({ one }) => ({
+  voucher: one(vouchers, { fields: [redemptions.voucher_id], references: [vouchers.id] }),
+  venue: one(venues, { fields: [redemptions.venue_id], references: [venues.id] }),
+}))
+
+export const staffUsersRelations = relations(staffUsers, ({ one }) => ({
+  venue: one(venues, { fields: [staffUsers.venue_id], references: [venues.id] }),
+}))
+
+export const redemptionDenialsRelations = relations(redemptionDenials, ({ }) => ({}))
