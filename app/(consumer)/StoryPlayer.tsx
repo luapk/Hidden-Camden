@@ -15,7 +15,9 @@ import {
 } from '@phosphor-icons/react'
 import type { TourStop } from '@/lib/tour/launchRoute'
 import { isPaywalled } from '@/lib/tour/useTourProgress'
+import { VENUE_POSTERS } from '@/lib/tour/venuePosters'
 import Paywall from './Paywall'
+import PosterCarousel from './PosterCarousel'
 
 function clock(s: number): string {
   if (!Number.isFinite(s) || s < 0) s = 0
@@ -275,6 +277,14 @@ function StoryBody({
             )}
           </AnimatePresence>
         </div>
+
+        {/* Who played here — poster carousel */}
+        {VENUE_POSTERS[stop.position] && (
+          <PosterCarousel
+            posters={VENUE_POSTERS[stop.position]}
+            accent={stop.accent}
+          />
+        )}
 
         {/* The bank moment */}
         <AnimatePresence>
