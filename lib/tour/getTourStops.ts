@@ -48,6 +48,7 @@ export async function getTourStops(): Promise<TourStop[]> {
         accent: STOP_ACCENTS[i % STOP_ACCENTS.length],
         image: fallback?.image ?? STOP_IMAGES[i % STOP_IMAGES.length],
         transcript: stop.transcript ?? fallback?.transcript ?? '',
+        linkAudioUrl: stop.link_audio_url ?? fallback?.linkAudioUrl ?? null,
         audioUrl: stop.audio_url,
       }
     })
