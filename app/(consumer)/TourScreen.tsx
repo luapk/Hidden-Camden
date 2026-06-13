@@ -105,7 +105,15 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     arrive(nextStop)
   }, [geo.triggered, nextStop, paid, arrive])
 
+  const [searchSim, setSearchSim] = useState(false)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setSearchSim(new URLSearchParams(window.location.search).has('sim'))
+    }
+  }, [])
+
   const simEnabled =
+    searchSim ||
     process.env.NEXT_PUBLIC_GEO_SIM === 'true' ||
     geo.permissionState === 'denied'
 
