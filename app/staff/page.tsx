@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { redemptions, rewards, vouchers } from '@/lib/db/schema'
 import { getStaffContext } from '@/lib/staff/auth'
 import StaffControls from './StaffControls'
+import LiveRefresh from './LiveRefresh'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,17 +19,20 @@ export default async function StaffTodayPage() {
 
   if (!ctx) {
     return (
-      <main className="pt-12 text-center">
-        <h2 className="font-display text-2xl uppercase tracking-tight">
+      <main className="pt-14 text-center">
+        <div className="font-grotesk text-[10px] uppercase tracking-[0.35em] text-acid">
+          Staff access
+        </div>
+        <h2 className="mt-2 font-jost text-2xl font-bold uppercase tracking-tight text-label-1">
           Sign in with your venue email
         </h2>
-        <p className="mt-3 text-sm text-smoke">
+        <p className="mt-3 text-sm leading-relaxed text-label-2">
           Staff access works by magic link. Use the email your manager
           registered with Camden Crawl.
         </p>
         <Link
           href="/api/auth/signin"
-          className="mt-6 inline-block rounded-md bg-cream px-6 py-3 font-display text-[15px] uppercase tracking-[0.08em] text-ink"
+          className="mt-6 inline-block bg-acid px-6 py-3 font-jost text-[15px] font-bold uppercase tracking-[0.08em] text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]"
         >
           Sign in
         </Link>
@@ -67,37 +71,76 @@ export default async function StaffTodayPage() {
 
   const tornByReward = new Map(tornCounts.map((r) => [r.rewardId, r.cnt]))
   const now = new Date()
+  const tornToday = tornCounts.reduce((sum, r) => sum + r.cnt, 0)
 
   return (
     <main>
+      {/* Live status + day total */}
+      <div className="mt-5 flex items-center justify-between">
+        <LiveRefresh />
+        <div
+          className="font-grotesk leading-none"
+          aria-label={`${tornToday} poured today`}
+        >
+          <span className="text-3xl font-bold text-acid">
+            {String(tornToday).padStart(2, '0')}
+          </span>
+          <span className="ml-1.5 text-[11px] uppercase tracking-[0.2em] text-label-3">
+            poured today
+          </span>
+        </div>
+      </div>
+
       {/* Today's pours vs cap, per reward */}
-      <section className="mt-6">
-        <h2 className="font-mono text-[11px] uppercase tracking-[0.3em] text-smoke">
+      <section className="mt-7">
+        <h2 className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-label-2">
           Today
         </h2>
         {venueRewards.length === 0 && (
-          <p className="mt-3 text-sm text-smoke">
+          <p className="mt-3 text-sm text-label-2">
             No rewards set up for this venue yet.
           </p>
         )}
-        <div className="mt-3 space-y-4">
+        <div className="mt-4 space-y-5">
           {venueRewards.map((reward) => {
             const torn = tornByReward.get(reward.id) ?? 0
             const pct = Math.min(100, (torn / reward.daily_cap) * 100)
+            const capped = torn >= reward.daily_cap
+            const paused = reward.kill_switch
             return (
               <div key={reward.id}>
-                <div className="flex items-baseline justify-between">
-                  <span className="text-sm text-cream">{reward.sku_label}</span>
-                  <span className="font-mono text-[12px] text-brass">
-                    {torn} of {reward.daily_cap} poured
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="truncate text-sm text-label-1">
+                    {reward.sku_label}
+                  </span>
+                  <span className="shrink-0 font-grotesk text-[12px] text-label-2">
+                    <span
+                      className={
+                        capped
+                          ? 'text-camden'
+                          : paused
+                            ? 'text-label-3'
+                            : 'text-acid'
+                      }
+                    >
+                      {torn}
+                    </span>{' '}
+                    of {reward.daily_cap}
                   </span>
                 </div>
-                <div className="mt-1.5 h-1 overflow-hidden rounded bg-cream/10">
+                <div className="mt-1.5 h-[3px] w-full overflow-hidden bg-white/10">
                   <div
-                    className="h-full bg-brass"
+                    className={`h-full transition-[width] duration-500 ${
+                      capped ? 'bg-camden' : paused ? 'bg-label-3' : 'bg-acid'
+                    }`}
                     style={{ width: `${pct}%` }}
                   />
                 </div>
+                {(capped || paused) && (
+                  <div className="mt-1 font-grotesk text-[10px] uppercase tracking-[0.15em] text-label-3">
+                    {paused ? 'Paused' : 'Cap reached for today'}
+                  </div>
+                )}
               </div>
             )
           })}
@@ -105,14 +148,12 @@ export default async function StaffTodayPage() {
       </section>
 
       {/* Live feed */}
-      <section className="mt-8">
-        <h2 className="font-mono text-[11px] uppercase tracking-[0.3em] text-smoke">
+      <section className="mt-9">
+        <h2 className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-label-2">
           Live feed
         </h2>
         {feed.length === 0 ? (
-          <p className="mt-3 text-sm text-smoke">
-            Nothing yet today. Reload to refresh.
-          </p>
+          <p className="mt-3 text-sm text-label-2">Nothing yet today.</p>
         ) : (
           <table className="mt-3 w-full text-left">
             <tbody>
@@ -124,22 +165,22 @@ export default async function StaffTodayPage() {
                     : 'live'
                 const when = r.torn_at ?? r.code_issued_at
                 return (
-                  <tr key={r.id} className="border-b border-cream/10">
-                    <td className="py-2 pr-3 font-mono text-[12px] text-smoke">
+                  <tr key={r.id} className="border-b border-white/10">
+                    <td className="py-2.5 pr-3 font-grotesk text-[12px] text-label-3">
                       {hhmm(when)}
                     </td>
-                    <td className="py-2 pr-3 text-sm text-cream">
+                    <td className="py-2.5 pr-3 text-sm text-label-1">
                       {r.voucher.reward.sku_label}
                     </td>
-                    <td className="py-2 text-right font-mono text-[11px] uppercase tracking-[0.15em]">
+                    <td className="py-2.5 text-right">
                       <span
-                        className={
+                        className={`font-grotesk text-[10px] uppercase tracking-[0.2em] ${
                           status === 'torn'
-                            ? 'text-brass'
+                            ? 'text-acid'
                             : status === 'live'
-                              ? 'text-camden'
-                              : 'text-smoke'
-                        }
+                              ? 'text-label-1'
+                              : 'text-label-3'
+                        }`}
                       >
                         {status}
                       </span>
@@ -150,14 +191,11 @@ export default async function StaffTodayPage() {
             </tbody>
           </table>
         )}
-        <p className="mt-2 font-mono text-[10px] text-smoke">
-          Reload the page for the latest.
-        </p>
       </section>
 
       {/* Controls */}
-      <section className="mt-8">
-        <h2 className="font-mono text-[11px] uppercase tracking-[0.3em] text-smoke">
+      <section className="mt-9">
+        <h2 className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-label-2">
           Controls
         </h2>
         <StaffControls

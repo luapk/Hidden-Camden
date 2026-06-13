@@ -63,16 +63,16 @@ function RewardRow({ reward }: { reward: RewardControl }) {
   }
 
   return (
-    <div className="rounded-lg border border-cream/10 p-4">
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-cream">{reward.skuLabel}</span>
+    <div className="border border-white/10 bg-night-2 p-4">
+      <div className="flex items-center justify-between gap-3">
+        <span className="truncate text-sm text-label-1">{reward.skuLabel}</span>
         <button
           onClick={toggleKill}
           disabled={busy}
-          className={`rounded px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.15em] disabled:opacity-50 ${
+          className={`shrink-0 px-3 py-1.5 font-grotesk text-[10px] uppercase tracking-[0.15em] disabled:opacity-50 ${
             reward.killSwitch
               ? 'bg-camden text-white'
-              : 'bg-cream/10 text-cream'
+              : 'border border-white/15 text-label-1'
           }`}
         >
           {reward.killSwitch ? 'Paused. Tap to resume' : 'Kill switch'}
@@ -81,29 +81,29 @@ function RewardRow({ reward }: { reward: RewardControl }) {
 
       <div className="mt-4 flex items-end gap-2">
         <label className="block">
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-smoke">
+          <span className="font-grotesk text-[9px] uppercase tracking-[0.2em] text-label-3">
             From
           </span>
           <input
             type="time"
             value={windowStart}
             onChange={(e) => setWindowStart(e.target.value)}
-            className="mt-1 block w-full rounded border border-cream/20 bg-ink px-2 py-1.5 font-mono text-[13px] text-cream"
+            className="mt-1 block w-full border border-white/15 bg-night px-2 py-1.5 font-grotesk text-[13px] text-label-1"
           />
         </label>
         <label className="block">
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-smoke">
+          <span className="font-grotesk text-[9px] uppercase tracking-[0.2em] text-label-3">
             To
           </span>
           <input
             type="time"
             value={windowEnd}
             onChange={(e) => setWindowEnd(e.target.value)}
-            className="mt-1 block w-full rounded border border-cream/20 bg-ink px-2 py-1.5 font-mono text-[13px] text-cream"
+            className="mt-1 block w-full border border-white/15 bg-night px-2 py-1.5 font-grotesk text-[13px] text-label-1"
           />
         </label>
         <label className="block w-20">
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-smoke">
+          <span className="font-grotesk text-[9px] uppercase tracking-[0.2em] text-label-3">
             Cap
           </span>
           <input
@@ -112,22 +112,22 @@ function RewardRow({ reward }: { reward: RewardControl }) {
             step={1}
             value={dailyCap}
             onChange={(e) => setDailyCap(e.target.value)}
-            className="mt-1 block w-full rounded border border-cream/20 bg-ink px-2 py-1.5 font-mono text-[13px] text-cream"
+            className="mt-1 block w-full border border-white/15 bg-night px-2 py-1.5 font-grotesk text-[13px] text-label-1"
           />
         </label>
         <button
           onClick={saveSettings}
           disabled={busy}
-          className="rounded bg-cream px-3 py-2 font-mono text-[11px] uppercase tracking-[0.15em] text-ink disabled:opacity-50"
+          className="bg-acid px-3 py-2 font-grotesk text-[10px] font-bold uppercase tracking-[0.15em] text-black disabled:opacity-50"
         >
           Save
         </button>
       </div>
-      <p className="mt-2 font-mono text-[10px] text-smoke">
+      <p className="mt-2 font-grotesk text-[10px] leading-relaxed text-label-3">
         Takes effect on the next code, not codes already on screen.
       </p>
       {error && (
-        <p className="mt-2 font-mono text-[11px] text-camden">{error}</p>
+        <p className="mt-2 font-grotesk text-[11px] text-camden">{error}</p>
       )}
     </div>
   )
@@ -164,14 +164,14 @@ function PinControl({ pinRequired }: { pinRequired: boolean }) {
   }
 
   return (
-    <div className="rounded-lg border border-cream/10 p-4">
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-cream">Staff PIN on tear</span>
+    <div className="border border-white/10 bg-night-2 p-4">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-sm text-label-1">Staff PIN on tear</span>
         {pinRequired ? (
           <button
             onClick={turnOff}
             disabled={busy}
-            className="rounded bg-brass px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.15em] text-ink disabled:opacity-50"
+            className="shrink-0 bg-acid px-3 py-1.5 font-grotesk text-[10px] font-bold uppercase tracking-[0.15em] text-black disabled:opacity-50"
           >
             On. Tap to turn off
           </button>
@@ -179,7 +179,7 @@ function PinControl({ pinRequired }: { pinRequired: boolean }) {
           <button
             onClick={() => setEnteringPin((v) => !v)}
             disabled={busy}
-            className="rounded bg-cream/10 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.15em] text-cream disabled:opacity-50"
+            className="shrink-0 border border-white/15 px-3 py-1.5 font-grotesk text-[10px] uppercase tracking-[0.15em] text-label-1 disabled:opacity-50"
           >
             Off. Tap to turn on
           </button>
@@ -198,19 +198,19 @@ function PinControl({ pinRequired }: { pinRequired: boolean }) {
             value={pin}
             onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
             aria-label="New staff PIN"
-            className="w-28 rounded border border-cream/20 bg-ink px-2 py-1.5 text-center font-mono text-[15px] tracking-[0.3em] text-cream"
+            className="w-28 border border-white/15 bg-night px-2 py-1.5 text-center font-grotesk text-[15px] tracking-[0.3em] text-label-1"
           />
           <button
             onClick={turnOn}
             disabled={pin.length !== 4 || busy}
-            className="rounded bg-cream px-3 py-2 font-mono text-[11px] uppercase tracking-[0.15em] text-ink disabled:opacity-50"
+            className="bg-acid px-3 py-2 font-grotesk text-[10px] font-bold uppercase tracking-[0.15em] text-black disabled:opacity-50"
           >
             Set PIN
           </button>
         </div>
       )}
       {error && (
-        <p className="mt-2 font-mono text-[11px] text-camden">{error}</p>
+        <p className="mt-2 font-grotesk text-[11px] text-camden">{error}</p>
       )}
     </div>
   )
