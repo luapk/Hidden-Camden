@@ -1,5 +1,6 @@
 import { eq } from 'drizzle-orm'
 import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { rewards, staffUsers } from '@/lib/db/schema'
 import type { StaffUser, Venue } from '@/lib/db/schema'
@@ -15,7 +16,7 @@ export type StaffAuthResult =
 
 async function sessionEmail(): Promise<string | null> {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     return session?.user?.email ?? null
   } catch {
     // Auth not configured (e.g. local dev without NEXTAUTH_SECRET)

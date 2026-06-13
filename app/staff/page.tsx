@@ -31,7 +31,7 @@ export default async function StaffTodayPage() {
           registered with Camden Crawl.
         </p>
         <Link
-          href="/api/auth/signin"
+          href="/staff/signin"
           className="mt-6 inline-block bg-acid px-6 py-3 font-jost text-[15px] font-bold uppercase tracking-[0.08em] text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]"
         >
           Sign in

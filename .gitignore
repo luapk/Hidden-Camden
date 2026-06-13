@@ -31,5 +31,4 @@ yarn-debug.log*
 yarn-error.log*
 .vercel
 
-# Drizzle generated
-drizzle/
+# Drizzle generated files are committed so migrations can run in CI/Vercel

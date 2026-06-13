@@ -1,4 +1,5 @@
 import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
 export type AdminContext = { email: string }
 export type AdminError = { error: string; status: number }
@@ -11,7 +12,7 @@ export async function requireAdmin(): Promise<AdminContext | AdminError> {
   type SessionShape = { user?: { email?: string | null } } | null
   let session: SessionShape = null
   try {
-    session = (await getServerSession()) as SessionShape
+    session = (await getServerSession(authOptions)) as SessionShape
   } catch {
     // NextAuth not configured in this environment
   }

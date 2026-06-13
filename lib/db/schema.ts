@@ -7,8 +7,11 @@ import {
   real,
   uniqueIndex,
   index,
+  primaryKey,
 } from 'drizzle-orm/pg-core'
 import { relations, sql } from 'drizzle-orm'
+
+type AdapterAccountType = 'oauth' | 'email' | 'credentials' | 'oidc'
 
 // ---------------------------------------------------------------------------
 // venues
@@ -219,6 +222,61 @@ export const redemptionDenials = pgTable('redemption_denials', {
   device_hash: text('device_hash'),
   denied_at: timestamp('denied_at').defaultNow().notNull(),
 })
+
+// ---------------------------------------------------------------------------
+// NextAuth tables (required by @auth/drizzle-adapter)
+// ---------------------------------------------------------------------------
+export const authUsers = pgTable('auth_users', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text('name'),
+  email: text('email').notNull().unique(),
+  emailVerified: timestamp('emailVerified', { mode: 'date' }),
+  image: text('image'),
+})
+
+export const authAccounts = pgTable(
+  'auth_accounts',
+  {
+    userId: text('userId')
+      .notNull()
+      .references(() => authUsers.id, { onDelete: 'cascade' }),
+    type: text('type').$type<AdapterAccountType>().notNull(),
+    provider: text('provider').notNull(),
+    providerAccountId: text('providerAccountId').notNull(),
+    refresh_token: text('refresh_token'),
+    access_token: text('access_token'),
+    expires_at: integer('expires_at'),
+    token_type: text('token_type'),
+    scope: text('scope'),
+    id_token: text('id_token'),
+    session_state: text('session_state'),
+  },
+  (account) => ({
+    pk: primaryKey({ columns: [account.provider, account.providerAccountId] }),
+  }),
+)
+
+export const authSessions = pgTable('auth_sessions', {
+  sessionToken: text('sessionToken').primaryKey(),
+  userId: text('userId')
+    .notNull()
+    .references(() => authUsers.id, { onDelete: 'cascade' }),
+  expires: timestamp('expires', { mode: 'date' }).notNull(),
+})
+
+export const authVerificationTokens = pgTable(
+  'auth_verification_tokens',
+  {
+    identifier: text('identifier').notNull(),
+    token: text('token').notNull(),
+    expires: timestamp('expires', { mode: 'date' }).notNull(),
+  },
+  (vt) => ({
+    pk: primaryKey({ columns: [vt.identifier, vt.token] }),
+  }),
+)
 
 // ---------------------------------------------------------------------------
 // Type exports
