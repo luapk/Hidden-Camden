@@ -74,7 +74,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     nextStop
       ? { lat: nextStop.lat, lng: nextStop.lng, radiusM: nextStop.radiusM }
       : null,
-    8_000,
+    5_000,
     override,
   )
 
