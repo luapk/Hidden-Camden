@@ -107,6 +107,7 @@ export async function POST(req: Request) {
     const result = await put(`audio/${file.filename}`, audioBuffer, {
       access: 'public',
       contentType: 'audio/mpeg',
+      addRandomSuffix: false,
     })
     url = result.url
   } catch (e) {
