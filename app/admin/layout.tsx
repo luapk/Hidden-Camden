@@ -35,6 +35,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <a href="/admin/routes" className="hover:text-cream transition-colors">Routes</a>
           <a href="/admin/vouchers" className="hover:text-cream transition-colors">Vouchers</a>
           <a href="/admin/redemptions" className="hover:text-cream transition-colors">Redemptions</a>
+          <a href="/admin/generate-audio" className="hover:text-cream transition-colors">Audio</a>
         </nav>
         <span className="ml-auto text-xs text-smoke" style={{ fontFamily: 'var(--font-courier, monospace)' }}>
           {ctx.email}
