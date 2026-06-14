@@ -336,6 +336,13 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
             Simulate arrival
           </button>
         )}
+        {simEnabled && geo.position && (
+          <p className="mt-1 font-mono text-[10px] text-label-3">
+            GPS {geo.position.lat.toFixed(6)}, {geo.position.lng.toFixed(6)} ±{Math.round(geo.position.accuracy)}m
+            {geo.distanceM !== null && ` · ${Math.round(geo.distanceM)}m from stop`}
+            {geo.lowAccuracy && ' · LOW ACC'}
+          </p>
+        )}
       </div>
 
       {/* Stop list */}
