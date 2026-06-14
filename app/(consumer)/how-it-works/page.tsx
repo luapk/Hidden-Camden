@@ -119,7 +119,7 @@ export default function HowItWorksPage() {
           offline? The answers are short and unapologetic.
         </p>
         <Link
-          href="/help"
+          href="/settings"
           className="mt-3 inline-flex items-center gap-1.5 font-grotesk text-[12px] uppercase tracking-[0.15em] text-acid"
         >
           Read the FAQ

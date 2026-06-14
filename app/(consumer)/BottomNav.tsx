@@ -6,8 +6,8 @@ import { motion } from 'framer-motion'
 import {
   BeerStein,
   BookOpen,
+  GearSix,
   MapPin,
-  Question,
   Wallet,
   type Icon,
 } from '@phosphor-icons/react'
@@ -23,7 +23,7 @@ const ITEMS: NavItem[] = [
   { href: '/wallet', label: 'Wallet', icon: Wallet },
   { href: '/rewards', label: 'Rewards', icon: BeerStein },
   { href: '/how-it-works', label: 'Guide', icon: BookOpen },
-  { href: '/help', label: 'Help', icon: Question },
+  { href: '/settings', label: 'Settings', icon: GearSix },
 ]
 
 export default function BottomNav() {

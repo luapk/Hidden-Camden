@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { CaretDown, Globe, Waveform } from '@phosphor-icons/react'
+import { LANGUAGES, useLanguage } from '@/lib/tour/language'
 
-const LANGS = ['English', 'Français', 'Deutsch', 'Español', 'Italiano']
 const VOICES = ['North London', 'RP', 'Cockney legend']
 
 const FAQS: { q: string; a: string }[] = [
@@ -34,32 +34,21 @@ const FAQS: { q: string; a: string }[] = [
   },
 ]
 
-export default function HelpPage() {
-  const [lang, setLang] = useState(LANGS[0])
+export default function SettingsPage() {
+  const { lang, setLang, hydrated } = useLanguage()
   const [voice, setVoice] = useState(VOICES[0])
-  const [hydrated, setHydrated] = useState(false)
+  const [voiceHydrated, setVoiceHydrated] = useState(false)
   const [open, setOpen] = useState<number | null>(null)
 
   useEffect(() => {
     try {
-      const storedLang = localStorage.getItem('cc-lang')
       const storedVoice = localStorage.getItem('cc-voice')
-      if (storedLang && LANGS.includes(storedLang)) setLang(storedLang)
       if (storedVoice && VOICES.includes(storedVoice)) setVoice(storedVoice)
     } catch {
       /* fine, defaults stand */
     }
-    setHydrated(true)
+    setVoiceHydrated(true)
   }, [])
-
-  const pickLang = (value: string) => {
-    setLang(value)
-    try {
-      localStorage.setItem('cc-lang', value)
-    } catch {
-      /* ignore */
-    }
-  }
 
   const pickVoice = (value: string) => {
     setVoice(value)
@@ -74,42 +63,41 @@ export default function HelpPage() {
     <main>
       <header>
         <div className="font-grotesk text-[10px] uppercase tracking-[0.35em] text-acid">
-          Help
+          Settings
         </div>
         <h1 className="mt-2 font-jost text-4xl font-bold uppercase leading-[0.95] tracking-tight text-label-1">
-          Sort it out
+          Your tour, your way
         </h1>
       </header>
 
       {/* Settings card */}
       <section className="mt-6 border border-white/10 bg-night-2 p-4">
-        <h2 className="font-jost text-lg font-bold uppercase tracking-tight text-label-1">
-          Your tour, your way
-        </h2>
-
-        <div className="mt-4">
+        <div>
           <div className="flex items-center gap-1.5 font-grotesk text-[11px] uppercase tracking-[0.25em] text-label-2">
             <Globe size={14} weight="bold" />
             Language
           </div>
           <div className="mt-2.5 flex flex-wrap gap-2">
-            {LANGS.map((l) => {
-              const active = hydrated && l === lang
+            {LANGUAGES.map((l) => {
+              const active = hydrated && l.code === lang
               return (
                 <button
-                  key={l}
-                  onClick={() => pickLang(l)}
+                  key={l.code}
+                  onClick={() => setLang(l.code)}
                   className={`rounded-full border px-3 py-1.5 text-[12.5px] font-medium transition-colors ${
                     active
                       ? 'border-acid bg-acid text-black'
                       : 'border-white/10 bg-night-3 text-label-1'
                   }`}
                 >
-                  {l}
+                  {l.label}
                 </button>
               )
             })}
           </div>
+          <p className="mt-2.5 font-grotesk text-[10.5px] text-label-3">
+            Switches the narration for every stop. More languages landing soon.
+          </p>
         </div>
 
         <div className="mt-5">
@@ -119,7 +107,7 @@ export default function HelpPage() {
           </div>
           <div className="mt-2.5 flex flex-wrap gap-2">
             {VOICES.map((v) => {
-              const active = hydrated && v === voice
+              const active = voiceHydrated && v === voice
               return (
                 <button
                   key={v}
@@ -136,10 +124,6 @@ export default function HelpPage() {
             })}
           </div>
         </div>
-
-        <p className="mt-4 font-grotesk text-[10.5px] text-label-3">
-          More languages landing soon.
-        </p>
       </section>
 
       {/* FAQ accordion */}

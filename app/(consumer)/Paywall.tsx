@@ -63,7 +63,7 @@ export default function Paywall({
 
         <div className="mt-6 flex items-baseline gap-3">
           <span className="font-grotesk text-5xl font-bold tracking-tight text-label-1">
-            £4.99
+            £3.99
           </span>
           <span className="font-grotesk text-[12px] text-label-2">
             less than the pint already in your pocket
@@ -76,7 +76,7 @@ export default function Paywall({
           }}
           className="mt-6 w-full bg-acid px-5 py-4 font-jost text-lg font-bold uppercase tracking-[0.08em] text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]"
         >
-          Unlock the last five
+          Continue tour
         </button>
 
         <p className="mt-3 text-center font-grotesk text-[11px] text-label-3">

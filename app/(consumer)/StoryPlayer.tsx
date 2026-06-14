@@ -8,12 +8,14 @@ import {
   BeerStein,
   CaretDown,
   CheckCircle,
+  NavigationArrow,
   Pause,
   Play,
   Wallet,
   X,
 } from '@phosphor-icons/react'
-import type { TourStop } from '@/lib/tour/launchRoute'
+import { directionsHref, type TourStop } from '@/lib/tour/launchRoute'
+import { localizeAudioUrl, useLanguage } from '@/lib/tour/language'
 import { isPaywalled } from '@/lib/tour/useTourProgress'
 import { VENUE_POSTERS } from '@/lib/tour/venuePosters'
 import Paywall from './Paywall'
@@ -53,7 +55,7 @@ export default function StoryPlayer({
       exit={{ y: '100%' }}
       transition={{ type: 'spring', stiffness: 220, damping: 30 }}
       role="dialog"
-      aria-label={gated ? 'Unlock the last five' : `Story: ${stop.name}`}
+      aria-label={gated ? 'Continue tour' : `Story: ${stop.name}`}
     >
       {gated ? (
         <Paywall onUnlock={onMarkPaid} onClose={onClose} />
@@ -77,6 +79,8 @@ function StoryBody({
   onBank: (position: number) => void
   onClose: () => void
 }) {
+  const { lang } = useLanguage()
+  const audioUrl = localizeAudioUrl(stop.audioUrl, lang)
   const audioRef = useRef<HTMLAudioElement>(null)
   const [audioState, setAudioState] = useState<AudioState>(
     stop.audioUrl ? 'loading' : 'none',
@@ -123,7 +127,7 @@ function StoryBody({
     setJustBanked(true)
   }
 
-  const hasAudio = !!stop.audioUrl && audioState !== 'failed'
+  const hasAudio = !!audioUrl && audioState !== 'failed'
 
   return (
     <div className="pb-10">
@@ -162,6 +166,17 @@ function StoryBody({
             {stop.name}
           </h2>
           <p className="mt-1 text-[13px] text-label-2">{stop.subtitle}</p>
+          {stop.address && (
+            <a
+              href={directionsHref(stop.name, stop.address)}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-1.5 inline-flex items-center gap-1.5 font-grotesk text-[10.5px] uppercase tracking-[0.12em] text-label-3"
+            >
+              <NavigationArrow size={11} weight="bold" color="#CCFF00" />
+              {stop.address}
+            </a>
+          )}
         </div>
         {/* Play/pause button — embedded in banner bottom-right */}
         {hasAudio && (
@@ -182,10 +197,10 @@ function StoryBody({
       </div>
 
       {/* Hidden audio element */}
-      {stop.audioUrl && (
+      {audioUrl && (
         <audio
           ref={audioRef}
-          src={stop.audioUrl}
+          src={audioUrl}
           preload="metadata"
           onCanPlay={() => setAudioState('ready')}
           onError={() => setAudioState('failed')}

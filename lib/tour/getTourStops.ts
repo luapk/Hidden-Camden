@@ -38,6 +38,7 @@ export async function getTourStops(): Promise<TourStop[]> {
         position: stop.position,
         name: stop.venue.name,
         subtitle: fallback?.subtitle ?? '',
+        address: stop.venue.address ?? fallback?.address ?? '',
         lat: stop.venue.lat,
         lng: stop.venue.lng,
         radiusM: stop.venue.geofence_radius_m,

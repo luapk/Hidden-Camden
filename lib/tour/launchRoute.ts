@@ -21,6 +21,15 @@ const AUDIO_BASE =
 
 export const INTRO_AUDIO_URL = `${AUDIO_BASE}/audio/intro.mp3`
 
+/**
+ * Deep link that opens the user's maps app navigated to the venue. We query
+ * by name + address so the maps provider geocodes the real venue, which is
+ * accurate even if our stored pin drifts a few metres.
+ */
+export function directionsHref(name: string, address: string): string {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name}, ${address}`)}`
+}
+
 function stopAudio(n: number): string {
   return `${AUDIO_BASE}/audio/stop-${String(n).padStart(2, '0')}.mp3`
 }
@@ -34,6 +43,8 @@ export interface TourStop {
   position: number
   name: string
   subtitle: string
+  /** Street address, shown discreetly and used for the directions link. */
+  address: string
   lat: number
   lng: number
   radiusM: number
@@ -77,8 +88,9 @@ export const LAUNCH_ROUTE: TourStop[] = [
     position: 1,
     name: "The World's End & The Underworld",
     subtitle: "The witch's corner",
-    lat: 51.53935,
-    lng: -0.143,
+    address: '174 Camden High St, London NW1 0NE',
+    lat: 51.53925,
+    lng: -0.14283,
     radiusM: 30,
     rewardLabel: 'House pint',
     rewardWindow: '12:00 to 17:00, daily',
@@ -100,8 +112,9 @@ export const LAUNCH_ROUTE: TourStop[] = [
     position: 2,
     name: 'Electric Ballroom',
     subtitle: "The boxer's ballroom",
-    lat: 51.53985,
-    lng: -0.1432,
+    address: '184 Camden High St, London NW1 8QP',
+    lat: 51.53976,
+    lng: -0.14358,
     radiusM: 30,
     rewardLabel: 'Club night drink voucher',
     rewardWindow: 'Thu to Sat, after 19:00',
@@ -125,8 +138,9 @@ export const LAUNCH_ROUTE: TourStop[] = [
     position: 3,
     name: 'Jazz Café',
     subtitle: 'The small room for giants',
-    lat: 51.53872,
-    lng: -0.1443,
+    address: '5 Parkway, London NW1 7PG',
+    lat: 51.53906,
+    lng: -0.14512,
     radiusM: 30,
     rewardLabel: 'Tanqueray and tonic',
     rewardWindow: '19:00 to 20:00, doors hour',
@@ -148,8 +162,9 @@ export const LAUNCH_ROUTE: TourStop[] = [
     position: 4,
     name: 'The Dublin Castle',
     subtitle: 'The lie about jazz',
-    lat: 51.53858,
-    lng: -0.14598,
+    address: '94 Parkway, London NW1 7AN',
+    lat: 51.53808,
+    lng: -0.14640,
     radiusM: 30,
     rewardLabel: 'Pint of Guinness',
     rewardWindow: '12:00 to 18:00, daily',
@@ -171,8 +186,9 @@ export const LAUNCH_ROUTE: TourStop[] = [
     position: 5,
     name: 'The Good Mixer',
     subtitle: "Britpop's living room",
-    lat: 51.53948,
-    lng: -0.14545,
+    address: '30 Inverness St, London NW1 7HJ',
+    lat: 51.53879,
+    lng: -0.14560,
     radiusM: 30,
     rewardLabel: 'Pint plus a free rack of pool',
     rewardWindow: 'Mon to Thu, 12:00 to 17:00',
@@ -194,8 +210,9 @@ export const LAUNCH_ROUTE: TourStop[] = [
     position: 6,
     name: 'The Hawley Arms',
     subtitle: 'The hiding place',
-    lat: 51.54152,
-    lng: -0.14702,
+    address: '2 Castlehaven Rd, London NW1 8QU',
+    lat: 51.54108,
+    lng: -0.14618,
     radiusM: 30,
     rewardLabel: 'House pint',
     rewardWindow: 'Mon to Thu, 12:00 to 17:00',
@@ -218,8 +235,9 @@ export const LAUNCH_ROUTE: TourStop[] = [
     position: 7,
     name: 'Dingwalls',
     subtitle: 'The night punk went overground',
-    lat: 51.54172,
-    lng: -0.14618,
+    address: 'Middle Yard, Camden Lock, London NW1 8AB',
+    lat: 51.54148,
+    lng: -0.14642,
     radiusM: 30,
     rewardLabel: 'Terrace pint plus enamel pin',
     rewardWindow: 'Before 18:00, daily',

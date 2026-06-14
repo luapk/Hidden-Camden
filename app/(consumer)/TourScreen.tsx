@@ -10,13 +10,19 @@ import {
   Check,
   Headphones,
   LockSimple,
+  NavigationArrow,
   Pause,
   Play,
 } from '@phosphor-icons/react'
 import { haversineDistance } from '@/lib/geo'
 import { useGeofence, type GeoPosition } from '@/lib/geo/useGeofence'
 import { isPaywalled, useTourProgress } from '@/lib/tour/useTourProgress'
-import { INTRO_AUDIO_URL, type TourStop } from '@/lib/tour/launchRoute'
+import {
+  INTRO_AUDIO_URL,
+  directionsHref,
+  type TourStop,
+} from '@/lib/tour/launchRoute'
+import { localizeAudioUrl, useLanguage } from '@/lib/tour/language'
 import StoryPlayer from './StoryPlayer'
 
 const TourMap = dynamic(() => import('./TourMap'), {
@@ -58,6 +64,8 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     markPaid,
   } = progress
 
+  const { lang } = useLanguage()
+
   const sorted = useMemo(
     () => [...stops].sort((a, b) => a.position - b.position),
     [stops],
@@ -82,11 +90,12 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
       const closed = prevStoryRef.current
       prevStoryRef.current = null
       const nextInRoute = sorted.find((s) => s.position === closed.position + 1)
-      if (closed.linkAudioUrl && nextInRoute) {
-        setMiniAudio({ url: closed.linkAudioUrl, label: `Walk to ${nextInRoute.name}` })
+      const linkUrl = localizeAudioUrl(closed.linkAudioUrl, lang)
+      if (linkUrl && nextInRoute) {
+        setMiniAudio({ url: linkUrl, label: `Walk to ${nextInRoute.name}` })
       }
     }
-  }, [activeStory, sorted])
+  }, [activeStory, sorted, lang])
 
   // Reward sting played the instant a new stop unlocks.
   const rewardSoundRef = useRef<HTMLAudioElement | null>(null)
@@ -242,8 +251,8 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
       {/* Intro audio — shown before first stop unlocks */}
       {hydrated && unlockedStops.length === 0 && !miniAudio && (
         <MiniPlayer
-          key="intro"
-          url={INTRO_AUDIO_URL}
+          key={`intro-${lang}`}
+          url={localizeAudioUrl(INTRO_AUDIO_URL, lang) ?? INTRO_AUDIO_URL}
           label="Introduction"
           onDismiss={() => setMiniAudio(null)}
         />
@@ -515,6 +524,17 @@ function DistanceCard({
           <div className="mt-1 truncate font-jost text-[17px] font-bold uppercase tracking-tight text-label-1">
             {stop.name}
           </div>
+          {stop.address && (
+            <a
+              href={directionsHref(stop.name, stop.address)}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-1 inline-flex items-center gap-1.5 font-grotesk text-[11px] text-label-2"
+            >
+              <NavigationArrow size={11} weight="bold" color="#CCFF00" />
+              <span className="truncate">{stop.address}</span>
+            </a>
+          )}
         </div>
         <div className="shrink-0 text-right">
           {figure ? (
@@ -733,6 +753,27 @@ function StopSheet({
             <div className="mt-2 font-grotesk text-[12px] text-label-2">
               {formatDistance(distance)}
             </div>
+          )}
+          {stop.address && (
+            <a
+              href={directionsHref(stop.name, stop.address)}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 flex items-center justify-between gap-3 border border-white/10 bg-night-3/60 px-3 py-2.5"
+            >
+              <span className="min-w-0">
+                <span className="block font-grotesk text-[9px] uppercase tracking-[0.25em] text-label-3">
+                  Address
+                </span>
+                <span className="mt-0.5 block truncate text-[12.5px] text-label-1">
+                  {stop.address}
+                </span>
+              </span>
+              <span className="flex shrink-0 items-center gap-1.5 font-grotesk text-[10px] uppercase tracking-[0.15em] text-acid">
+                <NavigationArrow size={13} weight="bold" />
+                Directions
+              </span>
+            </a>
           )}
           {unlocked ? (
             <button
