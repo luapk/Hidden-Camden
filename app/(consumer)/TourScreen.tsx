@@ -70,6 +70,27 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   const [activeStory, setActiveStory] = useState<TourStop | null>(null)
   const [selectedStop, setSelectedStop] = useState<TourStop | null>(null)
 
+  // Reward sting played the instant a new stop unlocks.
+  const rewardSoundRef = useRef<HTMLAudioElement | null>(null)
+  useEffect(() => {
+    const audio = new Audio('/sounds/reward.wav')
+    audio.preload = 'auto'
+    audio.volume = 0.7
+    rewardSoundRef.current = audio
+    return () => {
+      audio.pause()
+      rewardSoundRef.current = null
+    }
+  }, [])
+
+  const playReward = useCallback(() => {
+    const audio = rewardSoundRef.current
+    if (!audio) return
+    audio.currentTime = 0
+    // Autoplay can be blocked before any interaction; ignore that.
+    audio.play().catch(() => {})
+  }, [])
+
   const geo = useGeofence(
     nextStop
       ? { lat: nextStop.lat, lng: nextStop.lng, radiusM: nextStop.radiusM }
@@ -86,13 +107,14 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         return
       }
       setUnlockFlash(stop)
+      playReward()
       unlockStop(stop.position)
       window.setTimeout(() => {
         setUnlockFlash(null)
         setActiveStory(stop)
       }, 1500)
     },
-    [paid, unlockStop],
+    [paid, unlockStop, playReward],
   )
 
   // Geofence dwell completed: unlock the next stop (once per stop+paid state).
