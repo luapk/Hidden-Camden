@@ -8,7 +8,7 @@ export default async function GenerateAudioPage() {
   if (isAdminError(ctx)) {
     return (
       <div style={{ padding: '2rem', color: '#F0E6D2' }}>
-        <p>Not authorised. <a href="/api/auth/signin" style={{ color: '#C9933C' }}>Sign in</a></p>
+        <p>Not authorised. <a href="/admin-login" style={{ color: '#C9933C' }}>Sign in</a></p>
       </div>
     )
   }

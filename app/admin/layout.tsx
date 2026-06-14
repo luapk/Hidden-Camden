@@ -14,7 +14,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             Not authorised.
           </h1>
           <p style={{ marginTop: '1rem', color: '#8A8077' }}>
-            Sign in at <a href="/api/auth/signin" style={{ color: '#C9933C' }}>/api/auth/signin</a> with an admin email.
+            Sign in at <a href="/admin-login" style={{ color: '#C9933C' }}>/admin-login</a>.
           </p>
         </body>
       </html>
