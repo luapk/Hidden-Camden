@@ -131,7 +131,11 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
 
   const geo = useGeofence(
     nextStop
-      ? { lat: nextStop.lat, lng: nextStop.lng, radiusM: nextStop.radiusM }
+      ? {
+          lat: nextStop.fenceLat ?? nextStop.lat,
+          lng: nextStop.fenceLng ?? nextStop.lng,
+          radiusM: nextStop.radiusM,
+        }
       : null,
     5_000,
     override,

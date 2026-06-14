@@ -22,7 +22,7 @@ export interface TourMapProps {
   onSelectStop: (stop: TourStop) => void
 }
 
-const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+const MAP_STYLE = 'https://tiles.openfreemap.org/styles/dark'
 const ACID = '#CCFF00'
 
 export default function TourMap({
@@ -83,16 +83,11 @@ export default function TourMap({
       for (const layer of layers) {
         try {
           if (layer.type === 'symbol') {
-            map.setPaintProperty(layer.id, 'text-color', '#6A6A6F')
-            map.setPaintProperty(layer.id, 'text-halo-color', '#000000')
-          } else if (
-            layer.type === 'line' &&
-            /road|street|highway|motorway|bridge|tunnel/i.test(layer.id)
-          ) {
-            map.setPaintProperty(layer.id, 'line-opacity', 0.5)
+            map.setPaintProperty(layer.id, 'text-color', '#5A5A5F')
+            map.setPaintProperty(layer.id, 'text-halo-color', '#111111')
           }
         } catch {
-          // Layer ids and paint props vary by style version. Skip silently.
+          // Layer ids vary by style version. Skip silently.
         }
       }
     } catch {
