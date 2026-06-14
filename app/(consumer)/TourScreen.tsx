@@ -9,6 +9,7 @@ import {
   BeerStein,
   Check,
   Headphones,
+  InstagramLogo,
   LockSimple,
   NavigationArrow,
   Pause,
@@ -819,27 +820,40 @@ function StopSheet({
               {formatDistance(distance)}
             </div>
           )}
-          {stop.address && (
-            <a
-              href={directionsHref(stop.name, stop.address)}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-3 flex items-center justify-between gap-3 border border-white/10 bg-night-3/60 px-3 py-2.5"
-            >
-              <span className="min-w-0">
-                <span className="block font-grotesk text-[9px] uppercase tracking-[0.25em] text-label-3">
-                  Address
+          <div className="mt-3 flex gap-2">
+            {stop.address && (
+              <a
+                href={directionsHref(stop.name, stop.address)}
+                target="_blank"
+                rel="noreferrer"
+                className="flex flex-1 items-center justify-between gap-3 border border-white/10 bg-night-3/60 px-3 py-2.5"
+              >
+                <span className="min-w-0">
+                  <span className="block font-grotesk text-[9px] uppercase tracking-[0.25em] text-label-3">
+                    Address
+                  </span>
+                  <span className="mt-0.5 block truncate text-[12.5px] text-label-1">
+                    {stop.address}
+                  </span>
                 </span>
-                <span className="mt-0.5 block truncate text-[12.5px] text-label-1">
-                  {stop.address}
+                <span className="flex shrink-0 items-center gap-1.5 font-grotesk text-[10px] uppercase tracking-[0.15em] text-acid">
+                  <NavigationArrow size={13} weight="bold" />
+                  Directions
                 </span>
-              </span>
-              <span className="flex shrink-0 items-center gap-1.5 font-grotesk text-[10px] uppercase tracking-[0.15em] text-acid">
-                <NavigationArrow size={13} weight="bold" />
-                Directions
-              </span>
-            </a>
-          )}
+              </a>
+            )}
+            {stop.instagram && (
+              <a
+                href={`https://instagram.com/${stop.instagram}`}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`@${stop.instagram} on Instagram`}
+                className="flex items-center justify-center border border-white/10 bg-night-3/60 px-3.5"
+              >
+                <InstagramLogo size={20} weight="regular" color="#CCFF00" />
+              </a>
+            )}
+          </div>
           {unlocked ? (
             <button
               onClick={onPlay}

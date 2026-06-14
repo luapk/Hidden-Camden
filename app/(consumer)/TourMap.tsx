@@ -83,8 +83,8 @@ export default function TourMap({
       for (const layer of layers) {
         try {
           if (layer.type === 'symbol') {
-            map.setPaintProperty(layer.id, 'text-color', '#5A5A5F')
-            map.setPaintProperty(layer.id, 'text-halo-color', '#111111')
+            map.setPaintProperty(layer.id, 'text-color', '#9A9AA0')
+            map.setPaintProperty(layer.id, 'text-halo-color', '#0A0A0A')
           }
         } catch {
           // Layer ids vary by style version. Skip silently.

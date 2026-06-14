@@ -8,6 +8,7 @@ import {
   BeerStein,
   CaretDown,
   CheckCircle,
+  InstagramLogo,
   NavigationArrow,
   Pause,
   Play,
@@ -166,17 +167,31 @@ function StoryBody({
             {stop.name}
           </h2>
           <p className="mt-1 text-[13px] text-label-2">{stop.subtitle}</p>
-          {stop.address && (
-            <a
-              href={directionsHref(stop.name, stop.address)}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-1.5 inline-flex items-center gap-1.5 font-grotesk text-[10.5px] uppercase tracking-[0.12em] text-label-3"
-            >
-              <NavigationArrow size={11} weight="bold" color="#CCFF00" />
-              {stop.address}
-            </a>
-          )}
+          <div className="mt-1.5 flex items-center gap-3">
+            {stop.address && (
+              <a
+                href={directionsHref(stop.name, stop.address)}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 font-grotesk text-[10.5px] uppercase tracking-[0.12em] text-label-3"
+              >
+                <NavigationArrow size={11} weight="bold" color="#CCFF00" />
+                {stop.address}
+              </a>
+            )}
+            {stop.instagram && (
+              <a
+                href={`https://instagram.com/${stop.instagram}`}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`@${stop.instagram} on Instagram`}
+                className="inline-flex items-center gap-1 font-grotesk text-[10.5px] text-label-3"
+              >
+                <InstagramLogo size={12} weight="regular" color="#CCFF00" />
+                @{stop.instagram}
+              </a>
+            )}
+          </div>
         </div>
         {/* Play/pause button — embedded in banner bottom-right */}
         {hasAudio && (

@@ -57,6 +57,8 @@ export interface TourStop {
   subtitle: string
   /** Street address, shown discreetly and used for the directions link. */
   address: string
+  /** Instagram handle without @, e.g. "worldsendcamden" */
+  instagram: string
   /** Actual venue coordinates — used for the map pin and directions. */
   lat: number
   lng: number
@@ -106,6 +108,7 @@ export const LAUNCH_ROUTE: TourStop[] = [
     name: "The World's End & The Underworld",
     subtitle: "The witch's corner",
     address: '174 Camden High St, London NW1 0NE',
+    instagram: 'worldsendcamden',
     lat: 51.53914,
     lng: -0.14220,
     radiusM: 35,
@@ -130,6 +133,7 @@ export const LAUNCH_ROUTE: TourStop[] = [
     name: 'Electric Ballroom',
     subtitle: "The boxer's ballroom",
     address: '184 Camden High St, London NW1 8QP',
+    instagram: 'electricballroomcamden',
     lat: 51.53970,
     lng: -0.14303,
     radiusM: 35,
@@ -156,6 +160,7 @@ export const LAUNCH_ROUTE: TourStop[] = [
     name: 'Jazz Café',
     subtitle: 'The small room for giants',
     address: '5 Parkway, London NW1 7PG',
+    instagram: 'thejazzcafe',
     lat: 51.53873,
     lng: -0.14306,
     radiusM: 50,
@@ -180,6 +185,7 @@ export const LAUNCH_ROUTE: TourStop[] = [
     name: 'The Dublin Castle',
     subtitle: 'The lie about jazz',
     address: '94 Parkway, London NW1 7AN',
+    instagram: 'thedublincastle',
     lat: 51.53745,
     lng: -0.14557,
     radiusM: 50,
@@ -204,6 +210,7 @@ export const LAUNCH_ROUTE: TourStop[] = [
     name: 'The Good Mixer',
     subtitle: "Britpop's living room",
     address: '30 Inverness St, London NW1 7HJ',
+    instagram: 'goodmixerpub',
     lat: 51.53882,
     lng: -0.14558,
     fenceLat: 51.53942,
@@ -230,6 +237,7 @@ export const LAUNCH_ROUTE: TourStop[] = [
     name: 'The Hawley Arms',
     subtitle: 'The hiding place',
     address: '2 Castlehaven Rd, London NW1 8QU',
+    instagram: 'thehawleyarms',
     lat: 51.54200,
     lng: -0.14530,
     radiusM: 38,
@@ -255,6 +263,7 @@ export const LAUNCH_ROUTE: TourStop[] = [
     name: 'Dingwalls',
     subtitle: 'The night punk went overground',
     address: 'Middle Yard, Camden Lock, London NW1 8AB',
+    instagram: 'dingwallscamden',
     lat: 51.54130,
     lng: -0.14583,
     radiusM: 38,
