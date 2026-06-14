@@ -60,30 +60,39 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: `Unknown file: ${parse.data.filename}` }, { status: 404 })
   }
 
-  const ttsRes = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
-    {
-      method: 'POST',
-      headers: {
-        'xi-api-key': apiKey,
-        'Content-Type': 'application/json',
-        Accept: 'audio/mpeg',
-      },
-      body: JSON.stringify({
-        text: file.text,
-        model_id: MODEL,
-        voice_settings: {
-          stability: 0.45,
-          similarity_boost: 0.75,
-          style: 0.0,
-          use_speaker_boost: true,
+  let ttsRes: Response
+  try {
+    ttsRes = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
+      {
+        method: 'POST',
+        headers: {
+          'xi-api-key': apiKey,
+          'Content-Type': 'application/json',
+          Accept: 'audio/mpeg',
         },
-      }),
-    },
-  )
+        body: JSON.stringify({
+          text: file.text,
+          model_id: MODEL,
+          voice_settings: {
+            stability: 0.45,
+            similarity_boost: 0.75,
+            style: 0.0,
+            use_speaker_boost: true,
+          },
+        }),
+        signal: AbortSignal.timeout(240_000),
+      },
+    )
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e)
+    console.error('[generate-audio] ElevenLabs fetch failed:', msg)
+    return NextResponse.json({ error: `ElevenLabs connection failed: ${msg}` }, { status: 502 })
+  }
 
   if (!ttsRes.ok) {
     const err = await ttsRes.text().catch(() => '')
+    console.error('[generate-audio] ElevenLabs error', ttsRes.status, err)
     return NextResponse.json(
       { error: `ElevenLabs error (${ttsRes.status}): ${err}` },
       { status: 502 },
@@ -91,11 +100,20 @@ export async function POST(req: Request) {
   }
 
   const audioBuffer = await ttsRes.arrayBuffer()
+  console.log('[generate-audio] TTS done, uploading to blob:', file.filename, Math.round(audioBuffer.byteLength / 1024), 'KB')
 
-  const { url } = await put(`audio/${file.filename}`, audioBuffer, {
-    access: 'public',
-    contentType: 'audio/mpeg',
-  })
+  let url: string
+  try {
+    const result = await put(`audio/${file.filename}`, audioBuffer, {
+      access: 'public',
+      contentType: 'audio/mpeg',
+    })
+    url = result.url
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e)
+    console.error('[generate-audio] Blob upload failed:', msg)
+    return NextResponse.json({ error: `Blob upload failed: ${msg}` }, { status: 502 })
+  }
 
   return NextResponse.json({ ok: true, filename: file.filename, url, sizeKb: Math.round(audioBuffer.byteLength / 1024) })
 }
