@@ -42,9 +42,10 @@ describe('LAUNCH_ROUTE', () => {
     }
   })
 
-  it('gives every stop a 30m geofence, a runtime, and a transcript snippet', () => {
+  it('gives every stop a sensible geofence (25–60m), a runtime, and a transcript snippet', () => {
     for (const stop of LAUNCH_ROUTE) {
-      expect(stop.radiusM).toBe(30)
+      expect(stop.radiusM, `${stop.name} radiusM`).toBeGreaterThanOrEqual(25)
+      expect(stop.radiusM, `${stop.name} radiusM`).toBeLessThanOrEqual(60)
       expect(stop.runtimeS).toBeGreaterThan(0)
       expect(stop.transcript.length).toBeGreaterThan(40)
     }

@@ -112,7 +112,7 @@ export interface GeofenceResult {
  * a 30m fence: we keep showing distance but never count it as "inside", so a
  * wild fix can't trip a stop. Real urban fixes settle well under this.
  */
-export const ACCURACY_GATE_M = 65
+export const ACCURACY_GATE_M = 80
 
 /**
  * Watches the user's position against a geofence target. `triggered` flips
