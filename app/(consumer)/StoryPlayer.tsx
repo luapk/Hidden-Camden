@@ -90,7 +90,6 @@ function StoryBody({
   const noAudio = audioState === 'none' || audioState === 'failed'
   const [transcriptOpen, setTranscriptOpen] = useState(false)
 
-  // No audio: the transcript is the story. Open it.
   useEffect(() => {
     if (noAudio) setTranscriptOpen(true)
   }, [noAudio])
@@ -111,11 +110,12 @@ function StoryBody({
     if (audioRef.current) audioRef.current.playbackRate = next
   }
 
-  const seek = (value: number) => {
+  const seek = (pct: number) => {
     const el = audioRef.current
     if (!el || !Number.isFinite(el.duration)) return
-    el.currentTime = value
-    setElapsed(value)
+    const t = pct * el.duration
+    el.currentTime = t
+    setElapsed(t)
   }
 
   const bank = () => {
@@ -123,9 +123,11 @@ function StoryBody({
     setJustBanked(true)
   }
 
+  const hasAudio = !!stop.audioUrl && audioState !== 'failed'
+
   return (
     <div className="pb-10">
-      {/* Banner */}
+      {/* Banner — play button lives here */}
       <div className="relative h-60 w-full">
         <Image
           src={stop.image}
@@ -137,7 +139,6 @@ function StoryBody({
           style={{ filter: 'grayscale(30%) contrast(1.05)' }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black" />
-        {/* Lime hairline along the banner's lower edge */}
         <span className="absolute inset-x-0 bottom-0 h-px bg-acid" aria-hidden />
         <button
           onClick={onClose}
@@ -146,14 +147,14 @@ function StoryBody({
         >
           <X size={18} weight="bold" />
         </button>
-        {/* Ghost stop numeral */}
         <span
           className="pointer-events-none absolute right-3 top-10 font-grotesk text-[96px] font-bold leading-none text-white/10"
           aria-hidden
         >
           {String(stop.position).padStart(2, '0')}
         </span>
-        <div className="absolute inset-x-5 bottom-5">
+        {/* Stop info — right-padded to clear play button */}
+        <div className="absolute inset-x-5 bottom-5 pr-16">
           <div className="font-grotesk text-[11px] uppercase tracking-[0.35em] text-acid">
             Stop {stop.position} · Unlocked
           </div>
@@ -162,69 +163,78 @@ function StoryBody({
           </h2>
           <p className="mt-1 text-[13px] text-label-2">{stop.subtitle}</p>
         </div>
+        {/* Play/pause button — embedded in banner bottom-right */}
+        {hasAudio && (
+          <button
+            onClick={togglePlay}
+            aria-label={playing ? 'Pause the story' : 'Play the story'}
+            className="absolute bottom-5 right-5 flex h-12 w-12 items-center justify-center rounded-full bg-acid text-black shadow-[0_0_24px_rgba(204,255,0,0.3)]"
+          >
+            {audioState === 'loading' ? (
+              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-black/30 border-t-black" />
+            ) : playing ? (
+              <Pause size={20} weight="fill" />
+            ) : (
+              <Play size={20} weight="fill" />
+            )}
+          </button>
+        )}
       </div>
 
-      <div className="px-5">
-        {/* Audio transport on a glass strip over the banner edge */}
-        {stop.audioUrl && audioState !== 'failed' ? (
-          <div className="relative z-10 -mt-7 rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-2xl">
-            <audio
-              ref={audioRef}
-              src={stop.audioUrl}
-              preload="metadata"
-              onCanPlay={() => setAudioState('ready')}
-              onError={() => setAudioState('failed')}
-              onPlay={() => setPlaying(true)}
-              onPause={() => setPlaying(false)}
-              onTimeUpdate={(e) => setElapsed(e.currentTarget.currentTime)}
-              onLoadedMetadata={(e) => {
-                if (Number.isFinite(e.currentTarget.duration)) {
-                  setDuration(e.currentTarget.duration)
-                }
-              }}
-              onEnded={() => {
-                setPlaying(false)
-                setFinished(true)
-              }}
+      {/* Hidden audio element */}
+      {stop.audioUrl && (
+        <audio
+          ref={audioRef}
+          src={stop.audioUrl}
+          preload="metadata"
+          onCanPlay={() => setAudioState('ready')}
+          onError={() => setAudioState('failed')}
+          onPlay={() => setPlaying(true)}
+          onPause={() => setPlaying(false)}
+          onTimeUpdate={(e) => setElapsed(e.currentTarget.currentTime)}
+          onLoadedMetadata={(e) => {
+            if (Number.isFinite(e.currentTarget.duration)) {
+              setDuration(e.currentTarget.duration)
+            }
+          }}
+          onEnded={() => {
+            setPlaying(false)
+            setFinished(true)
+          }}
+        />
+      )}
+
+      {/* Scrubber — full bleed, tight below the banner */}
+      {hasAudio && (
+        <div>
+          <div
+            className="relative h-[3px] cursor-pointer bg-white/10"
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect()
+              seek((e.clientX - rect.left) / rect.width)
+            }}
+          >
+            <div
+              className="h-full bg-acid"
+              style={{ width: duration > 0 ? `${(elapsed / duration) * 100}%` : '0%' }}
             />
-            <div className="flex items-center gap-4">
-              <button
-                onClick={togglePlay}
-                aria-label={playing ? 'Pause the story' : 'Play the story'}
-                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-acid text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]"
-              >
-                {playing ? (
-                  <Pause size={24} weight="fill" />
-                ) : (
-                  <Play size={24} weight="fill" />
-                )}
-              </button>
-              <div className="min-w-0 flex-1">
-                <input
-                  type="range"
-                  min={0}
-                  max={duration || stop.runtimeS}
-                  step={1}
-                  value={Math.min(elapsed, duration)}
-                  onChange={(e) => seek(Number(e.target.value))}
-                  aria-label="Seek"
-                  className="w-full"
-                  style={{ accentColor: '#CCFF00' }}
-                />
-                <div className="mt-1 flex justify-between font-grotesk text-[11px] text-label-2">
-                  <span>{clock(elapsed)}</span>
-                  <span>{clock(duration)}</span>
-                </div>
-              </div>
-              <button
-                onClick={toggleRate}
-                className="shrink-0 rounded-full border border-white/20 px-2.5 py-1 font-grotesk text-[12px] font-bold text-label-1"
-              >
-                {rate}x
-              </button>
-            </div>
           </div>
-        ) : (
+          <div className="flex items-center justify-between px-5 py-2 font-mono text-[11px]">
+            <span className="text-label-3">{clock(elapsed)}</span>
+            <button
+              onClick={toggleRate}
+              className="rounded border border-white/20 px-2 py-0.5 text-label-2"
+            >
+              {rate}x
+            </button>
+            <span className="text-label-3">{clock(duration)}</span>
+          </div>
+        </div>
+      )}
+
+      <div className="px-5">
+        {/* No-audio fallback */}
+        {noAudio && (
           <div className="mt-5 border border-white/10 bg-night-2 p-4">
             <p className="font-grotesk text-[12px] text-label-2">
               Audio coming soon. Read the story below.
@@ -347,7 +357,7 @@ function BauhausBurst() {
     angle: (i / 12) * Math.PI * 2,
     distance: 70 + (i % 3) * 30,
     delay: i * 0.025,
-    shape: i % 3, // 0 square, 1 circle, 2 triangle
+    shape: i % 3,
   }))
 
   return (

@@ -10,11 +10,13 @@ import {
   Check,
   Headphones,
   LockSimple,
+  Pause,
+  Play,
 } from '@phosphor-icons/react'
 import { haversineDistance } from '@/lib/geo'
 import { useGeofence, type GeoPosition } from '@/lib/geo/useGeofence'
 import { isPaywalled, useTourProgress } from '@/lib/tour/useTourProgress'
-import type { TourStop } from '@/lib/tour/launchRoute'
+import { INTRO_AUDIO_URL, type TourStop } from '@/lib/tour/launchRoute'
 import StoryPlayer from './StoryPlayer'
 
 const TourMap = dynamic(() => import('./TourMap'), {
@@ -69,6 +71,22 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   const [unlockFlash, setUnlockFlash] = useState<TourStop | null>(null)
   const [activeStory, setActiveStory] = useState<TourStop | null>(null)
   const [selectedStop, setSelectedStop] = useState<TourStop | null>(null)
+  const [miniAudio, setMiniAudio] = useState<{ url: string; label: string } | null>(null)
+
+  // When a story closes, auto-start the link audio for the walk to the next stop.
+  const prevStoryRef = useRef<TourStop | null>(null)
+  useEffect(() => {
+    if (activeStory) {
+      prevStoryRef.current = activeStory
+    } else if (prevStoryRef.current) {
+      const closed = prevStoryRef.current
+      prevStoryRef.current = null
+      const nextInRoute = sorted.find((s) => s.position === closed.position + 1)
+      if (closed.linkAudioUrl && nextInRoute) {
+        setMiniAudio({ url: closed.linkAudioUrl, label: `Walk to ${nextInRoute.name}` })
+      }
+    }
+  }, [activeStory, sorted])
 
   // Reward sting played the instant a new stop unlocks.
   const rewardSoundRef = useRef<HTMLAudioElement | null>(null)
@@ -101,8 +119,8 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
 
   const arrive = useCallback(
     (stop: TourStop) => {
+      setMiniAudio(null) // stop any link or intro audio
       if (isPaywalled(stop.position, paid)) {
-        // StoryPlayer shows the paywall for gated stops.
         setActiveStory(stop)
         return
       }
@@ -220,6 +238,26 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
           <span className="text-acid">{bankedCount}</span> of {sorted.length}
         </div>
       </div>
+
+      {/* Intro audio — shown before first stop unlocks */}
+      {hydrated && unlockedStops.length === 0 && !miniAudio && (
+        <MiniPlayer
+          key="intro"
+          url={INTRO_AUDIO_URL}
+          label="Introduction"
+          onDismiss={() => setMiniAudio(null)}
+        />
+      )}
+
+      {/* Link audio — auto-plays after a story closes */}
+      {miniAudio && (
+        <MiniPlayer
+          key={miniAudio.url}
+          url={miniAudio.url}
+          label={miniAudio.label}
+          onDismiss={() => setMiniAudio(null)}
+        />
+      )}
 
       {/* Distance / dwell card for the next stop */}
       <div className="mt-4">
@@ -356,6 +394,83 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         )}
       </AnimatePresence>
     </main>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+
+function miniClock(s: number): string {
+  if (!Number.isFinite(s) || s < 0) s = 0
+  const m = Math.floor(s / 60)
+  const sec = Math.floor(s % 60)
+  return `${m}:${String(sec).padStart(2, '0')}`
+}
+
+function MiniPlayer({
+  url,
+  label,
+  onDismiss,
+}: {
+  url: string
+  label: string
+  onDismiss: () => void
+}) {
+  const audioRef = useRef<HTMLAudioElement>(null)
+  const [playing, setPlaying] = useState(false)
+  const [elapsed, setElapsed] = useState(0)
+  const [duration, setDuration] = useState(0)
+
+  useEffect(() => {
+    audioRef.current?.play().catch(() => {})
+  }, [])
+
+  const togglePlay = () => {
+    const el = audioRef.current
+    if (!el) return
+    if (playing) el.pause()
+    else el.play().catch(() => {})
+  }
+
+  return (
+    <div className="mt-4 border border-white/10 bg-night-2">
+      <audio
+        ref={audioRef}
+        src={url}
+        preload="auto"
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onEnded={onDismiss}
+        onTimeUpdate={(e) => setElapsed(e.currentTarget.currentTime)}
+        onLoadedMetadata={(e) => {
+          if (Number.isFinite(e.currentTarget.duration)) {
+            setDuration(e.currentTarget.duration)
+          }
+        }}
+      />
+      <div className="flex items-center gap-3 px-4 py-3">
+        <button
+          onClick={togglePlay}
+          aria-label={playing ? 'Pause' : 'Play'}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-acid text-black"
+        >
+          {playing ? <Pause size={16} weight="fill" /> : <Play size={16} weight="fill" />}
+        </button>
+        <div className="min-w-0 flex-1">
+          <div className="truncate font-grotesk text-[11px] uppercase tracking-[0.2em] text-label-2">
+            {label}
+          </div>
+          <div className="relative mt-1.5 h-[2px] bg-white/10">
+            <div
+              className="h-full bg-acid"
+              style={{ width: duration > 0 ? `${(elapsed / duration) * 100}%` : '0%' }}
+            />
+          </div>
+        </div>
+        <span className="shrink-0 font-mono text-[11px] text-label-3">
+          {miniClock(elapsed)}
+        </span>
+      </div>
+    </div>
   )
 }
 

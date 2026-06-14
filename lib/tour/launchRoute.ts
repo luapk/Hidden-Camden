@@ -19,6 +19,8 @@ const DEFAULT_AUDIO_BASE = 'https://2nrkszijjyuoqrsq.public.blob.vercel-storage.
 const AUDIO_BASE =
   process.env.NEXT_PUBLIC_AUDIO_BASE || DEFAULT_AUDIO_BASE
 
+export const INTRO_AUDIO_URL = `${AUDIO_BASE}/audio/intro.mp3`
+
 function stopAudio(n: number): string {
   return `${AUDIO_BASE}/audio/stop-${String(n).padStart(2, '0')}.mp3`
 }
