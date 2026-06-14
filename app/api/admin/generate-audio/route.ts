@@ -108,6 +108,7 @@ export async function POST(req: Request) {
       access: 'public',
       contentType: 'audio/mpeg',
       addRandomSuffix: false,
+      allowOverwrite: true,
     })
     url = result.url
   } catch (e) {
