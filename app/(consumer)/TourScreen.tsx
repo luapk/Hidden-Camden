@@ -181,6 +181,9 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   const simulateArrival = () => {
     if (!nextStop) return
     setOverride({ lat: nextStop.lat, lng: nextStop.lng, accuracy: 5 })
+    // In sim mode, also bank the reward immediately so you can step through
+    // all 7 stops without opening the story player each time.
+    bankStop(nextStop.position)
     arrive(nextStop)
   }
 
@@ -328,20 +331,31 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
           </div>
         ) : null}
 
-        {simEnabled && nextStop && (
-          <button
-            onClick={simulateArrival}
-            className="mt-2 font-grotesk text-[11px] uppercase tracking-[0.15em] text-label-3 underline underline-offset-4"
-          >
-            Simulate arrival
-          </button>
-        )}
-        {simEnabled && geo.position && (
-          <p className="mt-1 font-mono text-[10px] text-label-3">
-            GPS {geo.position.lat.toFixed(6)}, {geo.position.lng.toFixed(6)} ±{Math.round(geo.position.accuracy)}m
-            {geo.distanceM !== null && ` · ${Math.round(geo.distanceM)}m from stop`}
-            {geo.lowAccuracy && ' · LOW ACC'}
-          </p>
+        {simEnabled && (
+          <div className="mt-3 border border-dashed border-acid/30 bg-night-2 p-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-acid/60">
+                Sim mode
+              </span>
+              {nextStop ? (
+                <button
+                  onClick={simulateArrival}
+                  className="bg-acid px-4 py-2 font-grotesk text-[11px] font-bold uppercase tracking-[0.2em] text-black"
+                >
+                  Arrive at stop {nextStop.position} →
+                </button>
+              ) : (
+                <span className="font-grotesk text-[11px] text-label-2">All stops done</span>
+              )}
+            </div>
+            {geo.position && (
+              <p className="mt-2 font-mono text-[9.5px] text-label-3">
+                {geo.position.lat.toFixed(6)}, {geo.position.lng.toFixed(6)} ±{Math.round(geo.position.accuracy)}m
+                {geo.distanceM !== null && ` · ${Math.round(geo.distanceM)}m from pin`}
+                {geo.lowAccuracy && ' · LOW ACC'}
+              </p>
+            )}
+          </div>
         )}
       </div>
 
