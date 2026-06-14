@@ -83,9 +83,9 @@ export default function GenerateAudioClient() {
     }
   }
 
-  const generateAll = async () => {
+  const generateAll = async (force = false) => {
     setRunning(true)
-    const pending = files.filter((f) => !f.exists || f.state === 'error')
+    const pending = force ? files : files.filter((f) => !f.exists || f.state === 'error')
     for (const f of pending) {
       await generateOne(f.filename)
       await new Promise((r) => setTimeout(r, 600))
@@ -116,17 +116,17 @@ export default function GenerateAudioClient() {
         <div style={{ height: '100%', background: '#C9933C', width: `${(doneCount / total) * 100}%`, transition: 'width 0.3s' }} />
       </div>
 
-      {/* Generate all */}
-      {doneCount < total && (
-        <button
-          onClick={generateAll}
-          disabled={running}
-          style={{
-            marginBottom: '1.5rem',
-            background: running ? '#2A2520' : '#C9933C',
-            color: running ? '#8A8077' : '#000',
-            border: 'none',
-            padding: '0.6rem 1.25rem',
+      {/* Generate all / Regenerate all */}
+      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+        {doneCount < total && (
+          <button
+            onClick={() => generateAll(false)}
+            disabled={running}
+            style={{
+              background: running ? '#2A2520' : '#C9933C',
+              color: running ? '#8A8077' : '#000',
+              border: 'none',
+              padding: '0.6rem 1.25rem',
             fontFamily: 'monospace',
             fontSize: '0.75rem',
             letterSpacing: '0.1em',
@@ -135,8 +135,26 @@ export default function GenerateAudioClient() {
           }}
         >
           {running ? 'Generating...' : `Generate remaining (${total - doneCount})`}
+          </button>
+        )}
+        <button
+          onClick={() => generateAll(true)}
+          disabled={running}
+          style={{
+            background: 'none',
+            color: running ? '#3A3530' : '#8A8077',
+            border: '1px solid #3A3530',
+            padding: '0.6rem 1.25rem',
+            fontFamily: 'monospace',
+            fontSize: '0.75rem',
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            cursor: running ? 'not-allowed' : 'pointer',
+          }}
+        >
+          Regenerate all
         </button>
-      )}
+      </div>
 
       {/* File list */}
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
