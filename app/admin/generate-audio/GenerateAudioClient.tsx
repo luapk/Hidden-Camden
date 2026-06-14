@@ -39,11 +39,26 @@ export default function GenerateAudioClient() {
       prev.map((f) => f.filename === filename ? { ...f, state: 'generating', error: undefined } : f),
     )
 
-    const res = await fetch('/api/admin/generate-audio', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ filename }),
-    })
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 270_000)
+    let res: Response
+    try {
+      res = await fetch('/api/admin/generate-audio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename }),
+        signal: controller.signal,
+      })
+    } catch {
+      setFiles((prev) =>
+        prev.map((f) =>
+          f.filename === filename ? { ...f, state: 'error', error: 'Request timed out. Try generating this file individually.' } : f,
+        ),
+      )
+      return
+    } finally {
+      clearTimeout(timeout)
+    }
 
     const data = (await res.json()) as { ok?: boolean; url?: string; sizeKb?: number; error?: string }
 

@@ -4,6 +4,8 @@ import { z } from 'zod'
 import { requireAdmin, isAdminError } from '@/lib/admin/auth'
 import { AUDIO_FILES } from '@/lib/tour/audioScripts'
 
+export const maxDuration = 300
+
 const VOICE_ID = 'Yex236tJMytMYoUWKVSJ'
 const MODEL = 'eleven_multilingual_v2'
 
