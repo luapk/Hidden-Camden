@@ -89,4 +89,48 @@ describe('createDwellTracker', () => {
     expect(over.dwellProgress).toBe(1)
     expect(over.triggered).toBe(true)
   })
+
+  describe('requireApproach', () => {
+    it('refuses to count while the user starts inside the fence', () => {
+      const tracker = createDwellTracker(DWELL, { requireApproach: true })
+
+      // Already inside on the first fix (e.g. fences overlap): held at zero.
+      expect(tracker.update(true, 0)).toEqual({ dwellProgress: 0, triggered: false })
+      expect(tracker.update(true, 8_000)).toEqual({ dwellProgress: 0, triggered: false })
+      expect(tracker.update(true, 20_000)).toEqual({ dwellProgress: 0, triggered: false })
+    })
+
+    it('arms once seen outside, then counts a normal dwell on re-entry', () => {
+      const tracker = createDwellTracker(DWELL, { requireApproach: true })
+
+      tracker.update(true, 0) // disarmed, no progress
+      tracker.update(false, 1_000) // steps outside: now armed
+
+      expect(tracker.update(true, 2_000).dwellProgress).toBe(0)
+      const mid = tracker.update(true, 6_000)
+      expect(mid.dwellProgress).toBeCloseTo(0.5)
+      expect(tracker.update(true, 10_000)).toEqual({ dwellProgress: 1, triggered: true })
+    })
+
+    it('arms immediately when the user is already outside the fence', () => {
+      const tracker = createDwellTracker(DWELL, { requireApproach: true })
+
+      tracker.update(false, 0) // outside on first fix: armed
+      tracker.update(true, 1_000)
+      expect(tracker.update(true, 9_000)).toEqual({ dwellProgress: 1, triggered: true })
+    })
+
+    it('re-disarms after reset()', () => {
+      const tracker = createDwellTracker(DWELL, { requireApproach: true })
+
+      tracker.update(false, 0)
+      tracker.update(true, 1_000)
+      expect(tracker.update(true, 9_000).triggered).toBe(true)
+
+      tracker.reset()
+      // Inside without first being seen outside again: held at zero.
+      expect(tracker.update(true, 9_000)).toEqual({ dwellProgress: 0, triggered: false })
+      expect(tracker.update(true, 18_000)).toEqual({ dwellProgress: 0, triggered: false })
+    })
+  })
 })

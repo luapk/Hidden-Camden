@@ -80,8 +80,15 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   const [activeStory, setActiveStory] = useState<TourStop | null>(null)
   const [selectedStop, setSelectedStop] = useState<TourStop | null>(null)
   const [miniAudio, setMiniAudio] = useState<{ url: string; label: string } | null>(null)
+  // Link audio is armed when a story closes, then plays once the walker
+  // actually leaves that venue heading for the next stop (see effect below).
+  const [pendingLink, setPendingLink] = useState<{
+    from: TourStop
+    url: string
+    label: string
+  } | null>(null)
 
-  // When a story closes, auto-start the link audio for the walk to the next stop.
+  // When a story closes, arm the link audio for the walk to the next stop.
   const prevStoryRef = useRef<TourStop | null>(null)
   useEffect(() => {
     if (activeStory) {
@@ -92,7 +99,11 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
       const nextInRoute = sorted.find((s) => s.position === closed.position + 1)
       const linkUrl = localizeAudioUrl(closed.linkAudioUrl, lang)
       if (linkUrl && nextInRoute) {
-        setMiniAudio({ url: linkUrl, label: `Walk to ${nextInRoute.name}` })
+        setPendingLink({
+          from: closed,
+          url: linkUrl,
+          label: `Walk to ${nextInRoute.name}`,
+        })
       }
     }
   }, [activeStory, sorted, lang])
@@ -129,6 +140,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   const arrive = useCallback(
     (stop: TourStop) => {
       setMiniAudio(null) // stop any link or intro audio
+      setPendingLink(null) // a new arrival makes a pending walk-link moot
       if (isPaywalled(stop.position, paid)) {
         setActiveStory(stop)
         return
@@ -171,6 +183,29 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     setOverride({ lat: nextStop.lat, lng: nextStop.lng, accuracy: 5 })
     arrive(nextStop)
   }
+
+  // Play the armed link audio only once the walker has left the venue they
+  // just heard about, i.e. they are genuinely walking to the next stop. In
+  // sim mode (or with no GPS fix) there is no walk to detect, so play it now.
+  useEffect(() => {
+    if (!pendingLink) return
+    if (simEnabled || !geo.position) {
+      setMiniAudio({ url: pendingLink.url, label: pendingLink.label })
+      setPendingLink(null)
+      return
+    }
+    const distFromHeard = haversineDistance(
+      geo.position.lat,
+      geo.position.lng,
+      pendingLink.from.lat,
+      pendingLink.from.lng,
+    )
+    // A clear step beyond the fence: they are on the move to the next room.
+    if (distFromHeard > pendingLink.from.radiusM + 15) {
+      setMiniAudio({ url: pendingLink.url, label: pendingLink.label })
+      setPendingLink(null)
+    }
+  }, [pendingLink, geo.position, simEnabled])
 
   const bankedCount = bankedStops.length
 
@@ -277,6 +312,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
             inside={geo.inside}
             dwellProgress={geo.dwellProgress}
             permissionState={geo.permissionState}
+            lowAccuracy={geo.lowAccuracy}
             onPlay={() => setActiveStory(nextStop)}
           />
         ) : hydrated ? (
@@ -491,6 +527,7 @@ function DistanceCard({
   inside,
   dwellProgress,
   permissionState,
+  lowAccuracy,
   onPlay,
 }: {
   stop: TourStop
@@ -498,6 +535,7 @@ function DistanceCard({
   inside: boolean
   dwellProgress: number
   permissionState: string
+  lowAccuracy: boolean
   onPlay: () => void
 }) {
   const fill =
@@ -595,7 +633,9 @@ function DistanceCard({
               ? permissionState === 'denied'
                 ? 'Location is off. Turn it on to unlock stops as you walk.'
                 : 'Waiting for a GPS fix. Keep walking, it will catch up.'
-              : `Inside ${stop.radiusM}m the story unlocks itself. No tapping, no QR codes.`}
+              : lowAccuracy
+                ? 'Improving the GPS lock. Step into the open and it will sharpen.'
+                : `Inside ${stop.radiusM}m the story unlocks itself. No tapping, no QR codes.`}
           </p>
         </div>
       )}

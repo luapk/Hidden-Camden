@@ -7,6 +7,11 @@
  *
  * Pure logic, driven by a stream of (inside, now) updates so it is fully
  * testable with fake timestamps.
+ *
+ * `requireApproach` makes the tracker refuse to count until it has seen the
+ * user at least once OUTSIDE the fence. This stops a single noisy fix that
+ * already reads "inside" the next stop from cascade-unlocking it the instant
+ * the previous stop unlocks: you have to actually arrive from outside.
  */
 
 export interface DwellState {
@@ -21,9 +26,21 @@ export interface DwellTracker {
   reset(): void
 }
 
-export function createDwellTracker(dwellMs: number): DwellTracker {
+export interface DwellOptions {
+  /** Require one observation outside the fence before the timer can start. */
+  requireApproach?: boolean
+}
+
+export function createDwellTracker(
+  dwellMs: number,
+  options: DwellOptions = {},
+): DwellTracker {
+  const requireApproach = options.requireApproach ?? false
   let enteredAt: number | null = null
   let triggered = false
+  // When approach is required, we start disarmed and only arm once we have
+  // seen the user outside the fence.
+  let armed = !requireApproach
 
   return {
     update(inside: boolean, now: number): DwellState {
@@ -33,6 +50,13 @@ export function createDwellTracker(dwellMs: number): DwellTracker {
 
       if (!inside) {
         enteredAt = null
+        armed = true
+        return { dwellProgress: 0, triggered: false }
+      }
+
+      // Inside, but we have never seen them outside yet: hold at zero until
+      // they approach the fence properly.
+      if (!armed) {
         return { dwellProgress: 0, triggered: false }
       }
 
@@ -54,6 +78,7 @@ export function createDwellTracker(dwellMs: number): DwellTracker {
     reset() {
       enteredAt = null
       triggered = false
+      armed = !requireApproach
     },
   }
 }

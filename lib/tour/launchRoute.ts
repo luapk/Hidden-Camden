@@ -22,6 +22,18 @@ const AUDIO_BASE =
 export const INTRO_AUDIO_URL = `${AUDIO_BASE}/audio/intro.mp3`
 
 /**
+ * Where the tour begins: outside Camden Town tube. Not a stop (no story, no
+ * reward), just the start marker on the map and the spot the intro is meant
+ * to play. Radius is generous; it only gates the intro, never an unlock.
+ */
+export const START_POINT = {
+  name: 'Camden Town tube',
+  lat: 51.5392,
+  lng: -0.1426,
+  radiusM: 80,
+} as const
+
+/**
  * Deep link that opens the user's maps app navigated to the venue. We query
  * by name + address so the maps provider geocodes the real venue, which is
  * accurate even if our stored pin drifts a few metres.

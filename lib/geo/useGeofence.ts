@@ -100,7 +100,19 @@ export interface GeofenceResult {
   dwellProgress: number
   /** Flips true after dwellMs continuously inside the fence. Latches. */
   triggered: boolean
+  /**
+   * True when the current fix is too imprecise to trust for unlocking. The UI
+   * uses this to say "improving GPS" instead of showing a misleading distance.
+   */
+  lowAccuracy: boolean
 }
+
+/**
+ * A fix worse than this (metres of reported accuracy) is too vague to unlock
+ * a 30m fence: we keep showing distance but never count it as "inside", so a
+ * wild fix can't trip a stop. Real urban fixes settle well under this.
+ */
+export const ACCURACY_GATE_M = 65
 
 /**
  * Watches the user's position against a geofence target. `triggered` flips
@@ -127,18 +139,32 @@ export function useGeofence(
       ? haversineDistance(position.lat, position.lng, targetLat, targetLng)
       : null
 
+  // A simulated override carries accuracy 5; real fixes carry the device's
+  // reported accuracy. Anything vaguer than the gate is shown but never
+  // counts toward unlocking.
+  const lowAccuracy =
+    position !== null && position.accuracy > ACCURACY_GATE_M
+
   const inside =
-    distanceM !== null && targetRadiusM !== undefined && distanceM <= targetRadiusM
+    distanceM !== null &&
+    targetRadiusM !== undefined &&
+    distanceM <= targetRadiusM &&
+    !lowAccuracy
 
   const insideRef = useRef(inside)
   insideRef.current = inside
 
-  const trackerRef = useRef(createDwellTracker(dwellMs))
+  // requireApproach: you must be seen outside the fence before the dwell can
+  // start, so one overlapping fix can't unlock the next stop the moment the
+  // previous one unlocks. Stops only ever unlock in order, on arrival.
+  const trackerRef = useRef(
+    createDwellTracker(dwellMs, { requireApproach: true }),
+  )
   const [dwell, setDwell] = useState({ dwellProgress: 0, triggered: false })
 
   // Fresh tracker whenever the target (or dwell window) changes.
   useEffect(() => {
-    trackerRef.current = createDwellTracker(dwellMs)
+    trackerRef.current = createDwellTracker(dwellMs, { requireApproach: true })
     setDwell({ dwellProgress: 0, triggered: false })
   }, [targetLat, targetLng, targetRadiusM, dwellMs])
 
@@ -165,5 +191,6 @@ export function useGeofence(
     inside,
     dwellProgress: dwell.dwellProgress,
     triggered: dwell.triggered,
+    lowAccuracy,
   }
 }

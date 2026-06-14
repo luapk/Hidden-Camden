@@ -9,8 +9,8 @@ import {
   type MapRef,
 } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { Check, Crosshair, LockSimple } from '@phosphor-icons/react'
-import type { TourStop } from '@/lib/tour/launchRoute'
+import { Check, Crosshair, FlagCheckered, LockSimple } from '@phosphor-icons/react'
+import { START_POINT, type TourStop } from '@/lib/tour/launchRoute'
 import type { GeoPosition } from '@/lib/geo/useGeofence'
 
 export interface TourMapProps {
@@ -41,8 +41,8 @@ export default function TourMap({
   )
 
   const bounds = useMemo(() => {
-    const lats = sorted.map((s) => s.lat)
-    const lngs = sorted.map((s) => s.lng)
+    const lats = [START_POINT.lat, ...sorted.map((s) => s.lat)]
+    const lngs = [START_POINT.lng, ...sorted.map((s) => s.lng)]
     return [
       [Math.min(...lngs), Math.min(...lats)],
       [Math.max(...lngs), Math.max(...lats)],
@@ -55,7 +55,10 @@ export default function TourMap({
       properties: {},
       geometry: {
         type: 'LineString' as const,
-        coordinates: sorted.map((s) => [s.lng, s.lat]),
+        coordinates: [
+          [START_POINT.lng, START_POINT.lat] as [number, number],
+          ...sorted.map((s) => [s.lng, s.lat] as [number, number]),
+        ],
       },
     }),
     [sorted],
@@ -133,6 +136,22 @@ export default function TourMap({
           />
         </Source>
 
+        {/* Start: outside Camden Town tube. */}
+        <Marker
+          longitude={START_POINT.lng}
+          latitude={START_POINT.lat}
+          anchor="center"
+        >
+          <div className="flex flex-col items-center">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white/30 bg-black text-label-1">
+              <FlagCheckered size={16} weight="fill" color="#F0E6D2" />
+            </span>
+            <span className="mt-1 rounded-full bg-black/60 px-2 py-0.5 font-grotesk text-[8px] uppercase tracking-[0.2em] text-label-2 backdrop-blur-sm">
+              Start
+            </span>
+          </div>
+        </Marker>
+
         {sorted.map((stop) => {
           const banked = bankedStops.includes(stop.position)
           const unlocked = unlockedStops.includes(stop.position)
@@ -154,11 +173,11 @@ export default function TourMap({
                 aria-label={`Stop ${stop.position}: ${stop.name}`}
                 className={`relative flex h-8 w-8 items-center justify-center rounded-full font-grotesk text-[13px] font-bold ${
                   banked
-                    ? 'bg-acid text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]'
-                    : isNext
-                      ? 'cc-next-ring border-2 border-acid bg-black text-acid shadow-[0_0_24px_rgba(204,255,0,0.25)]'
-                      : unlocked
-                        ? 'border-2 border-acid/60 bg-black text-acid'
+                    ? 'bg-acid text-black shadow-[0_0_24px_rgba(204,255,0,0.35)]'
+                    : unlocked
+                      ? 'border-2 border-acid bg-acid/25 text-acid shadow-[0_0_18px_rgba(204,255,0,0.2)]'
+                      : isNext
+                        ? 'cc-next-ring border-2 border-acid bg-black text-acid shadow-[0_0_24px_rgba(204,255,0,0.25)]'
                         : 'border-2 border-white/20 bg-black text-label-2'
                 }`}
               >
