@@ -12,14 +12,18 @@ interface FileStatus {
   sizeKb?: number
 }
 
+type Lang = 'en' | 'es'
+
 export default function GenerateAudioClient() {
   const [files, setFiles] = useState<FileStatus[]>([])
   const [loading, setLoading] = useState(true)
   const [running, setRunning] = useState(false)
   const [blobBase, setBlobBase] = useState<string | null>(null)
+  const [lang, setLang] = useState<Lang>('en')
 
-  const fetchStatus = useCallback(async () => {
-    const res = await fetch('/api/admin/generate-audio')
+  const fetchStatus = useCallback(async (which: Lang) => {
+    setLoading(true)
+    const res = await fetch(`/api/admin/generate-audio?lang=${which}`)
     const data = (await res.json()) as FileStatus[]
     setFiles(data.map((f) => ({ ...f, state: 'idle' })))
     setLoading(false)
@@ -32,7 +36,7 @@ export default function GenerateAudioClient() {
     }
   }, [])
 
-  useEffect(() => { fetchStatus() }, [fetchStatus])
+  useEffect(() => { fetchStatus(lang) }, [fetchStatus, lang])
 
   const generateOne = async (filename: string): Promise<void> => {
     setFiles((prev) =>
@@ -46,7 +50,7 @@ export default function GenerateAudioClient() {
       res = await fetch('/api/admin/generate-audio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename }),
+        body: JSON.stringify({ filename, lang }),
         signal: controller.signal,
       })
     } catch {
@@ -96,18 +100,52 @@ export default function GenerateAudioClient() {
   const doneCount = files.filter((f) => f.exists || f.state === 'done').length
   const total = files.length
 
+  const langTabs = (
+    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+      {(['en', 'es'] as Lang[]).map((l) => {
+        const active = l === lang
+        return (
+          <button
+            key={l}
+            onClick={() => { if (!running && l !== lang) setLang(l) }}
+            disabled={running}
+            style={{
+              background: active ? '#C9933C' : 'none',
+              color: active ? '#000' : '#8A8077',
+              border: active ? 'none' : '1px solid #3A3530',
+              padding: '0.35rem 0.9rem',
+              fontFamily: 'monospace',
+              fontSize: '0.7rem',
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              cursor: running ? 'not-allowed' : 'pointer',
+            }}
+          >
+            {l === 'en' ? 'English' : 'Español'}
+          </button>
+        )
+      })}
+    </div>
+  )
+
   if (loading) {
-    return <p style={{ padding: '2rem', color: '#8A8077' }}>Checking blob storage...</p>
+    return (
+      <div style={{ maxWidth: 640 }}>
+        {langTabs}
+        <p style={{ color: '#8A8077' }}>Checking blob storage...</p>
+      </div>
+    )
   }
 
   return (
     <div style={{ maxWidth: 640 }}>
+      {langTabs}
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '1rem', marginBottom: '1.5rem' }}>
         <h1 style={{ fontFamily: 'var(--font-anton, sans-serif)', fontSize: '1.5rem', textTransform: 'uppercase', margin: 0 }}>
           Audio Generation
         </h1>
         <span style={{ fontFamily: 'monospace', fontSize: '0.75rem', color: '#8A8077' }}>
-          {doneCount}/{total} files
+          {lang === 'es' ? 'ES' : 'EN'} · {doneCount}/{total} files
         </span>
       </div>
 

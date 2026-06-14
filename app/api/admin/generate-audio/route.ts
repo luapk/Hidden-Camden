@@ -2,31 +2,55 @@ import { NextResponse } from 'next/server'
 import { put, list } from '@vercel/blob'
 import { z } from 'zod'
 import { requireAdmin, isAdminError } from '@/lib/admin/auth'
-import { AUDIO_FILES } from '@/lib/tour/audioScripts'
+import { AUDIO_FILES, AUDIO_TEXT_ES } from '@/lib/tour/audioScripts'
 
 export const maxDuration = 300
 
-const VOICE_ID = 'Yex236tJMytMYoUWKVSJ'
 const MODEL = 'eleven_multilingual_v2'
 
-// GET — return status of all audio files in blob storage
-export async function GET() {
+type Lang = 'en' | 'es'
+
+// English voice is the default; Spanish voice is set once provided.
+function voiceFor(lang: Lang): string {
+  if (lang === 'es') {
+    return process.env.ELEVEN_VOICE_ID_ES ?? ''
+  }
+  return process.env.ELEVEN_VOICE_ID_EN ?? 'Yex236tJMytMYoUWKVSJ'
+}
+
+// English lives at audio/<file>; other languages at audio/<lang>/<file>.
+function blobPath(lang: Lang, filename: string): string {
+  return lang === 'en' ? `audio/${filename}` : `audio/${lang}/${filename}`
+}
+
+function textFor(lang: Lang, filename: string, english: string): string {
+  if (lang === 'es') return AUDIO_TEXT_ES[filename] ?? ''
+  return english
+}
+
+// GET — return status of all audio files in blob storage for a language
+export async function GET(req: Request) {
   const ctx = await requireAdmin()
   if (isAdminError(ctx)) {
     return NextResponse.json({ error: ctx.error }, { status: ctx.status })
   }
 
+  const lang: Lang = new URL(req.url).searchParams.get('lang') === 'es' ? 'es' : 'en'
+  const prefix = lang === 'en' ? 'audio/' : `audio/${lang}/`
+
   try {
-    const { blobs } = await list({ prefix: 'audio/' })
-    const uploaded = new Set(blobs.map((b) => b.pathname.replace('audio/', '')))
+    const { blobs } = await list({ prefix })
 
     return NextResponse.json(
-      AUDIO_FILES.map((f) => ({
-        filename: f.filename,
-        label: f.label,
-        exists: uploaded.has(f.filename),
-        url: blobs.find((b) => b.pathname === `audio/${f.filename}`)?.url ?? null,
-      })),
+      AUDIO_FILES.map((f) => {
+        const path = blobPath(lang, f.filename)
+        return {
+          filename: f.filename,
+          label: f.label,
+          exists: blobs.some((b) => b.pathname === path),
+          url: blobs.find((b) => b.pathname === path)?.url ?? null,
+        }
+      }),
     )
   } catch {
     // BLOB_READ_WRITE_TOKEN not configured — return pending state
@@ -36,7 +60,7 @@ export async function GET() {
   }
 }
 
-const bodySchema = z.object({ filename: z.string() })
+const bodySchema = z.object({ filename: z.string(), lang: z.enum(['en', 'es']).optional() })
 
 // POST — generate one file and upload to Vercel Blob
 export async function POST(req: Request) {
@@ -55,15 +79,30 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'filename required' }, { status: 400 })
   }
 
+  const lang: Lang = parse.data.lang ?? 'en'
+
   const file = AUDIO_FILES.find((f) => f.filename === parse.data.filename)
   if (!file) {
     return NextResponse.json({ error: `Unknown file: ${parse.data.filename}` }, { status: 404 })
   }
 
+  const voiceId = voiceFor(lang)
+  if (!voiceId) {
+    return NextResponse.json(
+      { error: 'No Spanish voice set. Add ELEVEN_VOICE_ID_ES in Vercel.' },
+      { status: 500 },
+    )
+  }
+
+  const text = textFor(lang, file.filename, file.text)
+  if (!text) {
+    return NextResponse.json({ error: `No ${lang} script for ${file.filename}` }, { status: 404 })
+  }
+
   let ttsRes: Response
   try {
     ttsRes = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
       {
         method: 'POST',
         headers: {
@@ -72,7 +111,7 @@ export async function POST(req: Request) {
           Accept: 'audio/mpeg',
         },
         body: JSON.stringify({
-          text: file.text,
+          text,
           model_id: MODEL,
           voice_settings: {
             stability: 0.45,
@@ -100,11 +139,12 @@ export async function POST(req: Request) {
   }
 
   const audioBuffer = await ttsRes.arrayBuffer()
-  console.log('[generate-audio] TTS done, uploading to blob:', file.filename, Math.round(audioBuffer.byteLength / 1024), 'KB')
+  const path = blobPath(lang, file.filename)
+  console.log('[generate-audio] TTS done, uploading to blob:', path, Math.round(audioBuffer.byteLength / 1024), 'KB')
 
   let url: string
   try {
-    const result = await put(`audio/${file.filename}`, audioBuffer, {
+    const result = await put(path, audioBuffer, {
       access: 'public',
       contentType: 'audio/mpeg',
       addRandomSuffix: false,

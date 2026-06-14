@@ -170,3 +170,126 @@ Your final pint is waiting on the terrace over the lock, and your pin is claimab
 Then tell them the one about the jazz band.`,
   },
 ]
+
+/**
+ * Spanish narration, keyed by the same filename as the English scripts.
+ * Band, pub and place names stay in English (they are proper nouns).
+ * No em dashes, per the copy rules.
+ */
+export const AUDIO_TEXT_ES: Record<string, string> = {
+  'intro.mp3': `Estás en el medio kilómetro más musical del planeta. Camden debería tener más placas azules que cualquier otro lugar de Londres, pero casi ninguna llegó a colocarse, porque la gente que hizo famoso este sitio solía tener prohibida la entrada en aquella época.
+
+Así funciona esto. Siete locales. Cada uno permanece bloqueado hasta que estás físicamente delante de él. Cuando tu teléfono vibra, empieza una historia, y una bebida va a tu bolsillo para más tarde. Las recompensas se acumulan, así que no tienes que beberte la ruta entera en una hora. Te sorprendería cuánta gente lo ha intentado.
+
+Una regla. Mantén la mirada en alto. Todo lo que merece la pena ver en Camden ocurre en la primera planta y más arriba, donde los promotores todavía no han llegado.
+
+Tu primera parada está a treinta segundos. Cruza en el semáforo y dirígete al pub que ocupa media manzana. No te preocupes por la bruja. Lleva muerta trescientos cincuenta años.
+
+Probablemente.`,
+
+  'stop-01.mp3': `Antes de los grupos. Antes del mercado. Antes de que Camden fuera siquiera Camden, había una casita en esta esquina, y en ella vivía una mujer llamada Jinny Bingham.
+
+Siglo diecisiete. Los vecinos la llamaban Mother Damnable, y más tarde Mother Red Cap, y la evitaban a toda costa. En parte por educación. Sobre todo porque los hombres de su vida no paraban de morir. Uno desapareció. Otro acabó en el horno, según las versiones más amables. Y cuentan que la noche en que la propia Jinny murió, hubo testigos que vieron al diablo entrar por su puerta.
+
+Nadie lo vio salir.
+
+El pub que creció en este lugar funcionó como The Mother Red Cap durante los tres siglos siguientes, una parada de diligencias al borde de Londres, la última copa antes del campo. El fin del mundo. De ahí el nombre que ves ahora en la pared. Hoy en día es el bar más grande de Camden, la sala de espera previa a los conciertos de cualquier actuación en NW1, y si la máquina de discos suena más dura que la de un pub normal, hay una razón.
+
+Viene de debajo de tus pies. Bajando las escaleras está The Underworld, y durante más de treinta años ha sido el sótano más ruidoso de Gran Bretaña. Cada grupo de metal, punk y hardcore que has querido alguna vez o tocó en esa sala mientras subía, o volvió a ella mientras bajaba, lo bastante cerca como para tocarlo y el doble de sudoroso. Hay una columna en mitad de la pista. Los veteranos la esquivan por instinto, a oscuras, en pleno mosh.
+
+Acaba de llegar tu primera recompensa. Una pinta, invitamos nosotros, en cualquier momento antes de las cinco. Invita Jinny.`,
+
+  'link-01-02.mp3': `Al salir del World's End, gira a la derecha y sube por la High Street con el metro a tu izquierda. Busca el edificio que sobrevivió a la Luftwaffe. Cuarenta segundos, a tu izquierda, pasados los escaparates con forma de botas gigantes y dragones. Mientras caminas: todo lo que estás a punto de oír es verdad, lo cual, para los estándares de Camden, es raro.`,
+
+  'stop-02.mp3': `En 1938, un constructor y boxeador aficionado nacido en Kerry llamado Bill Fuller se hizo con un pequeño y tosco club irlandés que había en este lugar, llamado el Buffalo. La entrada principal estaba en la parte de atrás, en Kentish Town Road. El negocio iba bien. El espacio era escaso.
+
+Entonces llegó la guerra, y la Luftwaffe bombardeó la hilera de casas de al lado.
+
+La mayoría vio una tragedia. Bill Fuller vio un solar despejado. Compró los escombros, tiró los tabiques, y se construyó una sala de baile con aforo para dos mil personas, donde el Londres irlandés vino a bailar durante los siguientes cuarenta años.
+
+Para 1978, el baile había cambiado. La noche de reapertura tuvo como estrellas a The Greedies, un supergrupo montado alrededor de Phil Lynott, de Thin Lizzy, más medio Sex Pistols. Les quedó ese nombre porque exigieron tres cuartas partes de la recaudación de la taquilla y Fuller los llamó una panda de avariciosos. Para su mérito, se lo quedaron.
+
+Dos semanas después, Sid Vicious tocó aquí una única vez con una banda improvisada. El concierto se anunció como Sid Sods Off, y la recaudación tenía un propósito concreto: reunir el dinero del billete de avión para llevar a Sid y a Nancy a Nueva York. Camden financió de forma colectiva la mudanza más condenada de la historia del rock, a cinco libras por cabeza.
+
+Desde entonces: Joy Division. The Clash, que ensayaron aquí una semana. Madness. The Smiths. Public Enemy. Y una noche de 2014, avisando con pocas horas de antelación y con los rumores volando por Twitter, Prince entró y tocó para unas setenta personas, mientras una cola de incrédulos rodeaba la manzana por fuera.
+
+Esta es una sala con aforo para dos mil. Él usó más o menos el cuatro por ciento.
+
+Tu vale está guardado. Sirve en las noches de club, después de las siete. Vístete de negro. Querrás pasar desapercibido.`,
+
+  'link-02-03.mp3': `Vuelve por donde viniste, pasa el metro y tira a la derecha por Parkway. Ahora. En enero de 1979, siete jóvenes entraron en un pub de esta calle y le contaron una mentira al dueño. El dueño les creyó, porque era una mentira respetable, contada con educación. Y esa mentira inventó la música pop británica tal y como la conoces. El pub está doscientos metros más adelante. La historia es...`,
+
+  'stop-03.mp3': `No todo en Camden es ruidoso.
+
+Esta esquina es el Jazz Café desde 1990, y se rige por una sola idea: coger a los artistas que llenan estadios, y ponerlos en una sala donde la última fila está más cerca que la primera fila de cualquier otro sitio. Cuatrocientas personas. Un palco donde puedes cenar mientras una leyenda trabaja debajo de ti, lo bastante cerca como para leer el repertorio.
+
+La reputación de la sala quedó sellada en 1995, cuando un joven cantante de Virginia llamado D'Angelo tocó aquí varias noches seguidas y las grabó. Esa grabación pasó de músico en músico durante años como si fuera contrabando, el sonido del neo-soul naciendo en NW1, y dejó un signo de interrogación permanente sobre la idea de que las grandes salas de soul estaban todas en América.
+
+Desde entonces, las paredes lo han absorbido todo. La realeza del soul, pioneros del funk en sus vueltas de despedida, raperos haciendo el único concierto pequeño de la gira, y de vez en cuando una chica del norte de Londres con un peinado de colmena, cuando solo Camden conocía su nombre.
+
+La cosa con esta sala es la siguiente: da lo mejor de sí en la primera hora, cuando las luces están bajas y el grupo está ajustando niveles y todavía puedes pillar sitio en la barandilla. Que es justo cuando funciona tu bebida. La hora de apertura, de siete a ocho, un buen gin-tonic en la barandilla de latón mientras los demás siguen haciendo cola.
+
+Llega pronto. La sala lo recompensa. Nosotros también.`,
+
+  'link-03-04.mp3': `Recto por Parkway, alejándote del ruido. Pasada la tienda de mascotas que lleva ahí toda la vida, pasadas las placas azules que sí se llegaron a colocar. Te diriges a un pub de esquina de color crema, con cestas de flores colgando, que no parece absolutamente nada. Número 94. La sala más importante del pop británico es la que no se molesta en decírtelo.`,
+
+  'stop-04.mp3': `Vale. Deja de mirar el teléfono y mira el pub. Pintura color crema, cestas de flores colgando, no parece nada. Esta es la sala más importante de la música pop británica y tiene cabida para unas ciento cincuenta personas.
+
+Abrió en 1856 para evitar que los peones se mataran entre ellos. Camden estaba lleno de hombres cavando el ferrocarril, y la idea brillante fue poner pubs separados para cada nacionalidad, para que hubiera menos peleas y más hombres en condiciones de trabajar por la mañana. A los irlandeses les tocó este. Tenlo en cuenta. Este pub existe gracias a una estrategia para gestionar a la gente borracha. La lleva perfeccionando desde entonces.
+
+Ahora. Enero de 1979. Siete jóvenes entran y le dicen al dueño, Alo Conlon, que son una banda de jazz. Alo piensa: jazz, encantador, respetable. Llega el viernes por la noche, y un muro de skinheads aparece en su puerta. La banda era Madness. El público fue estupendo. Alo les dio una residencia de un año, y la sala de atrás, detrás de ti, se convirtió en la plataforma de lanzamiento de One Step Beyond. Rodaron aquí el vídeo de My Girl. Ese que sale al principio es Alo.
+
+El truco de mentir sobre el jazz funcionó tan bien que la sala no paró nunca. Blur tocó ahí. Coldplay. Supergrass. The Killers. A Muse los ficharon a raíz de un concierto electrizante. Los Libertines hicieron una residencia que nadie recuerda del todo, incluidos los propios Libertines.
+
+Y luego está Amy. A Winehouse le gustaba tanto este pub que, cuando los paparazzi hacían imposible una noche normal, entraba y se ponía detrás de la barra, tirando pintas para clientes desconcertados. Escondida a plena vista, disfrazada de su propia camarera. En 2007, cuando ya estaba conquistando el mundo con Back to Black, dio un concierto secreto de vuelta a casa en esa sala de atrás. Apretados cadera con cadera. Suggs estaba allí. Y justo al fondo, con la gorra calada hasta la cara, estaba David Schwimmer. Ross, el de Friends, escondido en un bar de Camden, viendo a Amy. Nadie molestó a ninguno de los dos. Eso es el pub entero en una sola imagen.
+
+Tu recompensa está activa. Una pinta de Guinness, la misma bebida que sostenía John Foreman cuando descubrió la placa de Madness ahí fuera. Y esta noche tocan cuatro grupos en la parte de atrás. Estadísticamente, uno de ellos es el próximo Coldplay. Quedas avisado.`,
+
+  'link-04-05.mp3': `Sal del Castle, cruza, y sube por Arlington Road. Primera a la izquierda por Inverness Street, el viejo mercado de frutas y verduras. Estás a punto de entrar en los años noventa. En concreto, en el pub donde los años noventa se planearon, se tramaron y estuvieron a punto de acabar a puñetazos.`,
+
+  'stop-05.mp3': `Este es el pub que no parece nada dos veces.
+
+Mesas de formica. Una mesa de billar. Una tele para el fútbol. En cualquier otro código postal, pasarías de largo sin pensarlo. Pero durante unos cinco años en los noventa, este pequeño bar fue el centro de la industria musical británica, y la mesa de billar que hay detrás de esa ventana era el mueble más influyente del país.
+
+Blur bebía aquí. No de vez en cuando. De forma residente. Graham Coxon vivía a la vuelta de la esquina y trataba el Mixer como una prolongación de su salón, y donde bebía Blur, le seguían todos: periodistas, cazatalentos, fotógrafos, y un suministro constante de jóvenes flacos con ilusiones y trajes de tienda de segunda mano. Cuenta la leyenda que Menswear, más que formarse como grupo, se condensaron del humo de los cigarrillos, en algún punto entre esa mesa de billar y la barra. Tenían contrato discográfico antes de tener canciones.
+
+Y como toda escena necesita su guerra, aquí pasaba el frente frío del britpop. Cuando Oasis bajaron desde Manchester, este pub es donde las dos tribus tuvieron que compartir sala de verdad, y según quién lo cuente, aquello acabó en palabras, o en un cara a cara, o con los Gallagher expulsados del todo. Nadie se pone de acuerdo en los detalles. Todos se ponen de acuerdo en el lugar.
+
+Un habitual más, años después. Una chica del barrio que entraba, ponía su dinero en la mesa, y la dominaba sin hacer ruido. Amy, según todos, jugaba muy bien al billar. La gente solo recuerda la voz. El brazo del billar merece su reconocimiento.
+
+Tu recompensa pega con el sitio: una pinta y una partida de billar gratis. Tardes entre semana, cuando la mesa está vacía y la luz entra de lado. Trae a alguien a quien quieras ganar.`,
+
+  'link-05-06.mp3': `Baja por Inverness Street hasta la High Street, gira a la izquierda, y prepárate: vas a atravesar el gentío del mercado, bajo el puente del ferrocarril, hacia el canal. En el puente, tira a la izquierda por Castlehaven Road. El siguiente pub es el que Camden estuvo a punto de perder, dos veces. Una por el fuego. Otra por el dolor.`,
+
+  'stop-06.mp3': `Todos los pubs de esta ruta tienen clientes famosos. Este tenía una familia.
+
+Durante los años 2000, el Hawley Arms era el salón de la aristocracia indie. Kate Moss en la barra. Noel Fielding en el rincón. La mitad de los grupos que tenías en CD, aquí dentro un martes, sin que nadie los molestara. Ese era el trato en el Hawley. Podías ser cualquiera, y te trataban como a un don nadie, en el mejor de los sentidos.
+
+Por eso le encantaba a Amy Winehouse.
+
+No venía aquí para que la vieran. Venía aquí para desaparecer. Y cuando incluso sentarse en la barra se complicaba, hizo lo más típico de Amy que se puede imaginar: se levantó, dio la vuelta, y se puso a servir. La mayor voz del soul de su generación, tirando pintas para turistas que no se creían lo que estaban viendo. La barra no era un escenario. Era un escondite donde podía ser la versión de sí misma que más le gustaba.
+
+Entonces, en febrero de 2008, el gran incendio de Camden arrasó el mercado, y el Hawley ardió con él. Diez días después, Amy se levantó en los Grammy, en el mayor momento de su carrera, con el mundo entero por fin mirando, y lo aprovechó para mandar un mensaje a casa: que Camden Town seguía en pie. Su pub. En aquel escenario. Aquella noche.
+
+El Hawley se reconstruyó. Amy siguió volviendo hasta que no pudo. Y ahora, detrás del pub, hay un mural de ella, de dos plantas de alto, vigilando la calle que en realidad nunca abandonó. Ve a verlo cuando termine el audio. La gente deja flores. Es la única parada de esta ruta en la que te pediríamos que hagas la foto en silencio.
+
+Tu pinta queda guardada para una tarde tranquila entre semana, que es cuando este pub es más él mismo. Brinda por la familia.`,
+
+  'link-06-07.mp3': `Vuelve al puente y métete en el mercado de verdad. Sigue a la multitud hacia el agua, hasta el East Yard. Busca el viejo almacén con el nombre de un muerto pintado en el ladrillo. La última historia es la más grande. Va sobre la noche en que todo se aceleró.`,
+
+  'stop-07.mp3': `El nombre de este edificio pertenece a T.E. Dingwall, un fabricante de cajas de embalaje que estarció su nombre en su almacén y quebró mucho antes de todo esto. El nombre sobrevivió al hombre, al oficio, y casi al siglo. En 1973 el edificio reabrió como salón de baile, conservó el cartel del muerto por estética, y, sin querer, lo hizo inmortal.
+
+Pero esta parada va, en realidad, sobre una sola noche. El cinco de julio de 1976.
+
+La tarde anterior, cuatro hermanos con cazadora de cuero de Queens llamados los Ramones habían tocado en el Roundhouse, calle arriba, y lo redujeron a escombros en menos de cuarenta minutos. La noche siguiente tocaron aquí. Sala más pequeña. La misma motosierra. Y la cola a la puerta de Dingwalls era la lista de invitados más importante jamás reunida: los Sex Pistols. The Clash. The Damned. Chrissie Hynde. Cada grupo que iba a definir los siguientes cinco años de música, todos desconocidos, todos sin un duro, todos aquí.
+
+Los grupos británicos esperaban fuera antes de que abrieran, sentados en los capós de los coches aparcados como una banda de un western, intentando parecer peligrosos para los americanos. The Clash, que habían dado su primerísimo concierto la noche anterior, les preguntaron a los Ramones cómo demonios habían llenado dos locales. La respuesta, más o menos: somos malísimos músicos, tocamos rápido, le damos un espectáculo a la chavalería. Dejad de ensayar. Id a dejarlos boquiabiertos.
+
+Y lo hicieron. Todos lo hicieron. En seis meses, todos los grupos de Londres habían doblado su tempo, y la pelea que estalló aquí delante aquella noche, Clash contra Stranglers, salió en la prensa nacional y puso este almacén en el mapa para siempre. Blondie también hicieron su debut en el Reino Unido sobre este escenario, ya para completar el temario.
+
+Así que esa es tu hora. Una bruja, un boxeador, una mentira sobre el jazz, una mesa de billar, un escondite, y la noche en que el punk salió a la superficie. Todo en medio kilómetro, y todo sigue sirviendo copas.
+
+Tu última pinta te espera en la terraza sobre la esclusa, y tu chapa la puedes reclamar en la barra. Póntela en un sitio donde la gente te pregunte por ella.
+
+Y entonces cuéntales la de la banda de jazz.`,
+}
