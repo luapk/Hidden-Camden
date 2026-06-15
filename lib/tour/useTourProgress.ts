@@ -9,6 +9,8 @@ export interface TourProgress {
   bankedStops: number[]
   paid: boolean
   currentStop: number
+  /** True once the user has been within 50m of Camden Town tube. */
+  tourStarted: boolean
 }
 
 const DEFAULT_PROGRESS: TourProgress = {
@@ -16,6 +18,7 @@ const DEFAULT_PROGRESS: TourProgress = {
   bankedStops: [],
   paid: false,
   currentStop: 1,
+  tourStarted: false,
 }
 
 /** Stops 1 and 2 are free; the paywall gates stop 3 onwards. */
@@ -38,6 +41,7 @@ function load(): TourProgress {
       paid: parsed.paid === true,
       currentStop:
         typeof parsed.currentStop === 'number' ? parsed.currentStop : 1,
+      tourStarted: parsed.tourStarted === true,
     }
   } catch {
     return DEFAULT_PROGRESS
@@ -50,6 +54,7 @@ export interface UseTourProgress extends TourProgress {
   unlockStop: (n: number) => void
   bankStop: (n: number) => void
   markPaid: () => void
+  startTour: () => void
   reset: () => void
 }
 
@@ -112,7 +117,12 @@ export function useTourProgress(): UseTourProgress {
 
   const markPaid = useCallback(() => save((p) => ({ ...p, paid: true })), [save])
 
+  const startTour = useCallback(
+    () => save((p) => ({ ...p, tourStarted: true })),
+    [save],
+  )
+
   const reset = useCallback(() => save(() => DEFAULT_PROGRESS), [save])
 
-  return { ...progress, hydrated, unlockStop, bankStop, markPaid, reset }
+  return { ...progress, hydrated, unlockStop, bankStop, markPaid, startTour, reset }
 }

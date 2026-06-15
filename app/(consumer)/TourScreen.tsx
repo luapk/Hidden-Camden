@@ -8,9 +8,11 @@ import {
   ArrowRight,
   BeerStein,
   Check,
+  FlagCheckered,
   Headphones,
   InstagramLogo,
   LockSimple,
+  MapPin,
   NavigationArrow,
   Pause,
   Play,
@@ -20,6 +22,7 @@ import { useGeofence, type GeoPosition } from '@/lib/geo/useGeofence'
 import { isPaywalled, useTourProgress } from '@/lib/tour/useTourProgress'
 import {
   INTRO_AUDIO_URL,
+  START_POINT,
   directionsHref,
   type TourStop,
 } from '@/lib/tour/launchRoute'
@@ -60,9 +63,11 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     bankedStops,
     paid,
     hydrated,
+    tourStarted,
     unlockStop,
     bankStop,
     markPaid,
+    startTour,
   } = progress
 
   const { lang } = useLanguage()
@@ -72,7 +77,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     [stops],
   )
 
-  const nextStop = hydrated
+  const nextStop = hydrated && tourStarted
     ? sorted.find((s) => !unlockedStops.includes(s.position)) ?? null
     : null
 
@@ -88,6 +93,9 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     url: string
     label: string
   } | null>(null)
+  // When geofence triggers but confidence is low (nearby stops within GPS error
+  // margin), we hold and show a manual confirm instead of auto-firing.
+  const [pendingUnlock, setPendingUnlock] = useState<TourStop | null>(null)
 
   // When a story closes, arm the link audio for the walk to the next stop.
   const prevStoryRef = useRef<TourStop | null>(null)
@@ -109,7 +117,8 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     }
   }, [activeStory, sorted, lang])
 
-  // Reward sting played the instant a new stop unlocks.
+  // Reward sting: preloaded once, played on arrival. Audio element is created
+  // after a user gesture (the tap-to-start flow) so autoplay is allowed.
   const rewardSoundRef = useRef<HTMLAudioElement | null>(null)
   useEffect(() => {
     const audio = new Audio('/sounds/reward.wav')
@@ -126,7 +135,6 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     const audio = rewardSoundRef.current
     if (!audio) return
     audio.currentTime = 0
-    // Autoplay can be blocked before any interaction; ignore that.
     audio.play().catch(() => {})
   }, [])
 
@@ -142,10 +150,55 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     override,
   )
 
+  // Distance to start point (Camden Town tube) — used to gate the tour start.
+  const distanceToTube = geo.position
+    ? haversineDistance(
+        geo.position.lat,
+        geo.position.lng,
+        START_POINT.lat,
+        START_POINT.lng,
+      )
+    : null
+  const nearTube =
+    distanceToTube !== null &&
+    distanceToTube <= START_POINT.radiusM &&
+    !geo.lowAccuracy
+
+  // Confidence check: when the geofence triggers, make sure the GPS isn't
+  // ambiguously close to a different stop. If the second-nearest stop is
+  // within the accuracy radius, hold and ask for manual confirm rather than
+  // auto-firing the wrong venue.
+  const isConfidentUnlock = useCallback(
+    (stop: TourStop): boolean => {
+      if (!geo.position) return true
+      const accuracy = geo.position.accuracy
+      const others = sorted.filter((s) => s.position !== stop.position)
+      const distToStop = haversineDistance(
+        geo.position.lat,
+        geo.position.lng,
+        stop.fenceLat ?? stop.lat,
+        stop.fenceLng ?? stop.lng,
+      )
+      const tooClose = others.some((s) => {
+        const d = haversineDistance(
+          geo.position!.lat,
+          geo.position!.lng,
+          s.fenceLat ?? s.lat,
+          s.fenceLng ?? s.lng,
+        )
+        // Another stop is within our GPS accuracy bubble of the target stop
+        return d - distToStop < accuracy
+      })
+      return !tooClose
+    },
+    [geo.position, sorted],
+  )
+
   const arrive = useCallback(
     (stop: TourStop) => {
-      setMiniAudio(null) // stop any link or intro audio
-      setPendingLink(null) // a new arrival makes a pending walk-link moot
+      setMiniAudio(null)
+      setPendingLink(null)
+      setPendingUnlock(null)
       if (isPaywalled(stop.position, paid)) {
         setActiveStory(stop)
         return
@@ -161,15 +214,19 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     [paid, unlockStop, playReward],
   )
 
-  // Geofence dwell completed: unlock the next stop (once per stop+paid state).
+  // Geofence dwell completed: auto-unlock if confident, else ask for confirm.
   const handledRef = useRef<string | null>(null)
   useEffect(() => {
     if (!geo.triggered || !nextStop) return
     const key = `${nextStop.position}:${paid}`
     if (handledRef.current === key) return
     handledRef.current = key
-    arrive(nextStop)
-  }, [geo.triggered, nextStop, paid, arrive])
+    if (isConfidentUnlock(nextStop)) {
+      arrive(nextStop)
+    } else {
+      setPendingUnlock(nextStop)
+    }
+  }, [geo.triggered, nextStop, paid, arrive, isConfidentUnlock])
 
   const [searchSim, setSearchSim] = useState(false)
   useEffect(() => {
@@ -185,9 +242,11 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
 
   const simulateArrival = () => {
     if (!nextStop) return
+    if (!tourStarted) {
+      startTour()
+      return
+    }
     setOverride({ lat: nextStop.lat, lng: nextStop.lng, accuracy: 5 })
-    // In sim mode, also bank the reward immediately so you can step through
-    // all 7 stops without opening the story player each time.
     bankStop(nextStop.position)
     arrive(nextStop)
   }
@@ -291,17 +350,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         </div>
       </div>
 
-      {/* Intro audio — shown before first stop unlocks */}
-      {hydrated && unlockedStops.length === 0 && !miniAudio && (
-        <MiniPlayer
-          key={`intro-${lang}`}
-          url={localizeAudioUrl(INTRO_AUDIO_URL, lang) ?? INTRO_AUDIO_URL}
-          label="Introduction"
-          onDismiss={() => setMiniAudio(null)}
-        />
-      )}
-
-      {/* Link audio — auto-plays after a story closes */}
+      {/* Link audio — auto-plays once the walker leaves a venue */}
       {miniAudio && (
         <MiniPlayer
           key={miniAudio.url}
@@ -311,58 +360,121 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         />
       )}
 
-      {/* Distance / dwell card for the next stop */}
-      <div className="mt-4">
-        {nextStop ? (
-          <DistanceCard
-            stop={nextStop}
-            distanceM={geo.distanceM}
-            inside={geo.inside}
-            dwellProgress={geo.dwellProgress}
-            permissionState={geo.permissionState}
-            lowAccuracy={geo.lowAccuracy}
-            onPlay={() => setActiveStory(nextStop)}
-          />
-        ) : hydrated ? (
-          <div className="border border-white/10 bg-night-2 p-4">
-            <div className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-acid">
-              Tour complete
-            </div>
-            <p className="mt-2 text-sm leading-relaxed text-label-1">
-              A witch, a boxer, a lie about jazz, a pool table, a hiding place,
-              and the night punk went overground. Your pin is waiting at
-              Dingwalls. Wear it somewhere people will ask.
-            </p>
-          </div>
-        ) : null}
+      {/* ── Pre-start gate ── */}
+      {hydrated && !tourStarted && (
+        <StartGate
+          nearTube={nearTube || simEnabled}
+          distanceToTube={distanceToTube}
+          introUrl={localizeAudioUrl(INTRO_AUDIO_URL, lang) ?? INTRO_AUDIO_URL}
+          onStart={() => {
+            startTour()
+          }}
+        />
+      )}
 
-        {simEnabled && (
-          <div className="mt-3 border border-dashed border-acid/30 bg-night-2 p-3">
-            <div className="flex items-center justify-between gap-3">
-              <span className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-acid/60">
-                Sim mode
-              </span>
-              {nextStop ? (
-                <button
-                  onClick={simulateArrival}
-                  className="bg-acid px-4 py-2 font-grotesk text-[11px] font-bold uppercase tracking-[0.2em] text-black"
-                >
-                  Arrive at stop {nextStop.position} →
-                </button>
-              ) : (
-                <span className="font-grotesk text-[11px] text-label-2">All stops done</span>
-              )}
-            </div>
-            {geo.position && (
-              <p className="mt-2 font-mono text-[9.5px] text-label-3">
-                {geo.position.lat.toFixed(6)}, {geo.position.lng.toFixed(6)} ±{Math.round(geo.position.accuracy)}m
-                {geo.distanceM !== null && ` · ${Math.round(geo.distanceM)}m from pin`}
-                {geo.lowAccuracy && ' · LOW ACC'}
-              </p>
+      {/* ── Tour in progress ── */}
+      {hydrated && tourStarted && (
+        <>
+          {/* Pending-unlock confirm — shown when GPS can't confidently
+              distinguish which stop the user is at */}
+          <AnimatePresence>
+            {pendingUnlock && (
+              <motion.div
+                key="pending-unlock"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 12 }}
+                className="mt-4 border border-acid/40 bg-night-2 p-4"
+              >
+                <div className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-acid">
+                  Are you at stop {pendingUnlock.position}?
+                </div>
+                <p className="mt-1 text-[13px] text-label-1">
+                  {pendingUnlock.name}
+                </p>
+                <p className="mt-1 font-grotesk text-[11px] text-label-3">
+                  GPS signal is ambiguous here. Confirm if you are standing outside.
+                </p>
+                <div className="mt-3 flex gap-2">
+                  <button
+                    onClick={() => arrive(pendingUnlock)}
+                    className="flex-1 bg-acid py-3 font-jost text-[14px] font-bold uppercase tracking-[0.08em] text-black"
+                  >
+                    Yes, unlock it
+                  </button>
+                  <button
+                    onClick={() => setPendingUnlock(null)}
+                    className="px-4 py-3 border border-white/10 font-grotesk text-[11px] text-label-2"
+                  >
+                    Not yet
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Distance / dwell card for the next stop */}
+          <div className="mt-4">
+            {nextStop ? (
+              <DistanceCard
+                stop={nextStop}
+                distanceM={geo.distanceM}
+                inside={geo.inside}
+                dwellProgress={geo.dwellProgress}
+                permissionState={geo.permissionState}
+                lowAccuracy={geo.lowAccuracy}
+                onPlay={() => setActiveStory(nextStop)}
+              />
+            ) : (
+              <div className="border border-white/10 bg-night-2 p-4">
+                <div className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-acid">
+                  Tour complete
+                </div>
+                <p className="mt-2 text-sm leading-relaxed text-label-1">
+                  A witch, a boxer, a lie about jazz, a pool table, a hiding place,
+                  and the night punk went overground. Your pin is waiting at
+                  Dingwalls. Wear it somewhere people will ask.
+                </p>
+              </div>
             )}
           </div>
-        )}
-      </div>
+        </>
+      )}
+
+      {simEnabled && (
+        <div className="mt-3 border border-dashed border-acid/30 bg-night-2 p-3">
+          <div className="flex items-center justify-between gap-3">
+            <span className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-acid/60">
+              Sim mode
+            </span>
+            {!tourStarted ? (
+              <button
+                onClick={simulateArrival}
+                className="bg-acid px-4 py-2 font-grotesk text-[11px] font-bold uppercase tracking-[0.2em] text-black"
+              >
+                Start tour →
+              </button>
+            ) : nextStop ? (
+              <button
+                onClick={simulateArrival}
+                className="bg-acid px-4 py-2 font-grotesk text-[11px] font-bold uppercase tracking-[0.2em] text-black"
+              >
+                Arrive at stop {nextStop.position} →
+              </button>
+            ) : (
+              <span className="font-grotesk text-[11px] text-label-2">All stops done</span>
+            )}
+          </div>
+          {geo.position && (
+            <p className="mt-2 font-mono text-[9.5px] text-label-3">
+              {geo.position.lat.toFixed(6)}, {geo.position.lng.toFixed(6)} ±{Math.round(geo.position.accuracy)}m
+              {geo.distanceM !== null && ` · ${Math.round(geo.distanceM)}m from pin`}
+              {geo.lowAccuracy && ' · LOW ACC'}
+              {distanceToTube !== null && ` · ${Math.round(distanceToTube)}m from tube`}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Stop list */}
       <motion.ul
@@ -465,6 +577,149 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         )}
       </AnimatePresence>
     </main>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+
+function StartGate({
+  nearTube,
+  distanceToTube,
+  introUrl,
+  onStart,
+}: {
+  nearTube: boolean
+  distanceToTube: number | null
+  introUrl: string
+  onStart: () => void
+}) {
+  const [started, setStarted] = useState(false)
+
+  const handleStart = () => {
+    setStarted(true)
+    onStart()
+  }
+
+  if (started) return null
+
+  return (
+    <motion.div
+      className="mt-4 border border-white/10 bg-night-2 p-4"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 22 }}
+    >
+      <div className="flex items-center gap-2 font-grotesk text-[10px] uppercase tracking-[0.3em] text-label-2">
+        <FlagCheckered size={13} weight="fill" color="#CCFF00" />
+        Starting point
+      </div>
+
+      {nearTube ? (
+        <>
+          <p className="mt-2 text-[14px] font-semibold text-label-1">
+            You are at Camden Town tube.
+          </p>
+          <p className="mt-1 font-grotesk text-[11px] leading-relaxed text-label-2">
+            Tap below to start the tour and play the introduction.
+          </p>
+          <StartGateAudio url={introUrl} onStart={handleStart} />
+        </>
+      ) : (
+        <>
+          <p className="mt-2 text-[14px] font-semibold text-label-1">
+            Walk to Camden Town tube to begin.
+          </p>
+          <p className="mt-1 font-grotesk text-[11px] leading-relaxed text-label-2">
+            {distanceToTube !== null
+              ? `${Math.round(distanceToTube)}m from the start. The tour begins at the tube entrance on Camden High Street.`
+              : 'Waiting for a GPS fix. Head to Camden Town tube.'}
+          </p>
+          <div className="mt-3 flex items-center gap-2">
+            <MapPin size={14} weight="fill" color="#CCFF00" />
+            <span className="font-grotesk text-[11px] text-label-2">
+              Camden Town, London NW1 0JH
+            </span>
+          </div>
+        </>
+      )}
+    </motion.div>
+  )
+}
+
+// Separate component so the audio element is only mounted when the user is
+// at the tube, avoiding the iOS autoplay block: by the time they tap "Start
+// the tour", the button tap counts as a user gesture and audio plays.
+function StartGateAudio({
+  url,
+  onStart,
+}: {
+  url: string
+  onStart: () => void
+}) {
+  const audioRef = useRef<HTMLAudioElement>(null)
+  const [playing, setPlaying] = useState(false)
+  const [elapsed, setElapsed] = useState(0)
+  const [duration, setDuration] = useState(0)
+
+  const handleStart = () => {
+    onStart()
+    audioRef.current?.play().catch(() => {})
+  }
+
+  const togglePlay = () => {
+    const el = audioRef.current
+    if (!el) return
+    if (playing) el.pause()
+    else el.play().catch(() => {})
+  }
+
+  return (
+    <>
+      <audio
+        ref={audioRef}
+        src={url}
+        preload="auto"
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onTimeUpdate={(e) => setElapsed(e.currentTarget.currentTime)}
+        onLoadedMetadata={(e) => {
+          if (Number.isFinite(e.currentTarget.duration))
+            setDuration(e.currentTarget.duration)
+        }}
+      />
+      {!playing && elapsed === 0 ? (
+        <button
+          onClick={handleStart}
+          className="mt-4 w-full bg-acid px-5 py-4 font-jost text-lg font-bold uppercase tracking-[0.08em] text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]"
+        >
+          Start the tour
+        </button>
+      ) : (
+        <div className="mt-4 flex items-center gap-3">
+          <button
+            onClick={togglePlay}
+            aria-label={playing ? 'Pause' : 'Play'}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-acid text-black"
+          >
+            {playing ? <Pause size={16} weight="fill" /> : <Play size={16} weight="fill" />}
+          </button>
+          <div className="flex-1">
+            <div className="font-grotesk text-[10px] uppercase tracking-[0.2em] text-label-3">
+              Introduction
+            </div>
+            <div className="relative mt-1.5 h-[2px] bg-white/10">
+              <div
+                className="h-full bg-acid"
+                style={{ width: duration > 0 ? `${(elapsed / duration) * 100}%` : '0%' }}
+              />
+            </div>
+          </div>
+          <span className="shrink-0 font-mono text-[11px] text-label-3">
+            {miniClock(elapsed)}
+          </span>
+        </div>
+      )}
+    </>
   )
 }
 

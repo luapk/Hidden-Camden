@@ -28,9 +28,9 @@ export const INTRO_AUDIO_URL = `${AUDIO_BASE}/audio/intro.mp3`
  */
 export const START_POINT = {
   name: 'Camden Town tube',
-  lat: 51.5392,
-  lng: -0.1426,
-  radiusM: 80,
+  lat: 51.53940,
+  lng: -0.14290,
+  radiusM: 50,
 } as const
 
 /**
@@ -211,8 +211,8 @@ export const LAUNCH_ROUTE: TourStop[] = [
     subtitle: "Britpop's living room",
     address: '30 Inverness St, London NW1 7HJ',
     instagram: 'goodmixerpub',
-    lat: 51.53882,
-    lng: -0.14558,
+    lat: 51.53906,
+    lng: -0.14598,
     fenceLat: 51.53942,
     fenceLng: -0.14650,
     radiusM: 50,
