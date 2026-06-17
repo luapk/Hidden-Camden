@@ -1,7 +1,9 @@
 import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { vouchers, type Reward, type Venue, type Voucher } from '@/lib/db/schema'
+import { LAUNCH_ROUTE } from '@/lib/tour/launchRoute'
 import RedeemTicket from './RedeemTicket'
+import DemoRedeemTicket from './DemoRedeemTicket'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,6 +14,24 @@ export default async function RedeemPage({
 }: {
   params: { voucherId: string }
 }) {
+  // Demo vouchers (e.g. "demo-1") are served client-side without a DB lookup.
+  const demoMatch = params.voucherId.match(/^demo-(\d+)$/)
+  if (demoMatch) {
+    const position = parseInt(demoMatch[1], 10)
+    const stop = LAUNCH_ROUTE.find((s) => s.position === position) ?? LAUNCH_ROUTE[0]
+    return (
+      <main className="pt-4">
+        <div className="rounded-3xl bg-ink p-4 shadow-[0_12px_40px_rgba(22,18,16,0.35)]">
+          <DemoRedeemTicket
+            venueName={stop.name}
+            skuLabel={stop.rewardLabel}
+            rewardWindow={stop.rewardWindow}
+          />
+        </div>
+      </main>
+    )
+  }
+
   // The consumer shell is white; the ticket keeps its paper-on-dark look,
   // so the redeem surface wraps everything in an ink panel.
   let voucher: VoucherWithReward | undefined
