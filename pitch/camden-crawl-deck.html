@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Camden Crawl — Partner Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Jost:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --acid: #CCFF00;
+    --night: #000000;
+    --night-1: #0A0A0A;
+    --night-2: #111113;
+    --night-3: #16161A;
+    --label-1: #F5F5F7;
+    --label-2: #98989D;
+    --label-3: #5A5A5F;
+    --camden: #D8432F;
+    --line: rgba(255,255,255,0.10);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: #050505;
+    color: var(--label-1);
+    font-family: 'Jost', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .deck {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    padding: 40px 20px 80px;
+  }
+
+  /* 16:9 slide canvas */
+  .slide {
+    position: relative;
+    width: 1280px;
+    height: 720px;
+    background: var(--night);
+    overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pad { padding: 72px 80px; }
+
+  /* Type system */
+  .kicker {
+    font-family: 'Space Grotesk', monospace;
+    font-size: 13px;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--acid);
+  }
+  .kicker.muted { color: var(--label-2); }
+
+  h1.display {
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    color: var(--label-1);
+  }
+  .mono { font-family: 'Space Grotesk', monospace; }
+  .acid { color: var(--acid); }
+  .l2 { color: var(--label-2); }
+  .l3 { color: var(--label-3); }
+
+  .pagenum {
+    position: absolute;
+    bottom: 30px;
+    right: 40px;
+    font-family: 'Space Grotesk', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--label-3);
+  }
+  .brandmark {
+    position: absolute;
+    bottom: 30px;
+    left: 80px;
+    font-family: 'Space Grotesk', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--label-3);
+  }
+
+  /* Full-bleed image placeholder */
+  .bleed {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(115deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.15) 100%),
+      repeating-linear-gradient(45deg, #141414 0 2px, #0c0c0c 2px 22px);
+  }
+  .bleed.right {
+    background:
+      linear-gradient(245deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.15) 100%),
+      repeating-linear-gradient(45deg, #141414 0 2px, #0c0c0c 2px 22px);
+  }
+  .img-tag {
+    position: absolute;
+    font-family: 'Space Grotesk', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(204,255,0,0.45);
+    border: 1px dashed rgba(204,255,0,0.30);
+    padding: 5px 9px;
+    border-radius: 2px;
+  }
+
+  .relrow { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; }
+
+  /* Stat chips */
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--line); }
+  .stat {
+    padding: 30px 28px 30px 0;
+    border-right: 1px solid var(--line);
+  }
+  .stat:last-child { border-right: none; padding-right: 0; }
+  .stat:nth-child(n+2) { padding-left: 28px; }
+  .stat .num {
+    font-family: 'Anton', sans-serif;
+    font-size: 58px;
+    line-height: 1;
+    color: var(--acid);
+  }
+  .stat .lab {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--label-2);
+    line-height: 1.35;
+  }
+
+  /* Journey steps */
+  .journey { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-top: 8px; }
+  .step { position: relative; }
+  .step .dot {
+    width: 44px; height: 44px; border-radius: 50%;
+    border: 2px solid var(--acid);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Anton', sans-serif; font-size: 20px; color: var(--acid);
+  }
+  .step .arrow {
+    position: absolute; top: 21px; right: -10px; width: 20px; height: 2px; background: var(--line);
+  }
+  .step:last-child .arrow { display: none; }
+  .step h4 {
+    font-family: 'Jost', sans-serif; font-weight: 700; font-size: 17px;
+    text-transform: uppercase; letter-spacing: 0.02em; margin-top: 18px;
+  }
+  .step p { font-size: 13.5px; color: var(--label-2); margin-top: 8px; line-height: 1.45; }
+
+  /* Touchpoint cards */
+  .cards3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .card {
+    background: var(--night-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 26px 24px;
+    display: flex; flex-direction: column;
+  }
+  .card .tick { font-family: 'Space Grotesk', monospace; font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--acid); }
+  .card h3 { font-family: 'Anton', sans-serif; text-transform: uppercase; font-size: 26px; margin-top: 12px; line-height: 1; }
+  .card .price { font-family: 'Anton', sans-serif; font-size: 40px; color: var(--acid); margin-top: 16px; line-height: 1; }
+  .card .price small { font-family: 'Space Grotesk', monospace; font-size: 13px; color: var(--label-2); letter-spacing: 0.05em; }
+  .card ul { list-style: none; margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .card li { font-size: 13.5px; color: var(--label-1); padding-left: 18px; position: relative; line-height: 1.4; }
+  .card li::before { content: '+'; position: absolute; left: 0; color: var(--acid); font-weight: 700; }
+  .card .best {
+    align-self: flex-start; margin-bottom: 4px;
+    background: var(--acid); color: #000; font-family: 'Space Grotesk', monospace;
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; padding: 4px 8px; border-radius: 2px;
+  }
+
+  /* Partner logos row */
+  .logos { display: flex; gap: 14px; flex-wrap: wrap; }
+  .logo {
+    border: 1px solid var(--line); border-radius: 3px; padding: 14px 22px;
+    font-family: 'Space Grotesk', monospace; font-size: 15px; letter-spacing: 0.08em;
+    color: var(--label-1); background: var(--night-1);
+  }
+
+  /* Celeb chips */
+  .celebs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .celeb { position: relative; height: 250px; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; display: flex; align-items: flex-end; }
+  .celeb .ph {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.85)),
+      repeating-linear-gradient(45deg, #161616 0 2px, #0e0e0e 2px 20px);
+  }
+  .celeb .meta { position: relative; z-index: 2; padding: 20px; }
+  .celeb .meta .name { font-family: 'Anton', sans-serif; font-size: 26px; text-transform: uppercase; line-height: 1; }
+  .celeb .meta .role { font-family: 'Space Grotesk', monospace; font-size: 12px; color: var(--acid); letter-spacing: 0.12em; margin-top: 6px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; height: 100%; }
+  .bullets { list-style: none; display: flex; flex-direction: column; gap: 18px; }
+  .bullets li { font-size: 18px; line-height: 1.4; padding-left: 26px; position: relative; color: var(--label-1); }
+  .bullets li::before { content: '→'; position: absolute; left: 0; color: var(--acid); }
+  .bullets li b { color: var(--acid); }
+
+  .lead { font-size: 21px; line-height: 1.5; color: var(--label-1); }
+  .lead .acid { font-weight: 600; }
+
+  .divider { height: 1px; background: var(--line); width: 100%; }
+
+  .footnote { font-family: 'Space Grotesk', monospace; font-size: 10px; color: var(--label-3); letter-spacing: 0.04em; }
+
+  /* Print: one slide per landscape page */
+  @media print {
+    body { background: #fff; }
+    .deck { gap: 0; padding: 0; }
+    .slide { box-shadow: none; border: none; page-break-after: always; break-after: page; }
+    @page { size: 1280px 720px; margin: 0; }
+  }
+  .toolbar {
+    position: fixed; top: 14px; right: 16px; z-index: 99;
+    font-family: 'Space Grotesk', monospace; font-size: 12px;
+  }
+  .toolbar button {
+    background: var(--acid); color: #000; border: none; padding: 9px 14px;
+    font-family: 'Space Grotesk', monospace; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; border-radius: 3px; cursor: pointer;
+  }
+  @media print { .toolbar { display: none; } }
+</style>
+</head>
+<body>
+<div class="toolbar"><button onclick="window.print()">Print / PDF</button></div>
+<div class="deck">
+
+  <!-- SLIDE 1 — COVER -->
+  <section class="slide">
+    <div class="bleed"></div>
+    <span class="img-tag" style="top:24px; right:24px;">FULL-BLEED IMAGE · Camden high street at night, neon + crowd</span>
+    <div class="relrow pad">
+      <div class="kicker">Geofenced audio tours · Camden Town</div>
+      <div style="margin-top:auto;">
+        <h1 class="display" style="font-size:138px;">Camden<br/>Crawl</h1>
+        <p class="lead" style="max-width:620px; margin-top:26px;">
+          The streets tell the stories. The bars pour the drinks.
+          A walking tour that turns Camden's footfall into <span class="acid">verified visits</span> for the brands that built it.
+        </p>
+      </div>
+    </div>
+    <div class="brandmark">Partner Deck · 2026</div>
+    <div class="pagenum">01 / 10</div>
+  </section>
+
+  <!-- SLIDE 2 — THE OPPORTUNITY -->
+  <section class="slide">
+    <div class="relrow pad">
+      <div class="kicker">The opportunity</div>
+      <h1 class="display" style="font-size:62px; margin-top:20px; max-width:900px;">
+        Camden is one of the most walked corners of London. Almost none of it is <span class="acid">measurable.</span>
+      </h1>
+      <p class="lead l2" style="max-width:840px; margin-top:22px;">
+        Millions move through these streets every year. Brands pay for windows, billboards and pop-ups,
+        then guess at the return. We make the walk itself the medium, and the redemption the receipt.
+      </p>
+      <div style="margin-top:auto;">
+        <div class="stat-grid">
+          <div class="stat"><div class="num">28M</div><div class="lab">visitors to Camden Market every year, one of London's most visited destinations</div></div>
+          <div class="stat"><div class="num">250K</div><div class="lab">people through Camden Town every week, skewed heavily to the under-35s brands chase</div></div>
+          <div class="stat"><div class="num">91%</div><div class="lab">of consumers feel more positive about a brand after a live experience, and 85% are more likely to buy</div></div>
+        </div>
+        <p class="footnote" style="margin-top:14px;">Sources: Camden Market / LabTech visitor figures; EventTrack experiential marketing study. Figures indicative, confirm before publication.</p>
+      </div>
+    </div>
+    <div class="brandmark">Camden Crawl</div>
+    <div class="pagenum">02 / 10</div>
+  </section>
+
+  <!-- SLIDE 3 — THE SHIFT -->
+  <section class="slide">
+    <div class="bleed right"></div>
+    <span class="img-tag" style="bottom:24px; left:24px;">FULL-BLEED IMAGE · headphones, hand holding phone, Camden mural behind</span>
+    <div class="relrow pad" style="align-items:flex-start;">
+      <div style="max-width:620px;">
+        <div class="kicker">Why now</div>
+        <h1 class="display" style="font-size:60px; margin-top:20px;">The world put its headphones on.</h1>
+        <p class="lead l2" style="margin-top:22px;">
+          Audio is how a generation now experiences place. Voice-led tours and "sound maps" have turned cities into
+          things you listen to, not just look at. We give Camden a voice, and let a brand stand inside the story instead of beside it.
+        </p>
+        <ul class="bullets" style="margin-top:30px;">
+          <li>Location audio is intimate, hands-free and <b>unskippable</b> in a way a poster never is</li>
+          <li>A two-minute story earns minutes of attention, not a <b>1.5-second</b> glance</li>
+          <li>Every stop ends with an action, not an impression</li>
+        </ul>
+      </div>
+    </div>
+    <div class="brandmark">Camden Crawl</div>
+    <div class="pagenum">03 / 10</div>
+  </section>
+
+  <!-- SLIDE 4 — WHAT IT IS / CUSTOMER JOURNEY -->
+  <section class="slide">
+    <div class="relrow pad">
+      <div class="kicker">The customer journey</div>
+      <h1 class="display" style="font-size:56px; margin-top:18px;">Walk. Unlock. Listen. Bank. Redeem.</h1>
+      <p class="lead l2" style="max-width:880px; margin-top:18px;">
+        One route from Camden Town tube. Each venue unlocks only when you physically arrive.
+        No tickets to print, no hardware in the bar, no app store.
+      </p>
+      <div class="journey" style="margin-top:auto; margin-bottom:30px;">
+        <div class="step"><div class="dot">1</div><div class="arrow"></div><h4>Arrive</h4><p>You reach a venue on the route. The stop wakes up.</p></div>
+        <div class="step"><div class="dot">2</div><div class="arrow"></div><h4>Unlock</h4><p>A two-minute story about that spot plays in your ears.</p></div>
+        <div class="step"><div class="dot">3</div><div class="arrow"></div><h4>Bank</h4><p>A sponsored drink lands in your wallet, yours for 7 days.</p></div>
+        <div class="step"><div class="dot">4</div><div class="arrow"></div><h4>Redeem</h4><p>At the bar, a live ticket counts down. Staff tear it to pour.</p></div>
+        <div class="step"><div class="dot">5</div><h4>Walk on</h4><p>The next story plays you down the street to the next stop.</p></div>
+      </div>
+    </div>
+    <div class="brandmark">Camden Crawl</div>
+    <div class="pagenum">04 / 10</div>
+  </section>
+
+  <!-- SLIDE 5 — TOUCHPOINTS / WHERE A BRAND LIVES -->
+  <section class="slide">
+    <div class="relrow pad">
+      <div class="kicker">Brand touchpoints</div>
+      <h1 class="display" style="font-size:56px; margin-top:18px;">Four places a brand shows up.</h1>
+      <p class="lead l2" style="max-width:820px; margin-top:16px; margin-bottom:36px;">
+        Not a logo in a corner. A presence woven through the walk, the story and the drink in their hand.
+      </p>
+      <div class="cards3" style="grid-template-columns: repeat(4,1fr); gap:16px;">
+        <div class="card"><div class="tick">In the ear</div><h3>The Story</h3><p class="l2" style="margin-top:12px; font-size:13.5px; line-height:1.5;">Your brand named in the narration of the stop it sponsors. Heritage, not advertising.</p></div>
+        <div class="card"><div class="tick">In the hand</div><h3>The Drink</h3><p class="l2" style="margin-top:12px; font-size:13.5px; line-height:1.5;">A pint, a pour, a product sample, banked and redeemed in venue. The payoff is yours.</p></div>
+        <div class="card"><div class="tick">On screen</div><h3>The Ticket</h3><p class="l2" style="margin-top:12px; font-size:13.5px; line-height:1.5;">Co-branded redemption ticket, the moment of highest attention in the whole journey.</p></div>
+        <div class="card"><div class="tick">In store</div><h3>The Stop</h3><p class="l2" style="margin-top:12px; font-size:13.5px; line-height:1.5;">Your shop becomes a destination on the route. Footfall walked to your door.</p></div>
+      </div>
+    </div>
+    <div class="brandmark">Camden Crawl</div>
+    <div class="pagenum">05 / 10</div>
+  </section>
+
+  <!-- SLIDE 6 — THE VOICES -->
+  <section class="slide">
+    <div class="relrow pad">
+      <div class="kicker">The voices</div>
+      <h1 class="display" style="font-size:56px; margin-top:18px;">Camden, narrated by the people who made it.</h1>
+      <p class="lead l2" style="max-width:860px; margin-top:16px; margin-bottom:30px;">
+        Signature tours voiced by Camden's own. A name on the route sells the ticket and earns the press.
+      </p>
+      <div class="celebs">
+        <div class="celeb"><div class="ph"></div><span class="img-tag" style="top:16px; left:16px;">PORTRAIT</span><div class="meta"><div class="name">Suggs</div><div class="role">Madness · the Dublin Castle years</div></div></div>
+        <div class="celeb"><div class="ph"></div><span class="img-tag" style="top:16px; left:16px;">PORTRAIT</span><div class="meta"><div class="name">Yungblud</div><div class="role">The new Camden, loud and now</div></div></div>
+        <div class="celeb"><div class="ph"></div><span class="img-tag" style="top:16px; left:16px;">PORTRAIT</span><div class="meta"><div class="name">Carl Barât</div><div class="role">The Libertines · the Albion circuit</div></div></div>
+      </div>
+      <p class="footnote" style="margin-top:18px;">Talent in conversation. A signature voice is a premium tier and a launch moment in one.</p>
+    </div>
+    <div class="brandmark">Camden Crawl</div>
+    <div class="pagenum">06 / 10</div>
+  </section>
+
+  <!-- SLIDE 7 — PARTNERS -->
+  <section class="slide">
+    <div class="relrow pad">
+      <div class="kicker">Built for partners like you</div>
+      <h1 class="display" style="font-size:58px; margin-top:18px; max-width:920px;">Three names that already <span class="acid">are</span> Camden.</h1>
+      <div class="two-col" style="margin-top:30px; height:auto; flex:1;">
+        <div>
+          <ul class="bullets" style="gap:24px;">
+            <li><b>Camden Hells</b> &mdash; the drink in the wallet. Every banked pint is a verified pour, billed only when a real customer redeems in a real venue.</li>
+            <li><b>Dr. Martens</b> &mdash; a stop on the route and a reward at the till. Walk the crowd to the store, hand them a reason to cross the threshold.</li>
+            <li><b>Universal Music</b> &mdash; the new market store as a flagship stop. The tour scores the visit, the shop closes it.</li>
+          </ul>
+        </div>
+        <div>
+          <div class="kicker muted">The shape of a partnership</div>
+          <div class="cards3" style="grid-template-columns:1fr; gap:12px; margin-top:18px;">
+            <div class="card" style="padding:18px 22px;"><div class="tick">Reach</div><p style="margin-top:6px; font-size:14px;">Every walker on the route, every day it runs.</p></div>
+            <div class="card" style="padding:18px 22px;"><div class="tick">Proof</div><p style="margin-top:6px; font-size:14px;">A dashboard of verified redemptions, not estimated impressions.</p></div>
+            <div class="card" style="padding:18px 22px;"><div class="tick">Risk</div><p style="margin-top:6px; font-size:14px;">Pay on result. No stock held, no wastage, no guesswork.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="brandmark">Camden Crawl</div>
+    <div class="pagenum">07 / 10</div>
+  </section>
+
+  <!-- SLIDE 8 — WHY IT WORKS FOR BRANDS -->
+  <section class="slide">
+    <div class="bleed right"></div>
+    <span class="img-tag" style="bottom:24px; left:24px;">FULL-BLEED IMAGE · pint being poured, neon glow, paper ticket on bar</span>
+    <div class="relrow pad" style="align-items:flex-start;">
+      <div style="max-width:640px;">
+        <div class="kicker">The case for brands</div>
+        <h1 class="display" style="font-size:58px; margin-top:18px;">You only pay when it works.</h1>
+        <p class="lead l2" style="margin-top:20px;">
+          Traditional outdoor spend buys a guess. We bill against a redemption that happened, in a venue, by a real person who walked there.
+          Every pour is a data point: who, where, when, how often.
+        </p>
+        <div class="stat-grid" style="margin-top:34px;">
+          <div class="stat"><div class="num">1:1</div><div class="lab">spend tied directly to a verified redemption</div></div>
+          <div class="stat"><div class="num">100%</div><div class="lab">of activations location and dwell verified</div></div>
+          <div class="stat"><div class="num">0</div><div class="lab">hardware, stock or wastage for the venue</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="brandmark">Camden Crawl</div>
+    <div class="pagenum">08 / 10</div>
+  </section>
+
+  <!-- SLIDE 9 — PRICING MODELS -->
+  <section class="slide">
+    <div class="relrow pad">
+      <div class="kicker">Three ways to partner</div>
+      <h1 class="display" style="font-size:52px; margin-top:14px;">Pick the model that fits the goal.</h1>
+      <div class="cards3" style="margin-top:30px; flex:1;">
+        <div class="card">
+          <div class="tick">Model A</div>
+          <h3>Pay Per Pour</h3>
+          <div class="price">£ / unit<small> per verified redemption</small></div>
+          <ul>
+            <li>Pure performance. Pay only when a drink or reward is claimed</li>
+            <li>Lowest commitment, fastest to launch</li>
+            <li>Best for testing Camden before scaling</li>
+          </ul>
+          <p class="footnote" style="margin-top:auto; padding-top:16px;">Ideal: Camden Hells</p>
+        </div>
+        <div class="card">
+          <span class="best">Most popular</span>
+          <div class="tick">Model B</div>
+          <h3>Stop Sponsorship</h3>
+          <div class="price">£/month<small> + per redemption</small></div>
+          <ul>
+            <li>Own a stop on the route: story, ticket and reward</li>
+            <li>Monthly fee for presence, plus a per-pour top-up</li>
+            <li>Co-branded ticket and named narration</li>
+          </ul>
+          <p class="footnote" style="margin-top:auto; padding-top:16px;">Ideal: Dr. Martens, Universal Music</p>
+        </div>
+        <div class="card">
+          <div class="tick">Model C</div>
+          <h3>Headline Activation</h3>
+          <div class="price">£ fixed<small> campaign / launch</small></div>
+          <ul>
+            <li>A whole tour or signature celebrity route, brand-led</li>
+            <li>Launch moment, PR and full data package included</li>
+            <li>Best for a store opening or product drop</li>
+          </ul>
+          <p class="footnote" style="margin-top:auto; padding-top:16px;">Ideal: a flagship moment</p>
+        </div>
+      </div>
+      <p class="footnote" style="margin-top:14px;">Rate card on request. Models combine, a stop sponsor can headline a celebrity tour at launch.</p>
+    </div>
+    <div class="brandmark">Camden Crawl</div>
+    <div class="pagenum">09 / 10</div>
+  </section>
+
+  <!-- SLIDE 10 — CLOSE / ASK -->
+  <section class="slide">
+    <div class="bleed"></div>
+    <span class="img-tag" style="top:24px; right:24px;">FULL-BLEED IMAGE · Camden skyline dusk, lock bridge, lime accent light</span>
+    <div class="relrow pad">
+      <div class="kicker">Let's walk it</div>
+      <div style="margin-top:auto;">
+        <h1 class="display" style="font-size:96px; max-width:900px;">Be the reason<br/>they keep<br/><span class="acid">walking.</span></h1>
+        <div class="divider" style="margin:34px 0; max-width:560px;"></div>
+        <p class="lead" style="max-width:620px;">
+          A pilot route is live. We can have your brand on it in weeks, not quarters.
+        </p>
+        <p class="mono" style="margin-top:24px; font-size:15px; letter-spacing:0.06em; color:var(--label-1);">
+          Paul Knott &nbsp;·&nbsp; <span class="acid">paulknott@gmail.com</span>
+        </p>
+      </div>
+    </div>
+    <div class="brandmark">Camden Crawl</div>
+    <div class="pagenum">10 / 10</div>
+  </section>
+
+</div>
+</body>
+</html>
