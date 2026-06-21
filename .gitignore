@@ -20,8 +20,10 @@ dist/
 tsconfig.tsbuildinfo
 *.tsbuildinfo
 
-# Claude Code internals
-.claude/
+# Claude Code internals — commit settings and hooks, ignore worktrees/transcripts
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
 
 # Misc
 .DS_Store
