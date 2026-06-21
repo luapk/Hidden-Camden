@@ -117,23 +117,19 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     }
   }, [activeStory, sorted, lang])
 
-  // Reward sting: preloaded once, played on arrival. Audio element is created
-  // after a user gesture (the tap-to-start flow) so autoplay is allowed.
+  // Reward sting: plays the stop's own audio file on arrival.
   const rewardSoundRef = useRef<HTMLAudioElement | null>(null)
-  useEffect(() => {
-    const audio = new Audio('/sounds/reward.wav')
-    audio.preload = 'auto'
-    audio.volume = 0.7
-    rewardSoundRef.current = audio
-    return () => {
-      audio.pause()
-      rewardSoundRef.current = null
-    }
-  }, [])
 
-  const playReward = useCallback(() => {
-    const audio = rewardSoundRef.current
-    if (!audio) return
+  const playReward = useCallback((audioUrl: string | null) => {
+    const src = audioUrl ?? '/sounds/reward.wav'
+    // Reuse the element if the src hasn't changed, otherwise swap it out.
+    let audio = rewardSoundRef.current
+    if (!audio || audio.src !== new URL(src, window.location.href).href) {
+      audio?.pause()
+      audio = new Audio(src)
+      audio.volume = 0.7
+      rewardSoundRef.current = audio
+    }
     audio.currentTime = 0
     audio.play().catch(() => {})
   }, [])
@@ -204,7 +200,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         return
       }
       setUnlockFlash(stop)
-      playReward()
+      playReward(stop.audioUrl)
       unlockStop(stop.position)
       window.setTimeout(() => {
         setUnlockFlash(null)
