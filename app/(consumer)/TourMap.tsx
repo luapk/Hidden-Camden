@@ -164,26 +164,29 @@ export default function TourMap({
                 onSelectStop(stop)
               }}
             >
-              <button
-                aria-label={`Stop ${stop.position}: ${stop.name}`}
-                className={`relative flex h-8 w-8 items-center justify-center rounded-full font-grotesk text-[13px] font-bold ${
-                  banked
-                    ? 'bg-acid text-black shadow-[0_0_24px_rgba(204,255,0,0.35)]'
-                    : unlocked
-                      ? 'border-2 border-acid bg-acid/25 text-acid shadow-[0_0_18px_rgba(204,255,0,0.2)]'
-                      : isNext
-                        ? 'cc-next-ring border-2 border-acid bg-black text-acid shadow-[0_0_24px_rgba(204,255,0,0.25)]'
-                        : 'border-2 border-white/20 bg-black text-label-2'
-                }`}
-              >
-                {banked ? (
-                  <Check size={15} weight="bold" />
-                ) : locked ? (
-                  <LockSimple size={13} weight="bold" />
-                ) : (
-                  stop.position
-                )}
-              </button>
+              <div className="relative flex items-center justify-center">
+                {isNext && <span className="cc-next-dot" />}
+                <button
+                  aria-label={`Stop ${stop.position}: ${stop.name}`}
+                  className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full font-grotesk text-[13px] font-bold ${
+                    banked
+                      ? 'bg-acid text-black shadow-[0_0_24px_rgba(204,255,0,0.35)]'
+                      : unlocked
+                        ? 'border-2 border-acid bg-acid/25 text-acid shadow-[0_0_18px_rgba(204,255,0,0.2)]'
+                        : isNext
+                          ? 'cc-next-ring border-2 border-acid bg-black text-acid shadow-[0_0_24px_rgba(204,255,0,0.25)]'
+                          : 'border-2 border-white/20 bg-black text-label-2'
+                  }`}
+                >
+                  {banked ? (
+                    <Check size={15} weight="bold" />
+                  ) : locked ? (
+                    <LockSimple size={13} weight="bold" />
+                  ) : (
+                    stop.position
+                  )}
+                </button>
+              </div>
             </Marker>
           )
         })}

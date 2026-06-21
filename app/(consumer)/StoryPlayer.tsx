@@ -39,6 +39,7 @@ export default function StoryPlayer({
   onMarkPaid,
   onClose,
   bypassPaywall = false,
+  autoPlay = false,
 }: {
   stop: TourStop
   paid: boolean
@@ -47,6 +48,7 @@ export default function StoryPlayer({
   onMarkPaid: () => void
   onClose: () => void
   bypassPaywall?: boolean
+  autoPlay?: boolean
 }) {
   const gated = isPaywalled(stop.position, paid) && !bypassPaywall
 
@@ -63,7 +65,7 @@ export default function StoryPlayer({
       {gated ? (
         <Paywall onUnlock={onMarkPaid} onClose={onClose} />
       ) : (
-        <StoryBody stop={stop} banked={banked} onBank={onBank} onClose={onClose} />
+        <StoryBody stop={stop} banked={banked} onBank={onBank} onClose={onClose} autoPlay={autoPlay} />
       )}
     </motion.div>
   )
@@ -76,11 +78,13 @@ function StoryBody({
   banked,
   onBank,
   onClose,
+  autoPlay = false,
 }: {
   stop: TourStop
   banked: boolean
   onBank: (position: number) => void
   onClose: () => void
+  autoPlay?: boolean
 }) {
   const { lang } = useLanguage()
   const audioUrl = localizeAudioUrl(stop.audioUrl, lang)
@@ -96,10 +100,20 @@ function StoryBody({
   const [justBanked, setJustBanked] = useState(false)
   const noAudio = audioState === 'none' || audioState === 'failed'
   const [transcriptOpen, setTranscriptOpen] = useState(false)
+  const autoPlayedRef = useRef(false)
 
   useEffect(() => {
     if (noAudio) setTranscriptOpen(true)
   }, [noAudio])
+
+  // Auto-play VO when the user arrives at a stop. Fires once per mount when
+  // autoPlay is true and the audio element is ready. Silent failure on iOS
+  // if the gesture chain is broken — the play button stays visible.
+  useEffect(() => {
+    if (!autoPlay || autoPlayedRef.current || audioState !== 'ready') return
+    autoPlayedRef.current = true
+    audioRef.current?.play().catch(() => {})
+  }, [autoPlay, audioState])
 
   const togglePlay = () => {
     const el = audioRef.current

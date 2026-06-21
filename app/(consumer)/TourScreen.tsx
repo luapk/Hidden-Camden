@@ -84,6 +84,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   const [override, setOverride] = useState<GeoPosition | null>(null)
   const [unlockFlash, setUnlockFlash] = useState<TourStop | null>(null)
   const [activeStory, setActiveStory] = useState<TourStop | null>(null)
+  const [autoPlayStory, setAutoPlayStory] = useState(false)
   const [selectedStop, setSelectedStop] = useState<TourStop | null>(null)
   const [miniAudio, setMiniAudio] = useState<{ url: string; label: string } | null>(null)
   // Link audio is armed when a story closes, then plays once the walker
@@ -224,6 +225,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
       unlockStop(stop.position)
       window.setTimeout(() => {
         setUnlockFlash(null)
+        setAutoPlayStory(true)
         setActiveStory(stop)
       }, 1500)
     },
@@ -576,8 +578,12 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
             banked={bankedStops.includes(activeStory.position)}
             onBank={bankStop}
             onMarkPaid={markPaid}
-            onClose={() => setActiveStory(null)}
+            onClose={() => {
+              setActiveStory(null)
+              setAutoPlayStory(false)
+            }}
             bypassPaywall={simEnabled}
+            autoPlay={autoPlayStory}
           />
         )}
       </AnimatePresence>

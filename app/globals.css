@@ -68,9 +68,26 @@
   animation: cc-ring-pulse 2.2s ease-out infinite;
 }
 
+/* Filled pulsing dot behind the next stop pin */
+.cc-next-dot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  margin: auto;
+  border-radius: 9999px;
+  background: rgba(204, 255, 0, 0.5);
+  animation: cc-pulse 2s ease-out infinite;
+  animation-delay: -0.4s;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cc-user-dot::before,
-  .cc-next-ring::before {
+  .cc-next-ring::before,
+  .cc-next-dot {
     animation: none;
   }
 }
