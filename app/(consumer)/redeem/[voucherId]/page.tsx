@@ -56,7 +56,7 @@ export default async function RedeemPage({
         <div className="rounded-3xl bg-ink p-4 shadow-[0_12px_40px_rgba(22,18,16,0.35)]">
           <div className="rounded-lg bg-paper px-5 py-8 text-center text-ink shadow-[0_10px_30px_rgba(0,0,0,0.55)]">
             <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-[#a3431f]">
-              Camden Crawl
+              Hidden Camden
             </div>
             <h1 className="mt-2 font-display text-2xl uppercase leading-tight tracking-tight">
               This voucher does not exist

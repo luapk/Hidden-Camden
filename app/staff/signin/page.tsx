@@ -36,7 +36,7 @@ export default function StaffSignIn() {
             Sign in with your venue email
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-label-2">
-            Enter the email your manager registered with Camden Crawl. We will send a sign-in link.
+            Enter the email your manager registered with Hidden Camden. We will send a sign-in link.
           </p>
           <form onSubmit={submit} className="mt-6 flex flex-col items-center gap-3">
             <input

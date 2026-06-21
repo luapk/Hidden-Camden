@@ -16,7 +16,7 @@ async function sendMagicLink(email: string, url: string): Promise<void> {
     console.log(`\n[Auth] Magic link for ${email}:\n${url}\n`)
     return
   }
-  const from = process.env.EMAIL_FROM ?? 'Camden Crawl <noreply@camdencrawl.com>'
+  const from = process.env.EMAIL_FROM ?? 'Hidden Camden <noreply@hiddencamden.com>'
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -26,8 +26,8 @@ async function sendMagicLink(email: string, url: string): Promise<void> {
     body: JSON.stringify({
       from,
       to: email,
-      subject: 'Sign in to Camden Crawl',
-      html: `<table width="100%" cellpadding="0" cellspacing="0" style="background:#161210;padding:40px 0"><tr><td align="center"><table width="480" cellpadding="0" cellspacing="0" style="background:#1A1714;padding:32px"><tr><td><p style="font-family:monospace;font-size:11px;letter-spacing:0.3em;color:#CCFF00;margin:0 0 8px">CAMDEN CRAWL</p><h1 style="font-size:22px;color:#F0E6D2;margin:0 0 24px;font-family:sans-serif">Sign in to Staff</h1><p style="color:#8A8077;font-size:14px;margin:0 0 24px;font-family:sans-serif">Click the button to sign in. This link expires in 24 hours.</p><a href="${url}" style="display:inline-block;background:#CCFF00;color:#000;font-family:sans-serif;font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:12px 24px;text-decoration:none">Sign in</a><p style="color:#5A5A5F;font-size:11px;margin:24px 0 0;font-family:monospace">If you did not request this, ignore this email.</p></td></tr></table></td></tr></table>`,
+      subject: 'Sign in to Hidden Camden',
+      html: `<table width="100%" cellpadding="0" cellspacing="0" style="background:#161210;padding:40px 0"><tr><td align="center"><table width="480" cellpadding="0" cellspacing="0" style="background:#1A1714;padding:32px"><tr><td><p style="font-family:monospace;font-size:11px;letter-spacing:0.3em;color:#CCFF00;margin:0 0 8px">HIDDEN CAMDEN</p><h1 style="font-size:22px;color:#F0E6D2;margin:0 0 24px;font-family:sans-serif">Sign in to Staff</h1><p style="color:#8A8077;font-size:14px;margin:0 0 24px;font-family:sans-serif">Click the button to sign in. This link expires in 24 hours.</p><a href="${url}" style="display:inline-block;background:#CCFF00;color:#000;font-family:sans-serif;font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:12px 24px;text-decoration:none">Sign in</a><p style="color:#5A5A5F;font-size:11px;margin:24px 0 0;font-family:monospace">If you did not request this, ignore this email.</p></td></tr></table></td></tr></table>`,
     }),
   })
   if (!res.ok) {
@@ -54,7 +54,7 @@ function getAdapter(): Adapter {
 const _base = {
   providers: [
     EmailProvider({
-      from: process.env.EMAIL_FROM ?? 'noreply@camdencrawl.com',
+      from: process.env.EMAIL_FROM ?? 'noreply@hiddencamden.com',
       sendVerificationRequest: ({ identifier, url }) =>
         sendMagicLink(identifier, url),
     }),

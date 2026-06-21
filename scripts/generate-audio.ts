@@ -1,5 +1,5 @@
 /**
- * Generates all Camden Crawl narration MP3s via ElevenLabs TTS.
+ * Generates all Hidden Camden narration MP3s via ElevenLabs TTS.
  * Run: ELEVEN_API_KEY=sk_... pnpm dlx tsx scripts/generate-audio.ts
  */
 

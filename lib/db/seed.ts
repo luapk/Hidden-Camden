@@ -105,7 +105,7 @@ async function seed() {
   const [route] = await db
     .insert(routes)
     .values({
-      name: 'Camden Crawl Launch Route',
+      name: 'Hidden Camden Launch Route',
       status: 'live',
       paywall_after_stop: 2,
     })

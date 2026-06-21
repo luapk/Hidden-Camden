@@ -1,4 +1,4 @@
-# CAMDEN CRAWL — AUDIO SCRIPT PACK v1
+# HIDDEN CAMDEN — AUDIO SCRIPT PACK v1
 **Tour:** The Hour That Made British Music
 **Total narration:** ~19:45 (intro 1:15, seven stops, six links)
 **VO direction:** One narrator throughout. North London, lived-in, deadpan. Never tour-guide bright. Reads like a mate who knows too much, not a presenter. Pace ~150wpm, slower on the tender beats.

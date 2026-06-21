@@ -28,7 +28,7 @@ export default async function StaffTodayPage() {
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-label-2">
           Staff access works by magic link. Use the email your manager
-          registered with Camden Crawl.
+          registered with Hidden Camden.
         </p>
         <Link
           href="/staff/signin"

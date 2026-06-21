@@ -1,5 +1,5 @@
 """
-Camden Crawl partner deck — generates camden-crawl-deck.pptx
+Hidden Camden partner deck — generates camden-crawl-deck.pptx
 Run: python3 pitch/build_deck.py
 """
 from pptx import Presentation
@@ -86,7 +86,7 @@ def divider(slide, x, y, w):
 
 def footer(slide, page, total=10):
     # brandmark left
-    add_text(slide, "CAMDEN CRAWL", Inches(0.5), H - Inches(0.45),
+    add_text(slide, "HIDDEN CAMDEN", Inches(0.5), H - Inches(0.45),
              Inches(3), Inches(0.3), font_name="Space Grotesk",
              size=8, color=LABEL3, bold=True)
     # page num right

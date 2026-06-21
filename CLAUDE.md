@@ -1,8 +1,8 @@
-# CLAUDE.md — Camden Crawl
+# CLAUDE.md — Hidden Camden
 
 ## What this project is
 
-Camden Crawl is a geofenced audio tour app for Camden's music venues. Users walk a fixed route from Camden Town tube; each venue stop unlocks only when they physically arrive (40m geofence, 8s dwell). Unlocking plays a ~2:15 audio story and banks a drink voucher, redeemable later inside a venue-controlled window. Sponsors (Diageo brands) fund the drinks per verified redemption; venues pay nothing for stock and control when vouchers can be redeemed. Revenue: £4.99 tour purchase (stops 1–2 free, paywall fires mid-walk to stop 3), sponsor activation fees per redemption, venue analytics SaaS, gig ticket commission.
+Hidden Camden is a geofenced audio tour app for Camden's music venues. Users walk a fixed route from Camden Town tube; each venue stop unlocks only when they physically arrive (40m geofence, 8s dwell). Unlocking plays a ~2:15 audio story and banks a drink voucher, redeemable later inside a venue-controlled window. Sponsors (Diageo brands) fund the drinks per verified redemption; venues pay nothing for stock and control when vouchers can be redeemed. Revenue: £4.99 tour purchase (stops 1–2 free, paywall fires mid-walk to stop 3), sponsor activation fees per redemption, venue analytics SaaS, gig ticket commission.
 
 The consumer app concept, scripts, and a UX simulator already exist. **This codebase's current priorities are two backend-and-admin features:**
 

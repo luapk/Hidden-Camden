@@ -2,7 +2,7 @@ import Image from 'next/image'
 import { LAUNCH_ROUTE } from '@/lib/tour/launchRoute'
 
 export const metadata = {
-  title: 'Rewards · Camden Crawl',
+  title: 'Rewards · Hidden Camden',
 }
 
 export default function RewardsPage() {

@@ -1,5 +1,5 @@
 /**
- * All narration texts for Camden Crawl audio generation.
+ * All narration texts for Hidden Camden audio generation.
  * SFX cues stripped; paragraph breaks as double newlines.
  * Shared between scripts/generate-audio.ts and the admin API route.
  */

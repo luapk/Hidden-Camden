@@ -27,7 +27,7 @@ export default function PosterCarousel({
     posters.forEach((poster, i) => {
       const title = encodeURIComponent(poster.wikiTitle.replace(/ /g, '_'))
       fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${title}`, {
-        headers: { 'Api-User-Agent': 'CamdenCrawlApp/1.0' },
+        headers: { 'Api-User-Agent': 'HiddenCamdenApp/1.0' },
       })
         .then((r) => r.json())
         .then((data: { thumbnail?: { source?: string } }) => {

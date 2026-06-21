@@ -18,7 +18,7 @@ export default async function StaffLayout({
               Behind the bar
             </div>
             <h1 className="mt-1 truncate font-jost text-xl font-bold uppercase leading-none tracking-tight text-label-1">
-              {ctx?.venue.name ?? 'Camden Crawl'}
+              {ctx?.venue.name ?? 'Hidden Camden'}
             </h1>
           </div>
           <span className="shrink-0 rounded-full border border-acid/40 px-2.5 py-1 font-grotesk text-[10px] uppercase tracking-[0.2em] text-acid">

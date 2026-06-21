@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 
 /* ============================================================
-   CAMDEN CRAWL — core loop simulator
+   HIDDEN CAMDEN — core loop simulator
    Walk → geofence unlock → story → bank reward → paywall → redeem
    Design: pub-dark ink, gig-ticket paper, Camden red, brass.
    Signature element: the tear-off pint stub with live countdown.
@@ -200,7 +200,7 @@ function makeCode() {
   return c;
 }
 
-export default function CamdenCrawl() {
+export default function HiddenCamden() {
   const [screen, setScreen] = useState("tour"); // tour | story | wallet | redeem
   const [idx, setIdx] = useState(0); // next stop to unlock
   const [dist, setDist] = useState(STOPS[0].walk);

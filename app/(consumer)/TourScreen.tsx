@@ -291,7 +291,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         </div>
         <div className="mt-2 flex items-end justify-between gap-4">
           <h1 className="font-jost text-4xl font-bold uppercase leading-[0.95] tracking-tight text-label-1">
-            Camden <span className="text-acid">Crawl</span>
+            Hidden <span className="text-acid">Camden</span>
           </h1>
           <div
             className="shrink-0 font-grotesk text-3xl font-bold leading-none tracking-tight"

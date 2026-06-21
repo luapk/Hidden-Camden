@@ -31,7 +31,7 @@ const spaceGrotesk = Space_Grotesk({
 })
 
 export const metadata: Metadata = {
-  title: 'Camden Crawl',
+  title: 'Hidden Camden',
   description: 'A geofenced audio tour of Camden music venues.',
 }
 

@@ -25,7 +25,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="min-h-screen bg-ink text-cream">
       <header className="border-b border-smoke/30 px-6 py-4 flex items-center gap-4">
         <span style={{ fontFamily: 'var(--font-anton, sans-serif)', fontSize: '1.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          Camden Crawl
+          Hidden Camden
         </span>
         <span style={{ fontFamily: 'var(--font-courier, monospace)', fontSize: '0.75rem', color: '#C9933C', border: '1px solid #C9933C', padding: '0.125rem 0.375rem' }}>
           ADMIN
