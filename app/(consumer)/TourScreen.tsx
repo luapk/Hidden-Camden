@@ -120,14 +120,21 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   // Reward sting: plays the stop's own audio file on arrival.
   const rewardSoundRef = useRef<HTMLAudioElement | null>(null)
 
-  const playReward = useCallback((audioUrl: string | null) => {
-    const src = audioUrl ?? '/sounds/reward.wav'
-    // Reuse the element if the src hasn't changed, otherwise swap it out.
+  const playReward = useCallback((position: number) => {
+    // Per-stop guitar sting, served from /sounds/ by stop number. Independent
+    // of the DB and of the narration audioUrl, so it works in sim and live.
+    const src = `/sounds/stop-${String(position).padStart(2, '0')}.mp3`
     let audio = rewardSoundRef.current
     if (!audio || audio.src !== new URL(src, window.location.href).href) {
       audio?.pause()
       audio = new Audio(src)
       audio.volume = 0.7
+      // Missing per-stop file → fall back to the generic reward sound.
+      audio.onerror = () => {
+        const fallback = new Audio('/sounds/reward.wav')
+        fallback.volume = 0.7
+        fallback.play().catch(() => {})
+      }
       rewardSoundRef.current = audio
     }
     audio.currentTime = 0
@@ -200,7 +207,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         return
       }
       setUnlockFlash(stop)
-      playReward(stop.audioUrl)
+      playReward(stop.position)
       unlockStop(stop.position)
       window.setTimeout(() => {
         setUnlockFlash(null)

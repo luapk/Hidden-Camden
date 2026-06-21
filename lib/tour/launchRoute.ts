@@ -10,9 +10,13 @@
  * Override paths via NEXT_PUBLIC_AUDIO_BASE env var (CDN base URL, no trailing slash).
  */
 
-// Empty string = serve from public/audio/ on the same origin.
-// Set NEXT_PUBLIC_AUDIO_BASE to a CDN base URL (no trailing slash) to override.
-const AUDIO_BASE = process.env.NEXT_PUBLIC_AUDIO_BASE ?? ''
+// Public blob store base for the launch-route narration. Used as the
+// default so audio resolves on every deployment without depending on the
+// NEXT_PUBLIC_AUDIO_BASE env var being scoped into each build. The host is
+// public (not a secret); set NEXT_PUBLIC_AUDIO_BASE to override.
+const DEFAULT_AUDIO_BASE = 'https://2nrkszijjyuoqrsq.public.blob.vercel-storage.com'
+
+const AUDIO_BASE = process.env.NEXT_PUBLIC_AUDIO_BASE || DEFAULT_AUDIO_BASE
 
 export const INTRO_AUDIO_URL = `${AUDIO_BASE}/audio/intro.mp3`
 
