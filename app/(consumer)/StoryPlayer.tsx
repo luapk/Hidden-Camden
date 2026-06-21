@@ -38,6 +38,7 @@ export default function StoryPlayer({
   onBank,
   onMarkPaid,
   onClose,
+  bypassPaywall = false,
 }: {
   stop: TourStop
   paid: boolean
@@ -45,8 +46,9 @@ export default function StoryPlayer({
   onBank: (position: number) => void
   onMarkPaid: () => void
   onClose: () => void
+  bypassPaywall?: boolean
 }) {
-  const gated = isPaywalled(stop.position, paid)
+  const gated = isPaywalled(stop.position, paid) && !bypassPaywall
 
   return (
     <motion.div

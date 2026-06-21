@@ -197,12 +197,25 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     [geo.position, sorted],
   )
 
+  const [searchSim, setSearchSim] = useState(false)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setSearchSim(new URLSearchParams(window.location.search).has('sim'))
+    }
+  }, [])
+
+  const simEnabled =
+    searchSim ||
+    process.env.NEXT_PUBLIC_GEO_SIM === 'true' ||
+    geo.permissionState === 'denied'
+
   const arrive = useCallback(
     (stop: TourStop) => {
       setMiniAudio(null)
       setPendingLink(null)
       setPendingUnlock(null)
-      if (isPaywalled(stop.position, paid)) {
+      // Sim mode is for testing: walk through every stop, no paywall.
+      if (isPaywalled(stop.position, paid) && !simEnabled) {
         setActiveStory(stop)
         return
       }
@@ -214,7 +227,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         setActiveStory(stop)
       }, 1500)
     },
-    [paid, unlockStop, playReward],
+    [paid, unlockStop, playReward, simEnabled],
   )
 
   // Geofence dwell completed: auto-unlock if confident, else ask for confirm.
@@ -230,18 +243,6 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
       setPendingUnlock(nextStop)
     }
   }, [geo.triggered, nextStop, paid, arrive, isConfidentUnlock])
-
-  const [searchSim, setSearchSim] = useState(false)
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setSearchSim(new URLSearchParams(window.location.search).has('sim'))
-    }
-  }, [])
-
-  const simEnabled =
-    searchSim ||
-    process.env.NEXT_PUBLIC_GEO_SIM === 'true' ||
-    geo.permissionState === 'denied'
 
   const simulateArrival = () => {
     if (!nextStop) return
@@ -576,6 +577,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
             onBank={bankStop}
             onMarkPaid={markPaid}
             onClose={() => setActiveStory(null)}
+            bypassPaywall={simEnabled}
           />
         )}
       </AnimatePresence>
