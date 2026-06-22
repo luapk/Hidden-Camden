@@ -84,7 +84,7 @@ def stat_block(slide, num, label, x, y):
 def divider(slide, x, y, w):
     add_rect(slide, x, y, w, Pt(1.5), LINE)
 
-def footer(slide, page, total=10):
+def footer(slide, page, total=11):
     # brandmark left
     add_text(slide, "HIDDEN CAMDEN", Inches(0.5), H - Inches(0.45),
              Inches(3), Inches(0.3), font_name="Space Grotesk",
@@ -144,7 +144,7 @@ sp = overlay.element
 sp_pr = sp.find('{http://schemas.openxmlformats.org/drawingml/2006/main}spPr')
 
 kicker(s, "Geofenced audio tours · Camden Town", Inches(0.85), Inches(0.85))
-display_head(s, "Camden\nCrawl", Inches(0.85), Inches(1.4), Inches(8), size=96)
+display_head(s, "Hidden\nCamden", Inches(0.85), Inches(1.4), Inches(8), size=96)
 body(s, "The streets tell the stories. The bars pour the drinks.\nA walking tour that turns Camden's footfall into verified visits\nfor the brands that built it.",
      Inches(0.85), Inches(5.6), Inches(6.8), h=Inches(1.5), size=16, color=LABEL1)
 footer(s, 1)
@@ -435,7 +435,101 @@ for m in models:
 footer(s, 9)
 
 # ─────────────────────────────────────────────────────────────────────────────
-# SLIDE 10 — CLOSE
+# SLIDE 10 — SCENARIOS / THE NUMBERS
+# ─────────────────────────────────────────────────────────────────────────────
+s = prs.slides.add_slide(BLANK)
+bg(s)
+kicker(s, "What it earns", Inches(0.85), Inches(0.6))
+display_head(s, "Three ways the model runs.", Inches(0.85), Inches(0.98), Inches(11.5), size=36)
+
+scenarios = [
+    {
+        "tag": "Scenario A",
+        "name": "Tight & Local",
+        "rev": "£148K",
+        "sub": "PER YEAR · 37% MARGIN",
+        "split": "You £89k · Partner £59k",
+        "footfall": "~12.5k tour-starts/mo (8k organic + 4.5k bought) → 1.2k paid tours",
+        "spend": "Street team £5k · Online £2k · Billboards £0 · Fixed £5k → £12k out",
+        "charge": "2 sponsors @ £4k · 8 venues @ £100 · Tour £4.99 · Booze £1.50/serve · Merch",
+        "verdict": "Bootstrap it. Profit from day one.",
+        "best": False,
+    },
+    {
+        "tag": "Scenario B",
+        "name": "B2B Heavy",
+        "rev": "£398K",
+        "sub": "PER YEAR · 44% MARGIN",
+        "split": "You £239k · Partner £159k",
+        "footfall": "~22k tour-starts/mo (15k organic + 7k bought) → 1.8k paid tours",
+        "spend": "Street team £6k · Online £6k · Billboards £4k · Fixed £9k → £25k out",
+        "charge": "4 sponsors @ £7k · 15 venues @ £200 · Tour £3.99 · Booze £2.00/serve · Merch",
+        "verdict": "Sell the audience, not the tour.",
+        "best": True,
+    },
+    {
+        "tag": "Scenario C",
+        "name": "Full Throttle Lean",
+        "rev": "£881K",
+        "sub": "PER YEAR · 47% MARGIN",
+        "split": "You £529k · Partner £352k",
+        "footfall": "~40k tour-starts/mo (30k organic + 11k bought) → 4.5k paid tours",
+        "spend": "Street team £8k · Online £12k · Billboards £6k · Fixed £18k → £44k out",
+        "charge": "5 sponsors @ £8k · 20 venues @ £250 · Tour £4.99 + celeb upsell · Booze £2.00/serve · Merch",
+        "verdict": "The destination. A and B fund the climb.",
+        "best": False,
+    },
+]
+
+mx = Inches(0.5)
+mw = Inches(4.04)
+y0 = Inches(2.1)
+ch = Inches(4.15)
+pad = Inches(0.2)
+cw = mw - Inches(0.4)
+for m in scenarios:
+    card = dark_card(s, mx, y0, mw, ch)
+    if m["best"]:
+        # acid top border marks the recommended path
+        card.line.color.rgb = ACID
+        card.line.width = Pt(1.5)
+        add_rect(s, mx, y0, mw, Pt(3), ACID)
+    cxp = mx + pad
+    add_text(s, m["tag"].upper(), cxp, y0 + Inches(0.16), cw, Inches(0.3),
+             font_name="Space Grotesk", size=9, color=ACID, bold=True)
+    add_text(s, m["name"].upper(), cxp, y0 + Inches(0.40), cw, Inches(0.5),
+             font_name="Anton", size=19, color=LABEL1)
+    add_text(s, m["rev"], cxp, y0 + Inches(0.78), cw, Inches(0.6),
+             font_name="Anton", size=30, color=ACID)
+    add_text(s, m["sub"], cxp, y0 + Inches(1.38), cw, Inches(0.3),
+             font_name="Space Grotesk", size=8.5, color=LABEL2, bold=True)
+    add_text(s, m["split"], cxp, y0 + Inches(1.62), cw, Inches(0.3),
+             font_name="Jost", size=11, color=LABEL1)
+    divider(s, cxp, y0 + Inches(1.98), cw)
+    rows = [("Footfall", m["footfall"]), ("Spend", m["spend"]), ("Charge", m["charge"])]
+    ry = y0 + Inches(2.08)
+    for label, value in rows:
+        add_text(s, label.upper(), cxp, ry, cw, Inches(0.22),
+                 font_name="Space Grotesk", size=8, color=ACID, bold=True)
+        add_text(s, value, cxp, ry + Inches(0.19), cw, Inches(0.5),
+                 font_name="Jost", size=9, color=LABEL1)
+        ry += Inches(0.55)
+    add_text(s, m["verdict"], cxp, y0 + Inches(3.78), cw, Inches(0.32),
+             font_name="Jost", size=10.5, color=ACID, italic=True)
+    mx += mw + Inches(0.135)
+
+assumptions = ("Assumptions: Figures are monthly, directional, and pre-tax. Even the largest case is under 2% of "
+               "Camden's ~2.5M monthly visitors, so volume is conservative, not heroic. The load-bearing variables "
+               "are landing the sponsors (the bulk of profit), holding paid acquisition at roughly £1.40-£2.50 per "
+               "tour-start, and a ~8-11% free-to-paid conversion. Sponsor counts and fees are targets, not signed "
+               "deals; the rest scales off footfall the model treats as already walking past.")
+add_text(s, assumptions, Inches(0.5), Inches(6.4), Inches(12.33), Inches(0.6),
+         font_name="Jost", size=8.5, color=LABEL3)
+
+footer(s, 10)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SLIDE 11 — CLOSE
 # ─────────────────────────────────────────────────────────────────────────────
 s = prs.slides.add_slide(BLANK)
 bg(s)
@@ -455,7 +549,7 @@ body(s, "A pilot route is live. We can have your brand on it\nin weeks, not quar
 add_text(s, "paulknott@gmail.com", Inches(0.85), Inches(6.85), Inches(6.5), Inches(0.4),
          font_name="Space Grotesk", size=13, color=ACID, bold=True)
 
-footer(s, 10)
+footer(s, 11)
 
 # ─────────────────────────────────────────────────────────────────────────────
 out = "pitch/camden-crawl-deck.pptx"
