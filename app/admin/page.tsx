@@ -8,17 +8,26 @@ export default async function AdminDashboard() {
   const todayStart = new Date()
   todayStart.setUTCHours(0, 0, 0, 0)
 
-  const [venueCount, routeCount, vouchersToday] = await Promise.all([
-    db.select({ n: count() }).from(venues),
-    db.select({ n: count() }).from(routes).where(eq(routes.status, 'live')),
-    db.select({ n: count() }).from(vouchers).where(gte(vouchers.issued_at, todayStart)),
-  ])
-
-  const stats = [
-    { label: 'Venues', value: venueCount[0]?.n ?? 0 },
-    { label: 'Live routes', value: routeCount[0]?.n ?? 0 },
-    { label: 'Vouchers issued today', value: vouchersToday[0]?.n ?? 0 },
+  let stats = [
+    { label: 'Venues', value: '—' },
+    { label: 'Live routes', value: '—' },
+    { label: 'Vouchers issued today', value: '—' },
   ]
+
+  try {
+    const [venueCount, routeCount, vouchersToday] = await Promise.all([
+      db.select({ n: count() }).from(venues),
+      db.select({ n: count() }).from(routes).where(eq(routes.status, 'live')),
+      db.select({ n: count() }).from(vouchers).where(gte(vouchers.issued_at, todayStart)),
+    ])
+    stats = [
+      { label: 'Venues', value: String(venueCount[0]?.n ?? 0) },
+      { label: 'Live routes', value: String(routeCount[0]?.n ?? 0) },
+      { label: 'Vouchers issued today', value: String(vouchersToday[0]?.n ?? 0) },
+    ]
+  } catch {
+    // DB not available in this environment
+  }
 
   return (
     <div>
