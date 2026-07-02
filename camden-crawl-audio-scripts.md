@@ -46,7 +46,7 @@ Your first reward just landed. One pint, on us, any time before five. Jinny's ro
 
 ### LINK 01→02 (0:35)
 
-Out of the World's End, turn right, and walk up the High Street with the tube on your left. You're looking for the building that out-lasted the Luftwaffe. Forty seconds, on your left, past the shopfronts shaped like giant boots and dragons. While you walk: everything you're about to hear is true, which by Camden standards is rare.
+Out of the World's End, turn right, and walk up the High Street with the tube on your right. You're looking for the building that out-lasted the Luftwaffe. Forty seconds, on your left, past the shopfronts shaped like giant boots and dragons. While you walk: everything you're about to hear is true, which by Camden standards is rare.
 
 ---
 
