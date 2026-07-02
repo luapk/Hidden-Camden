@@ -212,13 +212,18 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   const [searchSim, setSearchSim] = useState(false)
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setSearchSim(new URLSearchParams(window.location.search).has('sim'))
+      // Keyed, not bare: a guessable ?sim would let anyone walk the tour
+      // (and skip the paywall) from their sofa.
+      setSearchSim(
+        new URLSearchParams(window.location.search).get('sim') === 'backstage',
+      )
     }
   }, [])
 
-  // Sim mode is a demo affordance: the ?sim query param or the env flag.
-  // Never auto-enabled by a denied location permission — that would hand a
-  // free walkthrough (and paywall bypass) to anyone who taps "Don't allow".
+  // Sim mode is a demo affordance: the keyed ?sim=backstage param or the
+  // env flag. Never auto-enabled by a denied location permission — that
+  // would hand a free walkthrough (and paywall bypass) to anyone who taps
+  // "Don't allow".
   const simEnabled =
     searchSim || process.env.NEXT_PUBLIC_GEO_SIM === 'true'
 
@@ -489,6 +494,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
                 permissionState={geo.permissionState}
                 lowAccuracy={geo.lowAccuracy}
                 onPlay={() => setActiveStory(nextStop)}
+                onConfirmHere={() => setPendingUnlock(nextStop)}
               />
             ) : (
               <div className="border border-white/10 bg-night-2 p-4">
@@ -935,6 +941,7 @@ function DistanceCard({
   permissionState,
   lowAccuracy,
   onPlay,
+  onConfirmHere,
 }: {
   stop: TourStop
   distanceM: number | null
@@ -943,7 +950,13 @@ function DistanceCard({
   permissionState: string
   lowAccuracy: boolean
   onPlay: () => void
+  onConfirmHere: () => void
 }) {
+  // GPS rescue: only offered when the best available fix already puts the
+  // user at the venue's doorstep (fence + 60m of drift allowance). Distant
+  // users never see it, so the tour cannot be completed from a sofa.
+  const canConfirmHere =
+    !inside && distanceM !== null && distanceM <= stop.radiusM + 60
   const fill =
     distanceM === null
       ? 0
@@ -1043,6 +1056,14 @@ function DistanceCard({
                 ? 'Improving the GPS lock. Step into the open and it will sharpen.'
                 : `Inside ${stop.radiusM}m the story unlocks itself. No tapping, no QR codes.`}
           </p>
+          {canConfirmHere && (
+            <button
+              onClick={onConfirmHere}
+              className="mt-3 w-full border border-acid/40 py-2.5 font-grotesk text-[11px] uppercase tracking-[0.2em] text-acid"
+            >
+              At the door and nothing happening? Tap here
+            </button>
+          )}
         </div>
       )}
     </div>
