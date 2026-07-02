@@ -21,6 +21,8 @@ export interface TourGuide {
   name: string
   /** One-liner shown under the name in the picker. */
   tagline: string
+  /** Short bio hinting at what this guide's telling of the route reveals. */
+  bio: string
   /** Portrait. Placeholder shots for guides not yet recorded. */
   image: string
   status: 'live' | 'coming-soon'
@@ -32,7 +34,8 @@ export const GUIDES: TourGuide[] = [
   {
     id: 'local',
     name: 'The Local',
-    tagline: 'The house voice. Dry, North London, knows every back door.',
+    tagline: 'The house voice. Dry, North London.',
+    bio: 'Knows every back door and who got thrown out of it. Witches, boxers, and the lie about jazz, told straight.',
     image: 'https://images.unsplash.com/photo-1543832923-44667a44c804?w=600&q=80',
     status: 'live',
   },
@@ -40,6 +43,7 @@ export const GUIDES: TourGuide[] = [
     id: 'sammie',
     name: 'DJ Sammie Star',
     tagline: 'Spins at the Dublin Castle and the Good Mixer on weekends.',
+    bio: 'He has worked these rooms for a decade. Expect the bar stools that matter, the booth gossip, and what really happens after the shutters drop.',
     image: '/guides/sammie.png',
     status: 'live',
   },
@@ -47,13 +51,15 @@ export const GUIDES: TourGuide[] = [
     id: 'suggs',
     name: 'Suggs',
     tagline: 'Madness frontman. Camden royalty.',
+    bio: 'The streets that built Madness, told by the man who walked them first. Ska, sharp suits, and the ballroom that nearly swallowed the band.',
     image: 'https://images.unsplash.com/photo-1563089145-599997674d42?w=600&q=80',
     status: 'coming-soon',
   },
   {
     id: 'yungblud',
     name: 'Yungblud',
-    tagline: 'Loud, restless, underworld approved.',
+    tagline: 'Loud, restless, Underworld approved.',
+    bio: 'The new noise and where it hides. Sweat on the Underworld ceiling, eyeliner in the Ballroom toilets, and why Camden still bites.',
     image: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=600&q=80',
     status: 'coming-soon',
   },
@@ -61,6 +67,7 @@ export const GUIDES: TourGuide[] = [
     id: 'carl-barat',
     name: 'Carl Barât',
     tagline: 'The Libertines. Knows the Dublin Castle stage by heart.',
+    bio: 'Lock-ins, guerrilla gigs and the Good Old Days. He played half these rooms and got carried out of the rest.',
     image: 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=600&q=80',
     status: 'coming-soon',
   },

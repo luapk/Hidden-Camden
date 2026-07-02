@@ -26,9 +26,9 @@ import {
   directionsHref,
   type TourStop,
 } from '@/lib/tour/launchRoute'
+import Link from 'next/link'
 import { localizeAudioUrl, useLanguage } from '@/lib/tour/language'
 import { resolveAudioUrl, useGuide } from '@/lib/tour/guides'
-import GuidePicker from './GuidePicker'
 import StoryPlayer from './StoryPlayer'
 
 const TourMap = dynamic(() => import('./TourMap'), {
@@ -73,7 +73,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   } = progress
 
   const { lang } = useLanguage()
-  const { guideId } = useGuide()
+  const { guideId, guide } = useGuide()
 
   const sorted = useMemo(
     () => [...stops].sort((a, b) => a.position - b.position),
@@ -305,8 +305,27 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     <main>
       {/* Header */}
       <header>
-        <div className="font-grotesk text-[10px] uppercase tracking-[0.35em] text-acid">
-          Walking tour · NW1
+        <div className="flex items-center justify-between">
+          <div className="font-grotesk text-[10px] uppercase tracking-[0.35em] text-acid">
+            Walking tour · NW1
+          </div>
+          {/* Current guide indicator — pick happens in Settings */}
+          {lang === 'en' && (
+            <Link
+              href="/settings#guide"
+              aria-label={`Your guide: ${guide.name}. Change in settings.`}
+              className="relative block h-9 w-9 shrink-0 overflow-hidden rounded-full border-2 border-acid/70 shadow-[0_0_16px_rgba(204,255,0,0.2)]"
+            >
+              <Image
+                src={guide.image}
+                alt={guide.name}
+                fill
+                sizes="36px"
+                className="object-cover"
+                style={{ filter: 'grayscale(15%) contrast(1.05)' }}
+              />
+            </Link>
+          )}
         </div>
         <div className="mt-2 flex items-end justify-between gap-4">
           <h1 className="font-jost text-4xl font-bold uppercase leading-[0.95] tracking-tight text-label-1">
@@ -360,8 +379,6 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         ))}
       </div>
 
-      {/* Guide chooser — guides narrate in English only */}
-      {lang === 'en' && <GuidePicker />}
 
       {/* Map */}
       <div className="relative mt-4 h-[50vh] min-h-[280px] overflow-hidden rounded-2xl border border-white/10">
@@ -659,6 +676,7 @@ function StartGate({
           <p className="mt-1 font-grotesk text-[11px] leading-relaxed text-label-2">
             Tap below to start the tour and play the introduction.
           </p>
+          <GuideNudge />
           <StartGateAudio url={introUrl} fallbackUrl={introFallbackUrl} onStart={handleStart} />
         </>
       ) : (
@@ -680,6 +698,47 @@ function StartGate({
         </>
       )}
     </motion.div>
+  )
+}
+
+/**
+ * The moment before the walk begins is the one time the user is standing
+ * still with headphones going in — the best moment to choose whose voice
+ * they walk with. Shows the current guide and points at Settings to swap.
+ */
+function GuideNudge() {
+  const { lang } = useLanguage()
+  const { guide } = useGuide()
+
+  if (lang !== 'en') return null
+
+  return (
+    <Link
+      href="/settings#guide"
+      className="mt-3 flex items-center gap-3 border border-white/10 bg-night-3/60 p-2.5"
+    >
+      <span className="relative block h-10 w-10 shrink-0 overflow-hidden rounded-full border border-acid/60">
+        <Image
+          src={guide.image}
+          alt={guide.name}
+          fill
+          sizes="40px"
+          className="object-cover"
+          style={{ filter: 'grayscale(15%) contrast(1.05)' }}
+        />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-grotesk text-[9px] uppercase tracking-[0.25em] text-label-3">
+          Walking with
+        </span>
+        <span className="mt-0.5 block truncate font-jost text-[13.5px] font-bold uppercase tracking-tight text-label-1">
+          {guide.name}
+        </span>
+      </span>
+      <span className="shrink-0 font-grotesk text-[10px] uppercase tracking-[0.15em] text-acid">
+        Change →
+      </span>
+    </Link>
   )
 }
 

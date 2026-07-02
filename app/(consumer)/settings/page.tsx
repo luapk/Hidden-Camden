@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { CaretDown, Globe, Waveform } from '@phosphor-icons/react'
 import { LANGUAGES, useLanguage } from '@/lib/tour/language'
-import { GUIDES, useGuide } from '@/lib/tour/guides'
+import GuidePicker from '../GuidePicker'
 
 const FAQS: { q: string; a: string }[] = [
   {
@@ -35,7 +35,6 @@ const FAQS: { q: string; a: string }[] = [
 
 export default function SettingsPage() {
   const { lang, setLang, hydrated } = useLanguage()
-  const { guideId, setGuide, hydrated: guideHydrated } = useGuide()
   const [open, setOpen] = useState<number | null>(null)
 
   return (
@@ -79,38 +78,12 @@ export default function SettingsPage() {
           </p>
         </div>
 
-        <div className="mt-5">
+        <div id="guide" className="mt-5 scroll-mt-6">
           <div className="flex items-center gap-1.5 font-grotesk text-[11px] uppercase tracking-[0.25em] text-label-2">
             <Waveform size={14} weight="bold" />
-            Tour guide
+            Your guide
           </div>
-          <div className="mt-2.5 flex flex-wrap gap-2">
-            {GUIDES.map((g) => {
-              const comingSoon = g.status === 'coming-soon'
-              const active = guideHydrated && g.id === guideId
-              return (
-                <button
-                  key={g.id}
-                  onClick={comingSoon ? undefined : () => setGuide(g.id)}
-                  aria-disabled={comingSoon}
-                  className={`rounded-full border px-3 py-1.5 text-[12.5px] font-medium transition-colors ${
-                    active
-                      ? 'border-acid bg-acid text-black'
-                      : comingSoon
-                        ? 'cursor-default border-white/10 bg-night-3 text-label-3'
-                        : 'border-white/10 bg-night-3 text-label-1'
-                  }`}
-                >
-                  {g.name}
-                  {comingSoon && (
-                    <span className="ml-1.5 font-grotesk text-[9px] uppercase tracking-[0.15em] text-label-3">
-                      Soon
-                    </span>
-                  )}
-                </button>
-              )
-            })}
-          </div>
+          <GuidePicker />
           <p className="mt-2.5 font-grotesk text-[10.5px] text-label-3">
             Same route, same stops, a different voice in your ears. Guides narrate in English.
           </p>
