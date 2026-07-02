@@ -395,10 +395,17 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         <StartGate
           nearTube={nearTube || simEnabled}
           distanceToTube={distanceToTube}
-          introUrl={resolveAudioUrl(INTRO_AUDIO_URL, lang, guideId) ?? INTRO_AUDIO_URL}
-          introFallbackUrl={localizeAudioUrl(INTRO_AUDIO_URL, lang) ?? INTRO_AUDIO_URL}
+          permissionState={geo.permissionState}
           onStart={() => {
             startTour()
+            // The intro rides the persistent mini player so it survives this
+            // card unmounting and keeps its controls on screen. Arrival at
+            // stop 1 clears it, so it can never talk over the first story.
+            setMiniAudio({
+              url: resolveAudioUrl(INTRO_AUDIO_URL, lang, guideId) ?? INTRO_AUDIO_URL,
+              fallbackUrl: localizeAudioUrl(INTRO_AUDIO_URL, lang) ?? INTRO_AUDIO_URL,
+              label: 'Introduction',
+            })
           }}
         />
       )}
@@ -621,24 +628,29 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
 function StartGate({
   nearTube,
   distanceToTube,
-  introUrl,
-  introFallbackUrl,
+  permissionState,
   onStart,
 }: {
   nearTube: boolean
   distanceToTube: number | null
-  introUrl: string
-  introFallbackUrl: string
+  permissionState: string
   onStart: () => void
 }) {
-  const [started, setStarted] = useState(false)
+  // One live status line, so the user always knows what the app is waiting
+  // for. The button itself never waits: the gate guides, it does not block.
+  const statusLine = nearTube
+    ? "That's the spot. Headphones in."
+    : distanceToTube !== null
+      ? `${Math.round(distanceToTube)}m away. It's the entrance on Camden High Street.`
+      : permissionState === 'denied'
+        ? 'Location is off, so the app cannot see you arrive. Turn it on for the full experience.'
+        : 'Getting a GPS fix. Head for the tube in the meantime.'
 
-  const handleStart = () => {
-    setStarted(true)
-    onStart()
-  }
-
-  if (started) return null
+  const steps: { label: string; done: boolean }[] = [
+    { label: 'Meet at Camden Town tube', done: nearTube },
+    { label: 'Tap start. The intro plays in your ears', done: false },
+    { label: 'Walk. Stories unlock when your feet arrive', done: false },
+  ]
 
   return (
     <motion.div
@@ -652,34 +664,71 @@ function StartGate({
         Starting point
       </div>
 
-      {nearTube ? (
-        <>
-          <p className="mt-2 text-[14px] font-semibold text-label-1">
-            You are at Camden Town tube.
-          </p>
-          <p className="mt-1 font-grotesk text-[11px] leading-relaxed text-label-2">
-            Tap below to start the tour and play the introduction.
-          </p>
-          <GuideNudge />
-          <StartGateAudio url={introUrl} fallbackUrl={introFallbackUrl} onStart={handleStart} />
-        </>
-      ) : (
-        <>
-          <p className="mt-2 text-[14px] font-semibold text-label-1">
-            Walk to Camden Town tube to begin.
-          </p>
-          <p className="mt-1 font-grotesk text-[11px] leading-relaxed text-label-2">
-            {distanceToTube !== null
-              ? `${Math.round(distanceToTube)}m from the start. The tour begins at the tube entrance on Camden High Street.`
-              : 'Waiting for a GPS fix. Head to Camden Town tube.'}
-          </p>
-          <div className="mt-3 flex items-center gap-2">
-            <MapPin size={14} weight="fill" color="#CCFF00" />
-            <span className="font-grotesk text-[11px] text-label-2">
-              Camden Town, London NW1 0JH
+      <p className="mt-2 text-[15px] font-semibold text-label-1">
+        {nearTube
+          ? 'You are at Camden Town tube.'
+          : 'The tour starts at Camden Town tube.'}
+      </p>
+      <p className="mt-1 font-grotesk text-[11px] leading-relaxed text-label-2">
+        {statusLine}
+      </p>
+
+      {/* How it works, in three lines. Step one ticks itself off live. */}
+      <ol className="mt-4 space-y-2">
+        {steps.map((step, i) => (
+          <li key={step.label} className="flex items-center gap-2.5">
+            {step.done ? (
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-acid">
+                <Check size={11} weight="bold" color="#000000" />
+              </span>
+            ) : (
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white/15 font-grotesk text-[10px] font-bold text-label-3">
+                {i + 1}
+              </span>
+            )}
+            <span
+              className={`font-grotesk text-[12px] ${
+                step.done ? 'text-label-1' : 'text-label-2'
+              }`}
+            >
+              {step.label}
             </span>
-          </div>
-        </>
+          </li>
+        ))}
+      </ol>
+
+      {!nearTube && (
+        <a
+          href={directionsHref(START_POINT.name, 'Camden High Street, London NW1 0JH')}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-3 flex items-center justify-between border border-white/10 bg-night-3/60 px-3 py-2.5"
+        >
+          <span className="flex items-center gap-2">
+            <MapPin size={14} weight="fill" color="#CCFF00" />
+            <span className="font-grotesk text-[11.5px] text-label-1">
+              Camden Town tube, NW1 0JH
+            </span>
+          </span>
+          <span className="flex items-center gap-1.5 font-grotesk text-[10px] uppercase tracking-[0.15em] text-acid">
+            <NavigationArrow size={12} weight="bold" />
+            Directions
+          </span>
+        </a>
+      )}
+
+      <GuideNudge />
+
+      <button
+        onClick={onStart}
+        className="mt-4 w-full bg-acid px-5 py-4 font-jost text-lg font-bold uppercase tracking-[0.08em] text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]"
+      >
+        Start the tour
+      </button>
+      {!nearTube && (
+        <p className="mt-2 font-grotesk text-[10.5px] leading-relaxed text-label-3">
+          Not there yet? Start anyway. The intro plays now and the map walks you to stop 1.
+        </p>
       )}
     </motion.div>
   )
@@ -723,90 +772,6 @@ function GuideNudge() {
         Change →
       </span>
     </Link>
-  )
-}
-
-// Separate component so the audio element is only mounted when the user is
-// at the tube, avoiding the iOS autoplay block: by the time they tap "Start
-// the tour", the button tap counts as a user gesture and audio plays.
-function StartGateAudio({
-  url,
-  fallbackUrl,
-  onStart,
-}: {
-  url: string
-  fallbackUrl: string
-  onStart: () => void
-}) {
-  const audioRef = useRef<HTMLAudioElement>(null)
-  const [playing, setPlaying] = useState(false)
-  const [elapsed, setElapsed] = useState(0)
-  const [duration, setDuration] = useState(0)
-  // Guide intro not recorded yet → quietly swap in the house narration.
-  const [src, setSrc] = useState(url)
-
-  const handleStart = () => {
-    onStart()
-    audioRef.current?.play().catch(() => {})
-  }
-
-  const togglePlay = () => {
-    const el = audioRef.current
-    if (!el) return
-    if (playing) el.pause()
-    else el.play().catch(() => {})
-  }
-
-  return (
-    <>
-      <audio
-        ref={audioRef}
-        src={src}
-        preload="auto"
-        onError={() => {
-          if (src !== fallbackUrl) setSrc(fallbackUrl)
-        }}
-        onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
-        onTimeUpdate={(e) => setElapsed(e.currentTarget.currentTime)}
-        onLoadedMetadata={(e) => {
-          if (Number.isFinite(e.currentTarget.duration))
-            setDuration(e.currentTarget.duration)
-        }}
-      />
-      {!playing && elapsed === 0 ? (
-        <button
-          onClick={handleStart}
-          className="mt-4 w-full bg-acid px-5 py-4 font-jost text-lg font-bold uppercase tracking-[0.08em] text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]"
-        >
-          Start the tour
-        </button>
-      ) : (
-        <div className="mt-4 flex items-center gap-3">
-          <button
-            onClick={togglePlay}
-            aria-label={playing ? 'Pause' : 'Play'}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-acid text-black"
-          >
-            {playing ? <Pause size={16} weight="fill" /> : <Play size={16} weight="fill" />}
-          </button>
-          <div className="flex-1">
-            <div className="font-grotesk text-[10px] uppercase tracking-[0.2em] text-label-3">
-              Introduction
-            </div>
-            <div className="relative mt-1.5 h-[2px] bg-white/10">
-              <div
-                className="h-full bg-acid"
-                style={{ width: duration > 0 ? `${(elapsed / duration) * 100}%` : '0%' }}
-              />
-            </div>
-          </div>
-          <span className="shrink-0 font-mono text-[11px] text-label-3">
-            {miniClock(elapsed)}
-          </span>
-        </div>
-      )}
-    </>
   )
 }
 
