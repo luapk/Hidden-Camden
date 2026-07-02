@@ -71,6 +71,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     bankStop,
     markPaid,
     startTour,
+    reset,
   } = progress
 
   const { lang } = useLanguage()
@@ -106,6 +107,22 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   // When geofence triggers but confidence is low (nearby stops within GPS error
   // margin), we hold and show a manual confirm instead of auto-firing.
   const [pendingUnlock, setPendingUnlock] = useState<TourStop | null>(null)
+  // TEMP: testing affordance, two-tap tour reset. Remove before launch.
+  const [confirmReset, setConfirmReset] = useState(false)
+
+  const resetTour = () => {
+    reset()
+    setOverride(null)
+    setMiniAudio(null)
+    setPendingLink(null)
+    setPendingUnlock(null)
+    setActiveStory(null)
+    setUnlockFlash(null)
+    setSelectedStop(null)
+    setAutoPlayStory(false)
+    handledRef.current = null
+    setConfirmReset(false)
+  }
 
   // When a story closes, arm the link audio for the walk to the next stop.
   const prevStoryRef = useRef<TourStop | null>(null)
@@ -298,16 +315,26 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
             <Link
               href="/settings#guide"
               aria-label={`Your guide: ${guide.name}. Change in settings.`}
-              className="relative block h-9 w-9 shrink-0 overflow-hidden rounded-full border-2 border-acid/70 shadow-[0_0_16px_rgba(204,255,0,0.2)]"
+              className="flex shrink-0 items-center gap-2"
             >
-              <Image
-                src={guide.image}
-                alt={guide.name}
-                fill
-                sizes="36px"
-                className="object-cover"
-                style={{ filter: 'grayscale(15%) contrast(1.05)' }}
-              />
+              <span className="text-right">
+                <span className="block font-grotesk text-[8px] uppercase tracking-[0.25em] text-label-3">
+                  Guide
+                </span>
+                <span className="block max-w-[110px] truncate font-jost text-[11px] font-bold uppercase tracking-tight text-label-1">
+                  {guide.name}
+                </span>
+              </span>
+              <span className="relative block h-9 w-9 shrink-0 overflow-hidden rounded-full border-2 border-acid/70 shadow-[0_0_16px_rgba(204,255,0,0.2)]">
+                <Image
+                  src={guide.image}
+                  alt={guide.name}
+                  fill
+                  sizes="36px"
+                  className="object-cover"
+                  style={{ filter: 'grayscale(15%) contrast(1.05)' }}
+                />
+              </span>
             </Link>
           )}
         </div>
@@ -543,6 +570,44 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
           )
         })}
       </motion.ul>
+
+      {/* TEMP: testing-only tour reset. Remove before launch. */}
+      {hydrated && (tourStarted || unlockedStops.length > 0) && (
+        <div className="mt-10 border-t border-white/10 pt-4">
+          {confirmReset ? (
+            <div className="border border-camden/50 bg-night-2 p-4">
+              <div className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-camden">
+                Reset the tour
+              </div>
+              <p className="mt-1.5 text-[13px] leading-relaxed text-label-1">
+                Your progress will be lost. Unlocked stories and banked rewards
+                go with it, and the tour starts again from the tube.
+              </p>
+              <div className="mt-3 flex gap-2">
+                <button
+                  onClick={resetTour}
+                  className="flex-1 bg-camden py-3 font-jost text-[14px] font-bold uppercase tracking-[0.08em] text-cream"
+                >
+                  Reset everything
+                </button>
+                <button
+                  onClick={() => setConfirmReset(false)}
+                  className="border border-white/10 px-4 py-3 font-grotesk text-[11px] text-label-2"
+                >
+                  Keep my progress
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmReset(true)}
+              className="w-full border border-white/10 py-2.5 font-grotesk text-[10px] uppercase tracking-[0.25em] text-label-3"
+            >
+              Reset tour · testing
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Marker bottom sheet */}
       <AnimatePresence>
