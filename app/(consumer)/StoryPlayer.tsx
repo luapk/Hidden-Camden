@@ -17,6 +17,7 @@ import {
 } from '@phosphor-icons/react'
 import { directionsHref, type TourStop } from '@/lib/tour/launchRoute'
 import { localizeAudioUrl, useLanguage } from '@/lib/tour/language'
+import { DEFAULT_GUIDE_ID, resolveAudioUrl, useGuide } from '@/lib/tour/guides'
 import { isPaywalled } from '@/lib/tour/useTourProgress'
 import { VENUE_POSTERS } from '@/lib/tour/venuePosters'
 import Paywall from './Paywall'
@@ -87,7 +88,15 @@ function StoryBody({
   autoPlay?: boolean
 }) {
   const { lang } = useLanguage()
-  const audioUrl = localizeAudioUrl(stop.audioUrl, lang)
+  const { guideId, guide } = useGuide()
+  const guideUrl = resolveAudioUrl(stop.audioUrl, lang, guideId)
+  const houseUrl = localizeAudioUrl(stop.audioUrl, lang)
+  // A guide whose file for this stop is not recorded yet falls back to the
+  // house narration rather than a dead player.
+  const [guideAudioFailed, setGuideAudioFailed] = useState(false)
+  const audioUrl = guideAudioFailed ? houseUrl : guideUrl
+  const guideActive =
+    lang === 'en' && guideId !== DEFAULT_GUIDE_ID && !guideAudioFailed
   const audioRef = useRef<HTMLAudioElement>(null)
   const [audioState, setAudioState] = useState<AudioState>(
     stop.audioUrl ? 'loading' : 'none',
@@ -179,6 +188,11 @@ function StoryBody({
           <div className="font-grotesk text-[11px] uppercase tracking-[0.35em] text-acid">
             Stop {stop.position} · Unlocked
           </div>
+          {guideActive && (
+            <div className="mt-1 font-grotesk text-[10px] uppercase tracking-[0.25em] text-label-2">
+              Told by <span className="text-acid">{guide.name}</span>
+            </div>
+          )}
           <h2 className="mt-1.5 font-jost text-3xl font-bold uppercase leading-[1.02] tracking-tight text-label-1">
             {stop.name}
           </h2>
@@ -234,7 +248,14 @@ function StoryBody({
           src={audioUrl}
           preload="metadata"
           onCanPlay={() => setAudioState('ready')}
-          onError={() => setAudioState('failed')}
+          onError={() => {
+            if (!guideAudioFailed && guideUrl !== houseUrl) {
+              setGuideAudioFailed(true)
+              setAudioState('loading')
+            } else {
+              setAudioState('failed')
+            }
+          }}
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
           onTimeUpdate={(e) => setElapsed(e.currentTarget.currentTime)}
@@ -279,6 +300,13 @@ function StoryBody({
       )}
 
       <div className="px-5">
+        {/* Guide file missing → house narration note */}
+        {guideAudioFailed && lang === 'en' && guideId !== DEFAULT_GUIDE_ID && (
+          <p className="mt-4 border border-white/10 bg-night-2 px-3 py-2 font-grotesk text-[11px] text-label-2">
+            {guide.name}&apos;s take on this stop lands soon. The house voice has it covered.
+          </p>
+        )}
+
         {/* No-audio fallback */}
         {noAudio && (
           <div className="mt-5 border border-white/10 bg-night-2 p-4">

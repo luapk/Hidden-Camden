@@ -20,6 +20,7 @@ vi.mock('@/lib/db', () => ({
 // We also need to stub isWithinGeofence and isWithinRedemptionWindow
 vi.mock('@/lib/geo', () => ({
   isWithinGeofence: vi.fn().mockReturnValue(true),
+  haversineDistance: vi.fn().mockReturnValue(0),
 }))
 
 vi.mock('../windows', () => ({
@@ -33,7 +34,7 @@ vi.mock('../codeAlphabet', () => ({
 }))
 
 import { db } from '@/lib/db'
-import { isWithinGeofence } from '@/lib/geo'
+import { isWithinGeofence, haversineDistance } from '@/lib/geo'
 import { isWithinRedemptionWindow } from '../windows'
 import { mintRedemptionCode } from '../mintCode'
 
@@ -89,6 +90,26 @@ const VOUCHER_BANKED = {
   reward: REWARD,
 }
 
+/**
+ * Drizzle builders are thenable at any stage, so a select can be awaited
+ * straight after .where() (count queries) or continue .orderBy().limit()
+ * (the impossible-travel lookup). `whereValue` resolves the awaited-where
+ * shape; `limitValue` resolves the orderBy().limit() shape.
+ */
+function selectChain(whereValue: unknown, limitValue: unknown = []) {
+  return {
+    from: vi.fn().mockReturnThis(),
+    innerJoin: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnValue({
+      then: (resolve: (v: unknown) => unknown, reject?: (e: unknown) => unknown) =>
+        Promise.resolve(whereValue).then(resolve, reject),
+      orderBy: vi.fn().mockReturnValue({
+        limit: vi.fn().mockResolvedValue(limitValue),
+      }),
+    }),
+  }
+}
+
 function makeDbMock(voucherOverride?: Partial<typeof VOUCHER_BANKED> | null) {
   const mockDb = vi.mocked(db)
 
@@ -97,13 +118,10 @@ function makeDbMock(voucherOverride?: Partial<typeof VOUCHER_BANKED> | null) {
     voucherOverride === null ? null : { ...VOUCHER_BANKED, ...voucherOverride },
   )
 
-  // select().from().innerJoin().where() chain for cap count → returns [{ cnt: 0 }]
-  const selectChain = {
-    from: vi.fn().mockReturnThis(),
-    innerJoin: vi.fn().mockReturnThis(),
-    where: vi.fn().mockResolvedValue([{ cnt: 0 }]),
-  }
-  ;(mockDb.select as ReturnType<typeof vi.fn>).mockReturnValue(selectChain)
+  // Counts resolve 0, the last-fix lookup resolves empty (no previous fix)
+  ;(mockDb.select as ReturnType<typeof vi.fn>).mockReturnValue(
+    selectChain([{ cnt: 0 }]),
+  )
 
   // insert().values().returning() → returns [{ id: 'redemption-1' }]
   const insertChain = {
@@ -111,8 +129,6 @@ function makeDbMock(voucherOverride?: Partial<typeof VOUCHER_BANKED> | null) {
     returning: vi.fn().mockResolvedValue([{ id: 'redemption-1' }]),
   }
   ;(mockDb.insert as ReturnType<typeof vi.fn>).mockReturnValue(insertChain)
-
-  return { selectChain }
 }
 
 // ---------------------------------------------------------------------------
@@ -128,6 +144,7 @@ describe('mintRedemptionCode', () => {
     vi.clearAllMocks()
     vi.mocked(isWithinGeofence).mockReturnValue(true)
     vi.mocked(isWithinRedemptionWindow).mockReturnValue(true)
+    vi.mocked(haversineDistance).mockReturnValue(0)
   })
 
   it('happy path: returns code and redemptionId', async () => {
@@ -223,26 +240,12 @@ describe('mintRedemptionCode', () => {
   })
 
   it('returns 429 when daily cap is reached', async () => {
+    makeDbMock()
     const mockDb = vi.mocked(db)
-    ;(mockDb.query.vouchers.findFirst as ReturnType<typeof vi.fn>).mockResolvedValue(
-      VOUCHER_BANKED,
+    // Cap check (first select) returns cnt=50 against a cap of 50
+    ;(mockDb.select as ReturnType<typeof vi.fn>).mockReturnValueOnce(
+      selectChain([{ cnt: 50 }]),
     )
-
-    // First select (cap check) returns cap=50, limit=50
-    const capChain = {
-      from: vi.fn().mockReturnThis(),
-      innerJoin: vi.fn().mockReturnThis(),
-      where: vi.fn().mockResolvedValue([{ cnt: 50 }]),
-    }
-    // Second select (rate limit check) returns 0
-    const rateChain = {
-      from: vi.fn().mockReturnThis(),
-      innerJoin: vi.fn().mockReturnThis(),
-      where: vi.fn().mockResolvedValue([{ cnt: 0 }]),
-    }
-    ;(mockDb.select as ReturnType<typeof vi.fn>)
-      .mockReturnValueOnce(capChain)
-      .mockReturnValueOnce(rateChain)
 
     const result = await mintRedemptionCode('voucher-1', userId, lat, lng, deviceHash)
     expect(result.ok).toBe(false)
@@ -265,32 +268,43 @@ describe('mintRedemptionCode', () => {
   })
 
   it('returns 429 when rate limit of 5 codes/hour is reached', async () => {
+    makeDbMock()
     const mockDb = vi.mocked(db)
-    ;(mockDb.query.vouchers.findFirst as ReturnType<typeof vi.fn>).mockResolvedValue(
-      VOUCHER_BANKED,
-    )
-
-    // Cap check returns 0 (cap not hit)
-    const capChain = {
-      from: vi.fn().mockReturnThis(),
-      innerJoin: vi.fn().mockReturnThis(),
-      where: vi.fn().mockResolvedValue([{ cnt: 0 }]),
-    }
-    // Rate limit check returns 5 (at limit)
-    const rateChain = {
-      from: vi.fn().mockReturnThis(),
-      innerJoin: vi.fn().mockReturnThis(),
-      where: vi.fn().mockResolvedValue([{ cnt: 5 }]),
-    }
     ;(mockDb.select as ReturnType<typeof vi.fn>)
-      .mockReturnValueOnce(capChain)
-      .mockReturnValueOnce(rateChain)
+      // Cap check returns 0 (cap not hit)
+      .mockReturnValueOnce(selectChain([{ cnt: 0 }]))
+      // Last-fix lookup finds nothing (no speed denial)
+      .mockReturnValueOnce(selectChain([], []))
+      // Rate limit check returns 5 (at limit)
+      .mockReturnValueOnce(selectChain([{ cnt: 5 }]))
 
     const result = await mintRedemptionCode('voucher-1', userId, lat, lng, deviceHash)
     expect(result.ok).toBe(false)
     if (!result.ok) {
       expect(result.status).toBe(429)
       expect(result.message).toContain('Too many')
+    }
+  })
+
+  it('returns 403 when the fix implies impossible travel from the last one', async () => {
+    makeDbMock()
+    const mockDb = vi.mocked(db)
+    // Last fix: recorded one minute ago...
+    ;(mockDb.select as ReturnType<typeof vi.fn>)
+      .mockReturnValueOnce(selectChain([{ cnt: 0 }]))
+      .mockReturnValueOnce(
+        selectChain([], [
+          { lat: 53.4808, lng: -2.2426, at: new Date(Date.now() - 60_000) },
+        ]),
+      )
+    // ...260km away (Manchester). 260km in a minute is not a walk.
+    vi.mocked(haversineDistance).mockReturnValue(260_000)
+
+    const result = await mintRedemptionCode('voucher-1', userId, lat, lng, deviceHash)
+    expect(result.ok).toBe(false)
+    if (!result.ok) {
+      expect(result.status).toBe(403)
+      expect(result.message).toContain('not reliable')
     }
   })
 

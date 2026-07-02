@@ -141,9 +141,17 @@ export function useGeofence(
 
   // A simulated override carries accuracy 5; real fixes carry the device's
   // reported accuracy. Anything vaguer than the gate is shown but never
-  // counts toward unlocking.
+  // counts toward unlocking. The gate scales with the fence so a 35m fence
+  // is not unlockable from a fix whose error bubble is twice the street:
+  // trust nothing vaguer than 2x the fence radius, capped at the absolute
+  // gate and floored at 50m so a tight fence still unlocks on normal urban
+  // accuracy.
+  const accuracyGateM =
+    targetRadiusM !== undefined
+      ? Math.min(ACCURACY_GATE_M, Math.max(50, targetRadiusM * 2))
+      : ACCURACY_GATE_M
   const lowAccuracy =
-    position !== null && position.accuracy > ACCURACY_GATE_M
+    position !== null && position.accuracy > accuracyGateM
 
   const inside =
     distanceM !== null &&

@@ -1,11 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { CaretDown, Globe, Waveform } from '@phosphor-icons/react'
 import { LANGUAGES, useLanguage } from '@/lib/tour/language'
-
-const VOICES = ['North London', 'RP', 'Cockney legend']
+import { GUIDES, useGuide } from '@/lib/tour/guides'
 
 const FAQS: { q: string; a: string }[] = [
   {
@@ -36,28 +35,8 @@ const FAQS: { q: string; a: string }[] = [
 
 export default function SettingsPage() {
   const { lang, setLang, hydrated } = useLanguage()
-  const [voice, setVoice] = useState(VOICES[0])
-  const [voiceHydrated, setVoiceHydrated] = useState(false)
+  const { guideId, setGuide, hydrated: guideHydrated } = useGuide()
   const [open, setOpen] = useState<number | null>(null)
-
-  useEffect(() => {
-    try {
-      const storedVoice = localStorage.getItem('cc-voice')
-      if (storedVoice && VOICES.includes(storedVoice)) setVoice(storedVoice)
-    } catch {
-      /* fine, defaults stand */
-    }
-    setVoiceHydrated(true)
-  }, [])
-
-  const pickVoice = (value: string) => {
-    setVoice(value)
-    try {
-      localStorage.setItem('cc-voice', value)
-    } catch {
-      /* ignore */
-    }
-  }
 
   return (
     <main>
@@ -103,26 +82,38 @@ export default function SettingsPage() {
         <div className="mt-5">
           <div className="flex items-center gap-1.5 font-grotesk text-[11px] uppercase tracking-[0.25em] text-label-2">
             <Waveform size={14} weight="bold" />
-            Voice
+            Tour guide
           </div>
           <div className="mt-2.5 flex flex-wrap gap-2">
-            {VOICES.map((v) => {
-              const active = voiceHydrated && v === voice
+            {GUIDES.map((g) => {
+              const comingSoon = g.status === 'coming-soon'
+              const active = guideHydrated && g.id === guideId
               return (
                 <button
-                  key={v}
-                  onClick={() => pickVoice(v)}
+                  key={g.id}
+                  onClick={comingSoon ? undefined : () => setGuide(g.id)}
+                  aria-disabled={comingSoon}
                   className={`rounded-full border px-3 py-1.5 text-[12.5px] font-medium transition-colors ${
                     active
                       ? 'border-acid bg-acid text-black'
-                      : 'border-white/10 bg-night-3 text-label-1'
+                      : comingSoon
+                        ? 'cursor-default border-white/10 bg-night-3 text-label-3'
+                        : 'border-white/10 bg-night-3 text-label-1'
                   }`}
                 >
-                  {v}
+                  {g.name}
+                  {comingSoon && (
+                    <span className="ml-1.5 font-grotesk text-[9px] uppercase tracking-[0.15em] text-label-3">
+                      Soon
+                    </span>
+                  )}
                 </button>
               )
             })}
           </div>
+          <p className="mt-2.5 font-grotesk text-[10.5px] text-label-3">
+            Same route, same stops, a different voice in your ears. Guides narrate in English.
+          </p>
         </div>
       </section>
 

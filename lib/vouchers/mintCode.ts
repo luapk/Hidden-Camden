@@ -1,7 +1,8 @@
-import { and, eq, gt, sql, count } from 'drizzle-orm'
+import { and, desc, eq, gt, sql, count } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { vouchers, rewards, venues, redemptions, redemptionDenials } from '@/lib/db/schema'
-import { isWithinGeofence } from '@/lib/geo'
+import { isWithinGeofence, haversineDistance } from '@/lib/geo'
+import { startOfLondonDay } from '@/lib/time/london'
 import { isWithinRedemptionWindow } from './windows'
 import { mintCode as generateCode } from './codeAlphabet'
 
@@ -11,6 +12,9 @@ export type MintResult =
 
 const RATE_LIMIT_CODES_PER_HOUR = 5
 const CODE_TTL_SECONDS = 60
+// Faster than any walker, cyclist, or Camden bus: a fix that implies the user
+// covered ground quicker than this since their last known fix is a spoof.
+const MAX_TRAVEL_SPEED_KMH = 25
 
 async function logDenial(
   voucherId: string | null,
@@ -108,9 +112,8 @@ export async function mintRedemptionCode(
     }
   }
 
-  // 2e. Daily cap
-  const todayStart = new Date(now)
-  todayStart.setUTCHours(0, 0, 0, 0)
+  // 2e. Daily cap — "today" means London's day, not UTC's
+  const todayStart = startOfLondonDay(now)
 
   const [capResult] = await db
     .select({ cnt: count() })
@@ -146,6 +149,37 @@ export async function mintRedemptionCode(
       ok: false,
       status: 403,
       message: 'You need to be at the venue to redeem this drink.',
+    }
+  }
+
+  // 2g. Impossible travel — compare against the user's last recorded fix.
+  // Covering ground faster than MAX_TRAVEL_SPEED_KMH means the location is
+  // spoofed (or the fix is garbage); either way, no code.
+  const [lastFix] = await db
+    .select({
+      lat: redemptions.lat,
+      lng: redemptions.lng,
+      at: redemptions.code_issued_at,
+    })
+    .from(redemptions)
+    .innerJoin(vouchers, eq(redemptions.voucher_id, vouchers.id))
+    .where(eq(vouchers.user_id, userId))
+    .orderBy(desc(redemptions.code_issued_at))
+    .limit(1)
+
+  if (lastFix && lastFix.lat !== null && lastFix.lng !== null) {
+    const km = haversineDistance(lat, lng, lastFix.lat, lastFix.lng) / 1000
+    // Floor elapsed time at one minute so two quick taps at the same bar
+    // can't divide by near-zero and trip the check on GPS jitter.
+    const hours =
+      Math.max(now.getTime() - lastFix.at.getTime(), 60_000) / 3_600_000
+    if (km / hours > MAX_TRAVEL_SPEED_KMH) {
+      await logDenial(voucherId, userId, 'impossible_travel', lat, lng, deviceHash)
+      return {
+        ok: false,
+        status: 403,
+        message: 'Location data is not reliable. Step outside and try again.',
+      }
     }
   }
 

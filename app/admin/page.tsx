@@ -1,6 +1,7 @@
 import { db } from '@/lib/db'
 import { venues, routes, vouchers } from '@/lib/db/schema'
 import { eq, gte, count } from 'drizzle-orm'
+import { startOfLondonDay } from '@/lib/time/london'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,8 +25,7 @@ const GLASS: React.CSSProperties = {
 }
 
 export default async function AdminDashboard() {
-  const todayStart = new Date()
-  todayStart.setUTCHours(0, 0, 0, 0)
+  const todayStart = startOfLondonDay(new Date())
 
   let stats = [
     { label: 'Venues', value: '7', sub: '6 live · 1 draft', accent: 'rgba(201,147,60,0.15)' },

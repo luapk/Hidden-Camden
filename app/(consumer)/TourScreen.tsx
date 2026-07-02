@@ -27,6 +27,8 @@ import {
   type TourStop,
 } from '@/lib/tour/launchRoute'
 import { localizeAudioUrl, useLanguage } from '@/lib/tour/language'
+import { resolveAudioUrl, useGuide } from '@/lib/tour/guides'
+import GuidePicker from './GuidePicker'
 import StoryPlayer from './StoryPlayer'
 
 const TourMap = dynamic(() => import('./TourMap'), {
@@ -71,6 +73,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   } = progress
 
   const { lang } = useLanguage()
+  const { guideId } = useGuide()
 
   const sorted = useMemo(
     () => [...stops].sort((a, b) => a.position - b.position),
@@ -86,12 +89,17 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   const [activeStory, setActiveStory] = useState<TourStop | null>(null)
   const [autoPlayStory, setAutoPlayStory] = useState(false)
   const [selectedStop, setSelectedStop] = useState<TourStop | null>(null)
-  const [miniAudio, setMiniAudio] = useState<{ url: string; label: string } | null>(null)
+  const [miniAudio, setMiniAudio] = useState<{
+    url: string
+    fallbackUrl: string | null
+    label: string
+  } | null>(null)
   // Link audio is armed when a story closes, then plays once the walker
   // actually leaves that venue heading for the next stop (see effect below).
   const [pendingLink, setPendingLink] = useState<{
     from: TourStop
     url: string
+    fallbackUrl: string | null
     label: string
   } | null>(null)
   // When geofence triggers but confidence is low (nearby stops within GPS error
@@ -107,16 +115,18 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
       const closed = prevStoryRef.current
       prevStoryRef.current = null
       const nextInRoute = sorted.find((s) => s.position === closed.position + 1)
-      const linkUrl = localizeAudioUrl(closed.linkAudioUrl, lang)
+      const linkUrl = resolveAudioUrl(closed.linkAudioUrl, lang, guideId)
       if (linkUrl && nextInRoute) {
         setPendingLink({
           from: closed,
           url: linkUrl,
+          // Guide files not recorded yet fall back to the house narration.
+          fallbackUrl: localizeAudioUrl(closed.linkAudioUrl, lang),
           label: `Walk to ${nextInRoute.name}`,
         })
       }
     }
-  }, [activeStory, sorted, lang])
+  }, [activeStory, sorted, lang, guideId])
 
   // Reward sting: plays the stop's own audio file on arrival.
   const rewardSoundRef = useRef<HTMLAudioElement | null>(null)
@@ -150,7 +160,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
           radiusM: nextStop.radiusM,
         }
       : null,
-    5_000,
+    8_000,
     override,
   )
 
@@ -205,10 +215,11 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     }
   }, [])
 
+  // Sim mode is a demo affordance: the ?sim query param or the env flag.
+  // Never auto-enabled by a denied location permission — that would hand a
+  // free walkthrough (and paywall bypass) to anyone who taps "Don't allow".
   const simEnabled =
-    searchSim ||
-    process.env.NEXT_PUBLIC_GEO_SIM === 'true' ||
-    geo.permissionState === 'denied'
+    searchSim || process.env.NEXT_PUBLIC_GEO_SIM === 'true'
 
   const arrive = useCallback(
     (stop: TourStop) => {
@@ -263,7 +274,11 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   useEffect(() => {
     if (!pendingLink) return
     if (simEnabled || !geo.position) {
-      setMiniAudio({ url: pendingLink.url, label: pendingLink.label })
+      setMiniAudio({
+        url: pendingLink.url,
+        fallbackUrl: pendingLink.fallbackUrl,
+        label: pendingLink.label,
+      })
       setPendingLink(null)
       return
     }
@@ -275,7 +290,11 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     )
     // A clear step beyond the fence: they are on the move to the next room.
     if (distFromHeard > pendingLink.from.radiusM + 15) {
-      setMiniAudio({ url: pendingLink.url, label: pendingLink.label })
+      setMiniAudio({
+        url: pendingLink.url,
+        fallbackUrl: pendingLink.fallbackUrl,
+        label: pendingLink.label,
+      })
       setPendingLink(null)
     }
   }, [pendingLink, geo.position, simEnabled])
@@ -341,6 +360,9 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         ))}
       </div>
 
+      {/* Guide chooser — guides narrate in English only */}
+      {lang === 'en' && <GuidePicker />}
+
       {/* Map */}
       <div className="relative mt-4 h-[50vh] min-h-[280px] overflow-hidden rounded-2xl border border-white/10">
         <TourMap
@@ -361,6 +383,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         <MiniPlayer
           key={miniAudio.url}
           url={miniAudio.url}
+          fallbackUrl={miniAudio.fallbackUrl}
           label={miniAudio.label}
           onDismiss={() => setMiniAudio(null)}
         />
@@ -371,7 +394,8 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         <StartGate
           nearTube={nearTube || simEnabled}
           distanceToTube={distanceToTube}
-          introUrl={localizeAudioUrl(INTRO_AUDIO_URL, lang) ?? INTRO_AUDIO_URL}
+          introUrl={resolveAudioUrl(INTRO_AUDIO_URL, lang, guideId) ?? INTRO_AUDIO_URL}
+          introFallbackUrl={localizeAudioUrl(INTRO_AUDIO_URL, lang) ?? INTRO_AUDIO_URL}
           onStart={() => {
             startTour()
           }}
@@ -597,11 +621,13 @@ function StartGate({
   nearTube,
   distanceToTube,
   introUrl,
+  introFallbackUrl,
   onStart,
 }: {
   nearTube: boolean
   distanceToTube: number | null
   introUrl: string
+  introFallbackUrl: string
   onStart: () => void
 }) {
   const [started, setStarted] = useState(false)
@@ -633,7 +659,7 @@ function StartGate({
           <p className="mt-1 font-grotesk text-[11px] leading-relaxed text-label-2">
             Tap below to start the tour and play the introduction.
           </p>
-          <StartGateAudio url={introUrl} onStart={handleStart} />
+          <StartGateAudio url={introUrl} fallbackUrl={introFallbackUrl} onStart={handleStart} />
         </>
       ) : (
         <>
@@ -662,15 +688,19 @@ function StartGate({
 // the tour", the button tap counts as a user gesture and audio plays.
 function StartGateAudio({
   url,
+  fallbackUrl,
   onStart,
 }: {
   url: string
+  fallbackUrl: string
   onStart: () => void
 }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playing, setPlaying] = useState(false)
   const [elapsed, setElapsed] = useState(0)
   const [duration, setDuration] = useState(0)
+  // Guide intro not recorded yet → quietly swap in the house narration.
+  const [src, setSrc] = useState(url)
 
   const handleStart = () => {
     onStart()
@@ -688,8 +718,11 @@ function StartGateAudio({
     <>
       <audio
         ref={audioRef}
-        src={url}
+        src={src}
         preload="auto"
+        onError={() => {
+          if (src !== fallbackUrl) setSrc(fallbackUrl)
+        }}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
         onTimeUpdate={(e) => setElapsed(e.currentTarget.currentTime)}
@@ -745,10 +778,12 @@ function miniClock(s: number): string {
 
 function MiniPlayer({
   url,
+  fallbackUrl,
   label,
   onDismiss,
 }: {
   url: string
+  fallbackUrl: string | null
   label: string
   onDismiss: () => void
 }) {
@@ -756,10 +791,12 @@ function MiniPlayer({
   const [playing, setPlaying] = useState(false)
   const [elapsed, setElapsed] = useState(0)
   const [duration, setDuration] = useState(0)
+  // Guide link audio not recorded yet → swap in the house narration.
+  const [src, setSrc] = useState(url)
 
   useEffect(() => {
     audioRef.current?.play().catch(() => {})
-  }, [])
+  }, [src])
 
   const togglePlay = () => {
     const el = audioRef.current
@@ -772,8 +809,12 @@ function MiniPlayer({
     <div className="mt-4 border border-white/10 bg-night-2">
       <audio
         ref={audioRef}
-        src={url}
+        src={src}
         preload="auto"
+        onError={() => {
+          if (fallbackUrl && src !== fallbackUrl) setSrc(fallbackUrl)
+          else onDismiss()
+        }}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
         onEnded={onDismiss}

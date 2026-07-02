@@ -3,16 +3,14 @@ import { and, count, desc, eq, gte } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { redemptions, rewards, vouchers } from '@/lib/db/schema'
 import { getStaffContext } from '@/lib/staff/auth'
+import { londonHHMM, startOfLondonDay } from '@/lib/time/london'
 import StaffControls from './StaffControls'
 import LiveRefresh from './LiveRefresh'
 
 export const dynamic = 'force-dynamic'
 
-function hhmm(d: Date): string {
-  return `${String(d.getUTCHours()).padStart(2, '0')}:${String(
-    d.getUTCMinutes(),
-  ).padStart(2, '0')}`
-}
+// Bar staff read London wall-clock time, not server UTC.
+const hhmm = londonHHMM
 
 export default async function StaffTodayPage() {
   const ctx = await getStaffContext()
@@ -42,8 +40,8 @@ export default async function StaffTodayPage() {
 
   const { venue } = ctx
 
-  const todayStart = new Date()
-  todayStart.setUTCHours(0, 0, 0, 0)
+  // "Today" is London's day: caps and counts reset at Camden midnight.
+  const todayStart = startOfLondonDay(new Date())
 
   const [venueRewards, tornCounts, feed] = await Promise.all([
     db.query.rewards.findMany({ where: eq(rewards.venue_id, venue.id) }),

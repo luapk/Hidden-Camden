@@ -38,6 +38,7 @@ const GLASS: React.CSSProperties = {
 
 export default async function VenuesPage() {
   let rows: VenueRow[] = EXAMPLE_VENUES
+  let usingExample = true
 
   try {
     const dbRows = await db.query.venues.findMany({
@@ -49,6 +50,7 @@ export default async function VenuesPage() {
         id: v.id, name: v.name, status: v.status, address: v.address,
         lat: v.lat, lng: v.lng, rewardCount: v.rewards.length,
       }))
+      usingExample = false
     }
   } catch {
     // DB not available; example data shown
@@ -61,7 +63,7 @@ export default async function VenuesPage() {
       <div className="flex items-end justify-between mb-8">
         <div>
           <p style={{ fontFamily: 'var(--font-courier, monospace)', fontSize: '0.7rem', color: '#8A8077', letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-            {rows.length} venues · {liveCount} live
+            {usingExample ? 'Example data · ' : ''}{rows.length} venues · {liveCount} live
           </p>
           <h1 style={{ fontFamily: 'var(--font-anton, sans-serif)', fontSize: '2.5rem', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
             Venues

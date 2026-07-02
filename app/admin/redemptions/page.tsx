@@ -33,8 +33,8 @@ const EXAMPLE_REDEMPTIONS: RedemptionRow[] = [
 
 function fmt(d: Date | null) {
   if (!d) return '—'
-  return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + ' ' +
-    d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })
+  return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London' }) + ' ' +
+    d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', timeZone: 'Europe/London' })
 }
 
 const GLASS: React.CSSProperties = {
