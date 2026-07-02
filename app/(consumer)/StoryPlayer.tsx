@@ -18,6 +18,7 @@ import {
 import { directionsHref, type TourStop } from '@/lib/tour/launchRoute'
 import { localizeAudioUrl, useLanguage } from '@/lib/tour/language'
 import { DEFAULT_GUIDE_ID, resolveAudioUrl, useGuide } from '@/lib/tour/guides'
+import { bankSting, playSting } from '@/lib/tour/stings'
 import { isPaywalled } from '@/lib/tour/useTourProgress'
 import { VENUE_POSTERS } from '@/lib/tour/venuePosters'
 import Paywall from './Paywall'
@@ -149,6 +150,9 @@ function StoryBody({
   }
 
   const bank = () => {
+    // A guitar riff for the bank moment: same shelf as the arrival stings,
+    // never the same riff this stop arrived to.
+    playSting(bankSting(stop.position), 0.6)
     onBank(stop.position)
     setJustBanked(true)
   }

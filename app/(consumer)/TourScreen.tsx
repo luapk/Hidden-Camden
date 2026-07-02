@@ -29,6 +29,7 @@ import {
 import Link from 'next/link'
 import { localizeAudioUrl, useLanguage } from '@/lib/tour/language'
 import { resolveAudioUrl, useGuide } from '@/lib/tour/guides'
+import { arrivalSting, playSting } from '@/lib/tour/stings'
 import StoryPlayer from './StoryPlayer'
 
 const TourMap = dynamic(() => import('./TourMap'), {
@@ -128,28 +129,11 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     }
   }, [activeStory, sorted, lang, guideId])
 
-  // Reward sting: plays the stop's own audio file on arrival.
-  const rewardSoundRef = useRef<HTMLAudioElement | null>(null)
-
+  // Arrival sting: the stop's own guitar riff, served from /sounds/ by stop
+  // number. Independent of the DB and of the narration audioUrl, so it works
+  // in sim and live.
   const playReward = useCallback((position: number) => {
-    // Per-stop guitar sting, served from /sounds/ by stop number. Independent
-    // of the DB and of the narration audioUrl, so it works in sim and live.
-    const src = `/sounds/stop-${String(position).padStart(2, '0')}.mp3`
-    let audio = rewardSoundRef.current
-    if (!audio || audio.src !== new URL(src, window.location.href).href) {
-      audio?.pause()
-      audio = new Audio(src)
-      audio.volume = 0.7
-      // Missing per-stop file → fall back to the generic reward sound.
-      audio.onerror = () => {
-        const fallback = new Audio('/sounds/reward.wav')
-        fallback.volume = 0.7
-        fallback.play().catch(() => {})
-      }
-      rewardSoundRef.current = audio
-    }
-    audio.currentTime = 0
-    audio.play().catch(() => {})
+    playSting(arrivalSting(position))
   }, [])
 
   const geo = useGeofence(
