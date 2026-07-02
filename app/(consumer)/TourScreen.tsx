@@ -30,6 +30,7 @@ import Link from 'next/link'
 import { localizeAudioUrl, useLanguage } from '@/lib/tour/language'
 import { resolveAudioUrl, useGuide } from '@/lib/tour/guides'
 import { arrivalSting, playSting } from '@/lib/tour/stings'
+import BrandLogo from './BrandLogo'
 import StoryPlayer from './StoryPlayer'
 
 const TourMap = dynamic(() => import('./TourMap'), {
@@ -343,9 +344,9 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
             </Link>
           )}
         </div>
-        <div className="mt-2 flex items-end justify-between gap-4">
-          <h1 className="font-jost text-4xl font-bold uppercase leading-[0.95] tracking-tight text-label-1">
-            Hidden <span className="text-acid">Camden</span>
+        <div className="mt-3 flex items-end justify-between gap-4">
+          <h1 className="m-0">
+            <BrandLogo className="h-auto w-[188px]" priority />
           </h1>
           <div
             className="shrink-0 font-grotesk text-3xl font-bold leading-none tracking-tight"

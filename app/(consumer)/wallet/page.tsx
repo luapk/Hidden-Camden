@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { BeerStein, Wallet as WalletIcon } from '@phosphor-icons/react'
 import { LAUNCH_ROUTE, type TourStop } from '@/lib/tour/launchRoute'
 import { useTourProgress } from '@/lib/tour/useTourProgress'
+import BrandLogo from '../BrandLogo'
 
 export default function WalletPage() {
   const { bankedStops, hydrated } = useTourProgress()
@@ -91,7 +92,11 @@ export default function WalletPage() {
               <div className="relative flex overflow-hidden border border-white/10 bg-night-2">
                 {/* Lime ticket rule */}
                 <span className="w-[3px] shrink-0 bg-acid" aria-hidden />
-                <div className="min-w-0 flex-1 p-4">
+                <div className="relative min-w-0 flex-1 p-4">
+                  {/* Brand watermark */}
+                  <BrandLogo
+                    className="pointer-events-none absolute right-3 top-3 h-auto w-12 opacity-45"
+                  />
                   <div className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-label-2">
                     Banked · Stop{' '}
                     <span style={{ color: stop.accent }}>{stop.position}</span>

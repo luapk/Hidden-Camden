@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useState } from 'react'
+import BrandLogo from '../../BrandLogo'
 import CountdownBar from './CountdownBar'
 
 interface VoucherView {
@@ -213,6 +214,14 @@ export default function RedeemTicket({ voucher }: { voucher: VoucherView }) {
 
   return (
     <div className="rounded-lg bg-paper px-5 py-6 text-ink shadow-[0_10px_30px_rgba(0,0,0,0.55)]">
+      {/* Letterhead: the brand poster over the paper */}
+      <div className="mb-4 flex items-center justify-between border-b border-[#b9a883]/50 pb-3">
+        <BrandLogo className="h-auto w-[100px]" />
+        <span className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#6b5c44]">
+          Drink voucher
+        </span>
+      </div>
+
       {/* Ticket header: venue + reward */}
       <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-[#a3431f]">
         {voucher.venueName}
