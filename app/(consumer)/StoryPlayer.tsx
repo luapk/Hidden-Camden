@@ -42,6 +42,7 @@ export default function StoryPlayer({
   onClose,
   bypassPaywall = false,
   autoPlay = false,
+  nextStopName = null,
 }: {
   stop: TourStop
   paid: boolean
@@ -51,6 +52,7 @@ export default function StoryPlayer({
   onClose: () => void
   bypassPaywall?: boolean
   autoPlay?: boolean
+  nextStopName?: string | null
 }) {
   const gated = isPaywalled(stop.position, paid) && !bypassPaywall
 
@@ -67,7 +69,14 @@ export default function StoryPlayer({
       {gated ? (
         <Paywall onUnlock={onMarkPaid} onClose={onClose} />
       ) : (
-        <StoryBody stop={stop} banked={banked} onBank={onBank} onClose={onClose} autoPlay={autoPlay} />
+        <StoryBody
+          stop={stop}
+          banked={banked}
+          onBank={onBank}
+          onClose={onClose}
+          autoPlay={autoPlay}
+          nextStopName={nextStopName}
+        />
       )}
     </motion.div>
   )
@@ -81,12 +90,14 @@ function StoryBody({
   onBank,
   onClose,
   autoPlay = false,
+  nextStopName = null,
 }: {
   stop: TourStop
   banked: boolean
   onBank: (position: number) => void
   onClose: () => void
   autoPlay?: boolean
+  nextStopName?: string | null
 }) {
   const { lang } = useLanguage()
   const { guideId, guide } = useGuide()
@@ -95,9 +106,25 @@ function StoryBody({
   // A guide whose file for this stop is not recorded yet falls back to the
   // house narration rather than a dead player.
   const [guideAudioFailed, setGuideAudioFailed] = useState(false)
-  const audioUrl = guideAudioFailed ? houseUrl : guideUrl
   const guideActive =
     lang === 'en' && guideId !== DEFAULT_GUIDE_ID && !guideAudioFailed
+
+  // The walk to the next stop plays as the story's outro, in this same
+  // player, while headphones are still on. Only on the first full listen
+  // (not on replays of an already banked stop), and never if the story is
+  // closed early. Nothing chases the walker around afterwards.
+  const guideLinkUrl = resolveAudioUrl(stop.linkAudioUrl, lang, guideId)
+  const houseLinkUrl = localizeAudioUrl(stop.linkAudioUrl, lang)
+  const [track, setTrack] = useState<'story' | 'link'>('story')
+  const [linkFallbackTried, setLinkFallbackTried] = useState(false)
+  const [linkDead, setLinkDead] = useState(false)
+  const firstListenRef = useRef(!banked)
+  const canRollIntoLink =
+    firstListenRef.current && !!guideLinkUrl && !!nextStopName
+
+  const storySrc = guideAudioFailed ? houseUrl : guideUrl
+  const linkSrc = linkFallbackTried ? houseLinkUrl : guideLinkUrl
+  const audioUrl = track === 'story' ? storySrc : linkSrc
   const audioRef = useRef<HTMLAudioElement>(null)
   const [audioState, setAudioState] = useState<AudioState>(
     stop.audioUrl ? 'loading' : 'none',
@@ -124,6 +151,15 @@ function StoryBody({
     autoPlayedRef.current = true
     audioRef.current?.play().catch(() => {})
   }, [autoPlay, audioState])
+
+  // Roll straight into the walk narration when the track flips to link.
+  // The element is already gesture-unlocked from the story playback, so
+  // play() on the swapped src is allowed on iOS.
+  useEffect(() => {
+    if (track !== 'link') return
+    setElapsed(0)
+    audioRef.current?.play().catch(() => {})
+  }, [track, linkFallbackTried])
 
   const togglePlay = () => {
     const el = audioRef.current
@@ -253,6 +289,17 @@ function StoryBody({
           preload="metadata"
           onCanPlay={() => setAudioState('ready')}
           onError={() => {
+            if (track === 'link') {
+              // Missing guide link file → try the house cut once, then give
+              // up quietly. Link failures never mark the story as failed.
+              if (!linkFallbackTried && guideLinkUrl !== houseLinkUrl) {
+                setLinkFallbackTried(true)
+              } else {
+                setLinkDead(true)
+                setTrack('story')
+              }
+              return
+            }
             if (!guideAudioFailed && guideUrl !== houseUrl) {
               setGuideAudioFailed(true)
               setAudioState('loading')
@@ -270,7 +317,10 @@ function StoryBody({
           }}
           onEnded={() => {
             setPlaying(false)
-            setFinished(true)
+            if (track === 'story') {
+              setFinished(true)
+              if (canRollIntoLink) setTrack('link')
+            }
           }}
         />
       )}
@@ -300,6 +350,14 @@ function StoryBody({
             </button>
             <span className="text-label-3">{clock(duration)}</span>
           </div>
+          {track === 'link' && !linkDead && nextStopName && (
+            <div className="flex items-center gap-2 px-5 pb-1">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-acid" aria-hidden />
+              <span className="font-grotesk text-[10px] uppercase tracking-[0.25em] text-label-2">
+                Walking on · {nextStopName}
+              </span>
+            </div>
+          )}
         </div>
       )}
 

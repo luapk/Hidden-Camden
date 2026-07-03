@@ -97,14 +97,6 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     fallbackUrl: string | null
     label: string
   } | null>(null)
-  // Link audio is armed when a story closes, then plays once the walker
-  // actually leaves that venue heading for the next stop (see effect below).
-  const [pendingLink, setPendingLink] = useState<{
-    from: TourStop
-    url: string
-    fallbackUrl: string | null
-    label: string
-  } | null>(null)
   // When geofence triggers but confidence is low (nearby stops within GPS error
   // margin), we hold and show a manual confirm instead of auto-firing.
   const [pendingUnlock, setPendingUnlock] = useState<TourStop | null>(null)
@@ -115,7 +107,6 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     reset()
     setOverride(null)
     setMiniAudio(null)
-    setPendingLink(null)
     setPendingUnlock(null)
     setActiveStory(null)
     setUnlockFlash(null)
@@ -124,28 +115,6 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     handledRef.current = null
     setConfirmReset(false)
   }
-
-  // When a story closes, arm the link audio for the walk to the next stop.
-  const prevStoryRef = useRef<TourStop | null>(null)
-  useEffect(() => {
-    if (activeStory) {
-      prevStoryRef.current = activeStory
-    } else if (prevStoryRef.current) {
-      const closed = prevStoryRef.current
-      prevStoryRef.current = null
-      const nextInRoute = sorted.find((s) => s.position === closed.position + 1)
-      const linkUrl = resolveAudioUrl(closed.linkAudioUrl, lang, guideId)
-      if (linkUrl && nextInRoute) {
-        setPendingLink({
-          from: closed,
-          url: linkUrl,
-          // Guide files not recorded yet fall back to the house narration.
-          fallbackUrl: localizeAudioUrl(closed.linkAudioUrl, lang),
-          label: `Walk to ${nextInRoute.name}`,
-        })
-      }
-    }
-  }, [activeStory, sorted, lang, guideId])
 
   // Arrival sting: the stop's own guitar riff, served from /sounds/ by stop
   // number. Independent of the DB and of the narration audioUrl, so it works
@@ -231,7 +200,6 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   const arrive = useCallback(
     (stop: TourStop) => {
       setMiniAudio(null)
-      setPendingLink(null)
       setPendingUnlock(null)
       // Sim mode is for testing: walk through every stop, no paywall.
       if (isPaywalled(stop.position, paid) && !simEnabled) {
@@ -275,36 +243,26 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     arrive(nextStop)
   }
 
-  // Play the armed link audio only once the walker has left the venue they
-  // just heard about, i.e. they are genuinely walking to the next stop. In
-  // sim mode (or with no GPS fix) there is no walk to detect, so play it now.
-  useEffect(() => {
-    if (!pendingLink) return
-    if (simEnabled || !geo.position) {
-      setMiniAudio({
-        url: pendingLink.url,
-        fallbackUrl: pendingLink.fallbackUrl,
-        label: pendingLink.label,
-      })
-      setPendingLink(null)
-      return
-    }
-    const distFromHeard = haversineDistance(
-      geo.position.lat,
-      geo.position.lng,
-      pendingLink.from.lat,
-      pendingLink.from.lng,
-    )
-    // A clear step beyond the fence: they are on the move to the next room.
-    if (distFromHeard > pendingLink.from.radiusM + 15) {
-      setMiniAudio({
-        url: pendingLink.url,
-        fallbackUrl: pendingLink.fallbackUrl,
-        label: pendingLink.label,
-      })
-      setPendingLink(null)
-    }
-  }, [pendingLink, geo.position, simEnabled])
+  // Walk directions live inside the story player now: the link narration
+  // rolls on as the story's outro, while headphones are still on. Nothing
+  // auto-plays later; the distance card offers directions on demand.
+  const prevStop = nextStop
+    ? sorted.find((s) => s.position === nextStop.position - 1) ?? null
+    : null
+  const directionsUrl =
+    prevStop && unlockedStops.includes(prevStop.position)
+      ? resolveAudioUrl(prevStop.linkAudioUrl, lang, guideId)
+      : null
+
+  const hearDirections =
+    directionsUrl && nextStop && prevStop
+      ? () =>
+          setMiniAudio({
+            url: directionsUrl,
+            fallbackUrl: localizeAudioUrl(prevStop.linkAudioUrl, lang),
+            label: `Walk to ${nextStop.name}`,
+          })
+      : undefined
 
   const bankedCount = bankedStops.length
 
@@ -447,6 +405,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
                 lowAccuracy={geo.lowAccuracy}
                 onPlay={() => setActiveStory(nextStop)}
                 onConfirmHere={() => setPendingUnlock(nextStop)}
+                onHearDirections={hearDirections}
               />
             ) : (
               <div className="border border-white/10 bg-night-2 p-4">
@@ -639,6 +598,9 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
             }}
             bypassPaywall={simEnabled}
             autoPlay={autoPlayStory}
+            nextStopName={
+              sorted.find((s) => s.position === activeStory.position + 1)?.name ?? null
+            }
           />
         )}
       </AnimatePresence>
@@ -948,6 +910,7 @@ function DistanceCard({
   lowAccuracy,
   onPlay,
   onConfirmHere,
+  onHearDirections,
 }: {
   stop: TourStop
   distanceM: number | null
@@ -957,6 +920,7 @@ function DistanceCard({
   lowAccuracy: boolean
   onPlay: () => void
   onConfirmHere: () => void
+  onHearDirections?: () => void
 }) {
   // GPS rescue: only offered when the best available fix already puts the
   // user at the venue's doorstep (fence + 60m of drift allowance). Distant
@@ -1057,6 +1021,15 @@ function DistanceCard({
                 ? 'Improving the GPS lock. Step into the open and it will sharpen.'
                 : `Inside ${stop.radiusM}m the story unlocks itself. No tapping, no QR codes.`}
           </p>
+          {onHearDirections && (
+            <button
+              onClick={onHearDirections}
+              className="mt-3 flex w-full items-center justify-center gap-2 border border-white/10 py-2.5 font-grotesk text-[11px] uppercase tracking-[0.2em] text-label-1"
+            >
+              <Headphones size={13} weight="bold" color="#CCFF00" />
+              Hear the way there
+            </button>
+          )}
           {canConfirmHere && (
             <button
               onClick={onConfirmHere}
