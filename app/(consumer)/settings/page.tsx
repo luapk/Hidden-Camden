@@ -144,6 +144,21 @@ export default function SettingsPage() {
           })}
         </div>
       </section>
+
+      {/* Map data credit — required by the OSM licence, housed here so the
+          map canvas stays clean. */}
+      <p className="mt-10 pb-4 text-center font-grotesk text-[9.5px] text-label-3">
+        Map data ©{' '}
+        <a
+          href="https://www.openstreetmap.org/copyright"
+          target="_blank"
+          rel="noreferrer"
+          className="underline underline-offset-2"
+        >
+          OpenStreetMap
+        </a>{' '}
+        contributors · Tiles by OpenFreeMap
+      </p>
     </main>
   )
 }

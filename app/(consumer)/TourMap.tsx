@@ -73,9 +73,8 @@ export default function TourMap({
     })
   }
 
-  // Strip every text and icon layer from the basemap: no street names, no
-  // POI labels, no type at all. The city reads as pure dark geometry and
-  // the acid route plus our own markers do all the talking.
+  // Mute the stock labels and road contrast so the basemap recedes and the
+  // acid route reads as the brightest thing on the canvas.
   const handleLoad = useCallback(() => {
     const map = mapRef.current?.getMap()
     if (!map) return
@@ -84,7 +83,8 @@ export default function TourMap({
       for (const layer of layers) {
         try {
           if (layer.type === 'symbol') {
-            map.setLayoutProperty(layer.id, 'visibility', 'none')
+            map.setPaintProperty(layer.id, 'text-color', '#9A9AA0')
+            map.setPaintProperty(layer.id, 'text-halo-color', '#0A0A0A')
           }
         } catch {
           // Layer ids vary by style version. Skip silently.
@@ -105,7 +105,9 @@ export default function TourMap({
           fitBoundsOptions: { padding: 56 },
         }}
         style={{ width: '100%', height: '100%' }}
-        attributionControl={{ compact: true }}
+        // Attribution chrome removed from the canvas; OSM/OpenFreeMap credit
+        // lives in Settings instead.
+        attributionControl={false}
         // One-finger drags scroll the page; two fingers pan the map. Without
         // this, the map swallows every vertical swipe and short phones get
         // stuck unable to scroll past it.
