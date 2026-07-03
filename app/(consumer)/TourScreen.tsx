@@ -343,8 +343,9 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
             </span>
           </Link>
         </div>
-        <p className="mt-3 text-[13px] text-label-2">
-          Seven rooms across NW1. Stories unlock when your feet arrive.
+        <p className="mt-3 text-[13px] leading-relaxed text-label-2">
+          Your personal walking tour from a real Camden legend, with rewards
+          waiting to be unlocked.
         </p>
       </header>
 

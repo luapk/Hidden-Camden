@@ -73,8 +73,9 @@ export default function TourMap({
     })
   }
 
-  // Mute the stock Carto labels and road contrast so the basemap recedes
-  // and the acid route reads as the brightest thing on the canvas.
+  // Strip every text and icon layer from the basemap: no street names, no
+  // POI labels, no type at all. The city reads as pure dark geometry and
+  // the acid route plus our own markers do all the talking.
   const handleLoad = useCallback(() => {
     const map = mapRef.current?.getMap()
     if (!map) return
@@ -83,8 +84,7 @@ export default function TourMap({
       for (const layer of layers) {
         try {
           if (layer.type === 'symbol') {
-            map.setPaintProperty(layer.id, 'text-color', '#9A9AA0')
-            map.setPaintProperty(layer.id, 'text-halo-color', '#0A0A0A')
+            map.setLayoutProperty(layer.id, 'visibility', 'none')
           }
         } catch {
           // Layer ids vary by style version. Skip silently.
