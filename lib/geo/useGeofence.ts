@@ -170,11 +170,19 @@ export function useGeofence(
   )
   const [dwell, setDwell] = useState({ dwellProgress: 0, triggered: false })
 
-  // Fresh tracker whenever the target (or dwell window) changes.
-  useEffect(() => {
-    trackerRef.current = createDwellTracker(dwellMs, { requireApproach: true })
+  // Reset SYNCHRONOUSLY when the target changes, during render, not in an
+  // effect. An effect runs a commit too late: the previous stop's latched
+  // `triggered` would be visible for one render alongside the new target,
+  // and the consumer would unlock the new stop from the old stop's dwell.
+  // (Seen in the field: stop 3's confirm card appearing 235m away, straight
+  // after stop 2 unlocked.)
+  const targetKey = `${targetLat},${targetLng},${targetRadiusM},${dwellMs}`
+  const [prevTargetKey, setPrevTargetKey] = useState(targetKey)
+  if (prevTargetKey !== targetKey) {
+    setPrevTargetKey(targetKey)
     setDwell({ dwellProgress: 0, triggered: false })
-  }, [targetLat, targetLng, targetRadiusM, dwellMs])
+    trackerRef.current = createDwellTracker(dwellMs, { requireApproach: true })
+  }
 
   // Tick the dwell state machine so progress animates between GPS fixes.
   useEffect(() => {

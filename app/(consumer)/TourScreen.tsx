@@ -222,6 +222,10 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   const handledRef = useRef<string | null>(null)
   useEffect(() => {
     if (!geo.triggered || !nextStop) return
+    // Belt and braces on top of the hook's synchronous reset: a trigger is
+    // only honoured with the walker actually at the fence. A latch that
+    // somehow outlives its stop can never unlock a venue from streets away.
+    if (geo.distanceM === null || geo.distanceM > nextStop.radiusM + 30) return
     const key = `${nextStop.position}:${paid}`
     if (handledRef.current === key) return
     handledRef.current = key
@@ -230,7 +234,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     } else {
       setPendingUnlock(nextStop)
     }
-  }, [geo.triggered, nextStop, paid, arrive, isConfidentUnlock])
+  }, [geo.triggered, geo.distanceM, nextStop, paid, arrive, isConfidentUnlock])
 
   const simulateArrival = () => {
     if (!nextStop) return
@@ -242,6 +246,30 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     bankStop(nextStop.position)
     arrive(nextStop)
   }
+
+  // GPS rescue arming. The manual confirm is a last resort, never a shortcut:
+  // it only appears after the walker has been at the doorstep (fence + 40m,
+  // decent accuracy) for 20 continuous seconds without the fence firing.
+  // GPS gets its chance first; the magic stays intact. Never in sim mode.
+  const RESCUE_NEAR_EXTRA_M = 40
+  const RESCUE_ARM_MS = 20_000
+  const [rescueArmed, setRescueArmed] = useState(false)
+  const nearDoor =
+    !!nextStop &&
+    !geo.inside &&
+    !geo.lowAccuracy &&
+    geo.distanceM !== null &&
+    geo.distanceM <= nextStop.radiusM + RESCUE_NEAR_EXTRA_M
+
+  useEffect(() => {
+    if (!nearDoor || simEnabled) {
+      setRescueArmed(false)
+      return
+    }
+    const id = window.setTimeout(() => setRescueArmed(true), RESCUE_ARM_MS)
+    return () => window.clearTimeout(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nearDoor, simEnabled, nextStop?.position])
 
   // Walk directions live inside the story player now: the link narration
   // rolls on as the story's outro, while headphones are still on. Nothing
@@ -404,6 +432,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
                 permissionState={geo.permissionState}
                 lowAccuracy={geo.lowAccuracy}
                 onPlay={() => setActiveStory(nextStop)}
+                showConfirmHere={rescueArmed}
                 onConfirmHere={() => setPendingUnlock(nextStop)}
                 onHearDirections={hearDirections}
               />
@@ -909,6 +938,7 @@ function DistanceCard({
   permissionState,
   lowAccuracy,
   onPlay,
+  showConfirmHere = false,
   onConfirmHere,
   onHearDirections,
 }: {
@@ -919,14 +949,10 @@ function DistanceCard({
   permissionState: string
   lowAccuracy: boolean
   onPlay: () => void
+  showConfirmHere?: boolean
   onConfirmHere: () => void
   onHearDirections?: () => void
 }) {
-  // GPS rescue: only offered when the best available fix already puts the
-  // user at the venue's doorstep (fence + 60m of drift allowance). Distant
-  // users never see it, so the tour cannot be completed from a sofa.
-  const canConfirmHere =
-    !inside && distanceM !== null && distanceM <= stop.radiusM + 60
   const fill =
     distanceM === null
       ? 0
@@ -1030,7 +1056,7 @@ function DistanceCard({
               Hear the way there
             </button>
           )}
-          {canConfirmHere && (
+          {showConfirmHere && (
             <button
               onClick={onConfirmHere}
               className="mt-3 w-full border border-acid/40 py-2.5 font-grotesk text-[11px] uppercase tracking-[0.2em] text-acid"
