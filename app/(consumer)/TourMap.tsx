@@ -106,6 +106,10 @@ export default function TourMap({
         }}
         style={{ width: '100%', height: '100%' }}
         attributionControl={{ compact: true }}
+        // One-finger drags scroll the page; two fingers pan the map. Without
+        // this, the map swallows every vertical swipe and short phones get
+        // stuck unable to scroll past it.
+        cooperativeGestures
         onLoad={handleLoad}
       >
         <Source id="cc-route" type="geojson" data={routeLine}>

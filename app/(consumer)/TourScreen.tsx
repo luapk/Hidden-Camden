@@ -310,95 +310,48 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
 
   return (
     <main>
-      {/* Header */}
+      {/* Header: logo left, guide + progress lockup right, one subhead */}
       <header>
-        <div className="flex items-center justify-between">
-          <div className="font-grotesk text-[10px] uppercase tracking-[0.35em] text-acid">
-            Walking tour · NW1
-          </div>
-          {/* Current guide indicator — pick happens in Settings */}
-          {lang === 'en' && (
-            <Link
-              href="/settings#guide"
-              aria-label={`Your guide: ${guide.name}. Change in settings.`}
-              className="flex shrink-0 items-center gap-2"
-            >
-              <span className="text-right">
-                <span className="block font-grotesk text-[8px] uppercase tracking-[0.25em] text-label-3">
-                  Guide
-                </span>
-                <span className="block max-w-[110px] truncate font-jost text-[11px] font-bold uppercase tracking-tight text-label-1">
-                  {guide.name}
-                </span>
-              </span>
-              <span className="relative block h-9 w-9 shrink-0 overflow-hidden rounded-full border-2 border-acid/70 shadow-[0_0_16px_rgba(204,255,0,0.2)]">
-                <Image
-                  src={guide.image}
-                  alt={guide.name}
-                  fill
-                  sizes="36px"
-                  className="object-cover"
-                  style={{ filter: 'grayscale(15%) contrast(1.05)' }}
-                />
-              </span>
-            </Link>
-          )}
-        </div>
-        <div className="mt-3 flex items-end justify-between gap-4">
+        <div className="flex items-start justify-between gap-4">
           <h1 className="m-0">
-            <BrandLogo className="h-auto w-[188px]" priority />
+            <BrandLogo className="h-auto w-[141px]" priority />
           </h1>
-          <div
-            className="shrink-0 font-grotesk text-3xl font-bold leading-none tracking-tight"
-            aria-label={`${bankedCount} of ${sorted.length} stops`}
+          {/* Guide avatar + stops counter, one unit. The acid ring around
+              the portrait IS the progress bar; the numbers make it exact. */}
+          <Link
+            href="/settings#guide"
+            aria-label={`${bankedCount} of ${sorted.length} stops done. Your guide: ${guide.name}. Change in settings.`}
+            className="flex shrink-0 items-center gap-2.5 rounded-full border border-white/10 bg-night-2 py-1.5 pl-1.5 pr-4"
           >
-            <span className="text-acid">
-              {String(bankedCount).padStart(2, '0')}
+            <GuideProgressRing
+              image={lang === 'en' ? guide.image : null}
+              name={guide.name}
+              progress={sorted.length > 0 ? bankedCount / sorted.length : 0}
+            />
+            <span className="leading-none">
+              <span className="block font-grotesk text-[16px] font-bold tracking-tight">
+                <span className="text-acid">
+                  {String(bankedCount).padStart(2, '0')}
+                </span>
+                <span className="text-label-3">
+                  /{String(sorted.length).padStart(2, '0')}
+                </span>
+              </span>
+              <span className="mt-1 block max-w-[96px] truncate font-grotesk text-[8px] uppercase tracking-[0.2em] text-label-3">
+                {lang === 'en' ? guide.name : 'Stops done'}
+              </span>
             </span>
-            <span className="text-label-3">
-              /{String(sorted.length).padStart(2, '0')}
-            </span>
-          </div>
+          </Link>
         </div>
-        <p className="mt-2 text-[13px] text-label-2">
-          Seven rooms. Stories unlock when your feet arrive.
+        <p className="mt-3 text-[13px] text-label-2">
+          Seven rooms across NW1. Stories unlock when your feet arrive.
         </p>
-        {/* Bauhaus ornament */}
-        <div className="mt-3 flex items-center gap-2" aria-hidden>
-          <span className="h-2 w-2 rounded-full bg-acid" />
-          <span className="h-2 w-2 bg-label-1" />
-          <span
-            className="h-0 w-0"
-            style={{
-              borderLeft: '5px solid transparent',
-              borderRight: '5px solid transparent',
-              borderBottom: '9px solid #5A5A5F',
-            }}
-          />
-          <span className="h-px flex-1 bg-white/10" />
-        </div>
       </header>
 
-      {/* Segmented progress bar */}
-      <div className="mt-3 flex gap-1" aria-hidden>
-        {sorted.map((s) => (
-          <motion.span
-            key={s.position}
-            className="h-[3px] flex-1"
-            initial={false}
-            animate={{
-              backgroundColor: bankedStops.includes(s.position)
-                ? '#CCFF00'
-                : 'rgba(255,255,255,0.1)',
-            }}
-            transition={{ duration: 0.7 }}
-          />
-        ))}
-      </div>
 
-
-      {/* Map */}
-      <div className="relative mt-4 h-[50vh] min-h-[280px] overflow-hidden rounded-2xl border border-white/10">
+      {/* Map — capped height so shorter phones always see content peeking
+          below it; one-finger drags scroll the page, two fingers pan the map */}
+      <div className="relative mt-4 h-[42vh] max-h-[380px] min-h-[240px] overflow-hidden rounded-2xl border border-white/10">
         <TourMap
           stops={sorted}
           userPosition={geo.position}
@@ -407,9 +360,6 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
           nextPosition={nextStop?.position ?? null}
           onSelectStop={setSelectedStop}
         />
-        <div className="pointer-events-none absolute left-3 top-3 rounded-full border border-white/10 bg-black/40 px-3 py-1.5 font-grotesk text-[11px] uppercase tracking-[0.2em] text-label-1 backdrop-blur-xl">
-          <span className="text-acid">{bankedCount}</span> of {sorted.length}
-        </div>
       </div>
 
       {/* Link audio — auto-plays once the walker leaves a venue */}
@@ -807,6 +757,60 @@ function StartGate({
 }
 
 /**
+ * Guide portrait wrapped in a circular progress ring. The ring fill is
+ * banked stops over total: the header's only progress indicator, worn by
+ * the voice walking you round. Falls back to an acid pin when the tour is
+ * running in a language without guides.
+ */
+function GuideProgressRing({
+  image,
+  name,
+  progress,
+}: {
+  image: string | null
+  name: string
+  progress: number
+}) {
+  const R = 18
+  const C = 2 * Math.PI * R
+  const clamped = Math.max(0, Math.min(1, progress))
+
+  return (
+    <span className="relative flex h-10 w-10 shrink-0 items-center justify-center">
+      <svg viewBox="0 0 40 40" className="absolute inset-0 -rotate-90" aria-hidden>
+        <circle
+          cx="20" cy="20" r={R}
+          fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="2.5"
+        />
+        <circle
+          cx="20" cy="20" r={R}
+          fill="none" stroke="#CCFF00" strokeWidth="2.5" strokeLinecap="round"
+          strokeDasharray={C}
+          strokeDashoffset={C * (1 - clamped)}
+          style={{ transition: 'stroke-dashoffset 0.7s ease' }}
+        />
+      </svg>
+      {image ? (
+        <span className="relative block h-[30px] w-[30px] overflow-hidden rounded-full">
+          <Image
+            src={image}
+            alt={name}
+            fill
+            sizes="30px"
+            className="object-cover"
+            style={{ filter: 'grayscale(15%) contrast(1.05)' }}
+          />
+        </span>
+      ) : (
+        <span className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-night-3">
+          <MapPin size={14} weight="fill" color="#CCFF00" />
+        </span>
+      )}
+    </span>
+  )
+}
+
+/**
  * The moment before the walk begins is the one time the user is standing
  * still with headphones going in — the best moment to choose whose voice
  * they walk with. Shows the current guide and points at Settings to swap.
@@ -967,17 +971,12 @@ function DistanceCard({
 
   return (
     <div className="relative overflow-hidden border border-white/10 bg-night-2 p-4">
-      {/* Thin per-stop identity rule */}
-      <span
-        className="absolute left-0 top-0 h-full w-[2px]"
-        style={{ backgroundColor: stop.accent }}
-        aria-hidden
-      />
+      {/* Acid spine — one accent, everywhere */}
+      <span className="absolute left-0 top-0 h-full w-[2px] bg-acid" aria-hidden />
       <div className="flex items-end justify-between gap-3">
         <div className="min-w-0">
           <div className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-label-2">
-            Next up. Stop{' '}
-            <span style={{ color: stop.accent }}>{stop.position}</span>
+            Next up. Stop <span className="text-acid">{stop.position}</span>
           </div>
           <div className="mt-1 truncate font-jost text-[17px] font-bold uppercase tracking-tight text-label-1">
             {stop.name}
@@ -1117,7 +1116,7 @@ function StopRow({
           </div>
           <div className="mt-0.5 truncate font-grotesk text-[11px] text-label-2">
             {formatRuntime(stop.runtimeS)} story ·{' '}
-            <span style={locked ? undefined : { color: stop.accent }}>
+            <span className={locked ? undefined : 'text-acid/80'}>
               {stop.rewardLabel}
             </span>
           </div>
