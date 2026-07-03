@@ -26,6 +26,11 @@ export function bankSting(position: number): string {
   return stingSrc(((position + 2) % STING_COUNT) + 1)
 }
 
+/** The riff that counts the tour in at the start gate takeover. */
+export function startSting(): string {
+  return stingSrc(2)
+}
+
 /** Fire-and-forget playback with the generic reward fallback. */
 export function playSting(url: string, volume = 0.7): void {
   const audio = new Audio(url)

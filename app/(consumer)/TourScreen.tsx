@@ -29,7 +29,7 @@ import {
 import Link from 'next/link'
 import { localizeAudioUrl, useLanguage } from '@/lib/tour/language'
 import { resolveAudioUrl, useGuide } from '@/lib/tour/guides'
-import { arrivalSting, playSting } from '@/lib/tour/stings'
+import { arrivalSting, playSting, startSting } from '@/lib/tour/stings'
 import BrandLogo from './BrandLogo'
 import StoryPlayer from './StoryPlayer'
 
@@ -102,6 +102,9 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   const [pendingUnlock, setPendingUnlock] = useState<TourStop | null>(null)
   // TEMP: testing affordance, two-tap tour reset. Remove before launch.
   const [confirmReset, setConfirmReset] = useState(false)
+  // Full-screen acid takeover between tapping start and the intro VO:
+  // guitar sting, five second count-in, then the tour begins.
+  const [startCountdown, setStartCountdown] = useState<number | null>(null)
 
   const resetTour = () => {
     reset()
@@ -112,9 +115,35 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     setUnlockFlash(null)
     setSelectedStop(null)
     setAutoPlayStory(false)
+    setStartCountdown(null)
     handledRef.current = null
     setConfirmReset(false)
   }
+
+  const beginTour = useCallback(() => {
+    playSting(startSting())
+    setStartCountdown(5)
+  }, [])
+
+  // Tick the count-in. At zero: takeover exits, tour starts, intro plays.
+  useEffect(() => {
+    if (startCountdown === null) return
+    if (startCountdown <= 0) {
+      setStartCountdown(null)
+      startTour()
+      setMiniAudio({
+        url: resolveAudioUrl(INTRO_AUDIO_URL, lang, guideId) ?? INTRO_AUDIO_URL,
+        fallbackUrl: localizeAudioUrl(INTRO_AUDIO_URL, lang) ?? INTRO_AUDIO_URL,
+        label: 'Introduction',
+      })
+      return
+    }
+    const id = window.setTimeout(
+      () => setStartCountdown((c) => (c === null ? null : c - 1)),
+      1_000,
+    )
+    return () => window.clearTimeout(id)
+  }, [startCountdown, startTour, lang, guideId])
 
   // Arrival sting: the stop's own guitar riff, served from /sounds/ by stop
   // number. Independent of the DB and of the narration audioUrl, so it works
@@ -237,11 +266,11 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   }, [geo.triggered, geo.distanceM, nextStop, paid, arrive, isConfidentUnlock])
 
   const simulateArrival = () => {
-    if (!nextStop) return
     if (!tourStarted) {
-      startTour()
+      beginTour()
       return
     }
+    if (!nextStop) return
     setOverride({ lat: nextStop.lat, lng: nextStop.lng, accuracy: 5 })
     bankStop(nextStop.position)
     arrive(nextStop)
@@ -366,17 +395,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
           nearTube={nearTube || simEnabled}
           distanceToTube={distanceToTube}
           permissionState={geo.permissionState}
-          onStart={() => {
-            startTour()
-            // The intro rides the persistent mini player so it survives this
-            // card unmounting and keeps its controls on screen. Arrival at
-            // stop 1 clears it, so it can never talk over the first story.
-            setMiniAudio({
-              url: resolveAudioUrl(INTRO_AUDIO_URL, lang, guideId) ?? INTRO_AUDIO_URL,
-              fallbackUrl: localizeAudioUrl(INTRO_AUDIO_URL, lang) ?? INTRO_AUDIO_URL,
-              label: 'Introduction',
-            })
-          }}
+          onStart={beginTour}
         />
       )}
 
@@ -573,6 +592,38 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         )}
       </AnimatePresence>
 
+      {/* Start count-in takeover: sting playing, five, four... then the VO */}
+      <AnimatePresence>
+        {startCountdown !== null && startCountdown > 0 && (
+          <motion.div
+            key="start-countdown"
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-acid px-8 text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="font-grotesk text-[12px] uppercase tracking-[0.35em] text-black/70">
+              Hidden Camden · NW1
+            </div>
+            <motion.div
+              key={startCountdown}
+              className="font-grotesk text-[160px] font-bold leading-none text-black"
+              initial={{ scale: 0.4, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 220, damping: 20 }}
+            >
+              {startCountdown}
+            </motion.div>
+            <div className="mt-3 font-jost text-[34px] font-bold uppercase leading-none tracking-tight text-black">
+              Tour starting
+            </div>
+            <div className="mt-3 font-grotesk text-[11px] uppercase tracking-[0.3em] text-black/70">
+              Headphones in
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Unlock flash takeover */}
       <AnimatePresence>
         {unlockFlash && (
@@ -657,7 +708,7 @@ function StartGate({
     : distanceToTube !== null
       ? `${Math.round(distanceToTube)}m away. It's the entrance on Camden High Street.`
       : permissionState === 'denied'
-        ? 'Location is off, so the app cannot see you arrive. Turn it on for the full experience.'
+        ? 'Location is off. Turn it on so the tour can see you reach the tube.'
         : 'Getting a GPS fix. Head for the tube in the meantime.'
 
   const steps: { label: string; done: boolean }[] = [
@@ -733,15 +784,22 @@ function StartGate({
 
       <GuideNudge />
 
+      {/* The start button only wakes up at the tube: arriving at the
+          entrance is the first beat of the experience, not a suggestion. */}
       <button
-        onClick={onStart}
-        className="mt-4 w-full bg-acid px-5 py-4 font-jost text-lg font-bold uppercase tracking-[0.08em] text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]"
+        onClick={nearTube ? onStart : undefined}
+        disabled={!nearTube}
+        className={`mt-4 w-full px-5 py-4 font-jost text-lg font-bold uppercase tracking-[0.08em] transition-colors ${
+          nearTube
+            ? 'bg-acid text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]'
+            : 'cursor-not-allowed border border-white/10 bg-night-3 text-label-3'
+        }`}
       >
         Start the tour
       </button>
       {!nearTube && (
         <p className="mt-2 font-grotesk text-[10.5px] leading-relaxed text-label-3">
-          Not there yet? Start anyway. The intro plays now and the map walks you to stop 1.
+          The button wakes up when you reach the tube entrance.
         </p>
       )}
     </motion.div>
