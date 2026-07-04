@@ -13,6 +13,11 @@ on:
         description: Language (en or es)
         required: false
         default: en
+  # Touch .audio-generate-trigger and push to main to kick a full
+  # missing-files generation without needing dispatch permissions.
+  push:
+    branches: [main]
+    paths: ['.audio-generate-trigger']
 
 jobs:
   generate:
@@ -22,8 +27,8 @@ jobs:
       - name: Generate missing audio via the app API
         env:
           BASE: https://hidden-camden.vercel.app/api/admin/generate-audio
-          PREFIX: ${{ inputs.prefix }}
-          LANG_CODE: ${{ inputs.lang }}
+          PREFIX: ${{ inputs.prefix || '' }}
+          LANG_CODE: ${{ inputs.lang || 'en' }}
         run: |
           set -u
           echo "Listing manifest..."
