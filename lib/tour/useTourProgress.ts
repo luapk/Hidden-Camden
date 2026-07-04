@@ -2,7 +2,11 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-const STORAGE_KEY = 'cc-tour'
+// The crawl keeps the original key so nobody's progress is lost; other
+// tours get their own bucket. Progress is fully independent per tour.
+function storageKeyFor(tourId: string): string {
+  return tourId === 'crawl' ? 'cc-tour' : `cc-tour-${tourId}`
+}
 
 export interface TourProgress {
   unlockedStops: number[]
@@ -28,9 +32,9 @@ export function isPaywalled(position: number, paid: boolean): boolean {
   return position > FREE_STOPS && !paid
 }
 
-function load(): TourProgress {
+function load(storageKey: string): TourProgress {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = localStorage.getItem(storageKey)
     if (!raw) return DEFAULT_PROGRESS
     const parsed = JSON.parse(raw) as Partial<TourProgress>
     return {
@@ -59,31 +63,32 @@ export interface UseTourProgress extends TourProgress {
 }
 
 /**
- * localStorage-backed tour progress, keyed 'cc-tour'.
+ * localStorage-backed tour progress, one bucket per tour.
  * Paywall rule: stops 1 and 2 are free; unlocking stop 3+ requires paid.
  */
-export function useTourProgress(): UseTourProgress {
+export function useTourProgress(tourId: string = 'crawl'): UseTourProgress {
+  const storageKey = storageKeyFor(tourId)
   const [progress, setProgress] = useState<TourProgress>(DEFAULT_PROGRESS)
   const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
-    setProgress(load())
+    setProgress(load(storageKey))
     setHydrated(true)
-  }, [])
+  }, [storageKey])
 
   const save = useCallback(
     (updater: (p: TourProgress) => TourProgress) => {
       setProgress((prev) => {
         const next = updater(prev)
         try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+          localStorage.setItem(storageKey, JSON.stringify(next))
         } catch {
           /* private mode or full storage: progress survives in memory */
         }
         return next
       })
     },
-    [],
+    [storageKey],
   )
 
   const unlockStop = useCallback(

@@ -5,11 +5,19 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { BeerStein, Wallet as WalletIcon } from '@phosphor-icons/react'
 import { LAUNCH_ROUTE, type TourStop } from '@/lib/tour/launchRoute'
+import { CULTURE_ROUTE } from '@/lib/tour/cultureRoute'
 import { useTourProgress } from '@/lib/tour/useTourProgress'
 import BrandLogo from '../BrandLogo'
 
+interface BankedEntry {
+  stop: TourStop
+  tourLabel: string
+  redeemHref: string
+}
+
 export default function WalletPage() {
-  const { bankedStops, hydrated } = useTourProgress()
+  const crawl = useTourProgress('crawl')
+  const culture = useTourProgress('culture')
   const [stops, setStops] = useState<TourStop[] | null>(null)
 
   useEffect(() => {
@@ -27,11 +35,26 @@ export default function WalletPage() {
     }
   }, [])
 
-  const banked = (stops ?? [])
-    .filter((s) => bankedStops.includes(s.position))
-    .sort((a, b) => a.position - b.position)
+  // Drinks from the Crawl and rewards from the Culture Cut live side by
+  // side; a small tag on the ticket says which walk earned it.
+  const banked: BankedEntry[] = [
+    ...(stops ?? [])
+      .filter((s) => crawl.bankedStops.includes(s.position))
+      .map((stop) => ({
+        stop,
+        tourLabel: 'The Crawl',
+        redeemHref: `/redeem/demo-${stop.position}`,
+      })),
+    ...CULTURE_ROUTE.filter((s) => culture.bankedStops.includes(s.position)).map(
+      (stop) => ({
+        stop,
+        tourLabel: 'Culture Cut',
+        redeemHref: `/redeem/demo-culture-${stop.position}`,
+      }),
+    ),
+  ]
 
-  const loading = !hydrated || stops === null
+  const loading = !crawl.hydrated || !culture.hydrated || stops === null
 
   return (
     <main>
@@ -80,9 +103,9 @@ export default function WalletPage() {
           animate="show"
           variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
         >
-          {banked.map((stop) => (
+          {banked.map(({ stop, tourLabel, redeemHref }) => (
             <motion.li
-              key={stop.position}
+              key={`${tourLabel}-${stop.position}`}
               variants={{
                 hidden: { opacity: 0, y: 18 },
                 show: { opacity: 1, y: 0 },
@@ -98,7 +121,7 @@ export default function WalletPage() {
                     className="pointer-events-none absolute right-3 top-3 h-auto w-12 opacity-45"
                   />
                   <div className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-label-2">
-                    Banked · Stop{' '}
+                    Banked · {tourLabel} · Stop{' '}
                     <span style={{ color: stop.accent }}>{stop.position}</span>
                   </div>
                   <div className="mt-1.5 flex items-center gap-2">
@@ -111,10 +134,10 @@ export default function WalletPage() {
                     {stop.name} · {stop.rewardWindow}
                   </div>
                   <Link
-                    href={`/redeem/demo-${stop.position}`}
+                    href={redeemHref}
                     className="mt-3 inline-block font-jost text-[14px] font-bold uppercase tracking-[0.1em] text-acid underline-offset-4 hover:underline"
                   >
-                    Redeem at the bar
+                    Redeem at the counter
                   </Link>
                 </div>
                 {/* Perforation dot column */}

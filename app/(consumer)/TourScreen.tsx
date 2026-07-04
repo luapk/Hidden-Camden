@@ -21,11 +21,11 @@ import { haversineDistance } from '@/lib/geo'
 import { useGeofence, type GeoPosition } from '@/lib/geo/useGeofence'
 import { isPaywalled, useTourProgress } from '@/lib/tour/useTourProgress'
 import {
-  INTRO_AUDIO_URL,
   START_POINT,
   directionsHref,
   type TourStop,
 } from '@/lib/tour/launchRoute'
+import { TOURS, useActiveTour } from '@/lib/tour/tours'
 import Link from 'next/link'
 import { localizeAudioUrl, useLanguage } from '@/lib/tour/language'
 import { resolveAudioUrl, useGuide } from '@/lib/tour/guides'
@@ -61,7 +61,11 @@ function distanceFigure(m: number): { value: string; unit: string } {
 }
 
 export default function TourScreen({ stops }: { stops: TourStop[] }) {
-  const progress = useTourProgress()
+  // The crawl's stops arrive from the server (DB-aware, falls back to the
+  // static route); other tours are static client data from the registry.
+  const { tourId, tour, setTour } = useActiveTour()
+  const routeStops = tourId === 'crawl' ? stops : tour.stops
+  const progress = useTourProgress(tourId)
   const {
     unlockedStops,
     bankedStops,
@@ -79,8 +83,8 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   const { guideId, guide } = useGuide()
 
   const sorted = useMemo(
-    () => [...stops].sort((a, b) => a.position - b.position),
-    [stops],
+    () => [...routeStops].sort((a, b) => a.position - b.position),
+    [routeStops],
   )
 
   const nextStop = hydrated && tourStarted
@@ -132,8 +136,11 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
       setStartCountdown(null)
       startTour()
       setMiniAudio({
-        url: resolveAudioUrl(INTRO_AUDIO_URL, lang, guideId) ?? INTRO_AUDIO_URL,
-        fallbackUrl: localizeAudioUrl(INTRO_AUDIO_URL, lang) ?? INTRO_AUDIO_URL,
+        url:
+          resolveAudioUrl(tour.introAudioUrl, lang, guideId) ??
+          tour.introAudioUrl,
+        fallbackUrl:
+          localizeAudioUrl(tour.introAudioUrl, lang) ?? tour.introAudioUrl,
         label: 'Introduction',
       })
       return
@@ -143,7 +150,21 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
       1_000,
     )
     return () => window.clearTimeout(id)
-  }, [startCountdown, startTour, lang, guideId])
+  }, [startCountdown, startTour, lang, guideId, tour.introAudioUrl])
+
+  // Switching tours mid-flight: clear every transient piece of UI so the
+  // new route starts clean. Stored progress per tour is untouched.
+  useEffect(() => {
+    setOverride(null)
+    setMiniAudio(null)
+    setPendingUnlock(null)
+    setActiveStory(null)
+    setUnlockFlash(null)
+    setSelectedStop(null)
+    setAutoPlayStory(false)
+    setStartCountdown(null)
+    handledRef.current = null
+  }, [tourId])
 
   // Arrival sting: the stop's own guitar riff, served from /sounds/ by stop
   // number. Independent of the DB and of the narration audioUrl, so it works
@@ -255,7 +276,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     // only honoured with the walker actually at the fence. A latch that
     // somehow outlives its stop can never unlock a venue from streets away.
     if (geo.distanceM === null || geo.distanceM > nextStop.radiusM + 30) return
-    const key = `${nextStop.position}:${paid}`
+    const key = `${tourId}:${nextStop.position}:${paid}`
     if (handledRef.current === key) return
     handledRef.current = key
     if (isConfidentUnlock(nextStop)) {
@@ -263,7 +284,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     } else {
       setPendingUnlock(nextStop)
     }
-  }, [geo.triggered, geo.distanceM, nextStop, paid, arrive, isConfidentUnlock])
+  }, [geo.triggered, geo.distanceM, nextStop, paid, arrive, isConfidentUnlock, tourId])
 
   const simulateArrival = () => {
     if (!tourStarted) {
@@ -358,9 +379,26 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
             </span>
           </Link>
         </div>
+        {/* Tour switcher: two routes, one app. Progress is kept per tour. */}
+        <div className="mt-4 flex gap-1 border border-white/10 bg-night-2 p-1" role="group" aria-label="Choose your route">
+          {TOURS.map((t) => {
+            const active = t.id === tourId
+            return (
+              <button
+                key={t.id}
+                onClick={() => setTour(t.id)}
+                aria-pressed={active}
+                className={`flex-1 py-2 font-grotesk text-[11px] font-bold uppercase tracking-[0.18em] transition-colors ${
+                  active ? 'bg-acid text-black' : 'text-label-2'
+                }`}
+              >
+                {t.shortName}
+              </button>
+            )
+          })}
+        </div>
         <p className="mt-3 text-[13px] leading-relaxed text-label-2">
-          Your personal walking tour from a real Camden legend, with rewards
-          waiting to be unlocked.
+          {tour.tagline}
         </p>
       </header>
 
@@ -461,10 +499,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
                   Tour complete
                 </div>
                 <p className="mt-2 text-sm leading-relaxed text-label-1">
-                  A witch, a boxer, a lie about jazz, a pool table, a hiding
-                  place, the night punk went overground, a fortune teller, the
-                  room on every CV, and the bar where it happens next. Your pin
-                  is waiting at Dingwalls. Wear it somewhere people will ask.
+                  {tour.completeText}
                 </p>
               </div>
             )}
