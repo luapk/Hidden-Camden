@@ -17,7 +17,14 @@ import {
 } from '@phosphor-icons/react'
 import { directionsHref, type TourStop } from '@/lib/tour/launchRoute'
 import { localizeAudioUrl, useLanguage } from '@/lib/tour/language'
-import { DEFAULT_GUIDE_ID, resolveAudioUrl, useGuide } from '@/lib/tour/guides'
+import {
+  DEFAULT_GUIDE_ID,
+  effectiveGuideId,
+  getGuide,
+  resolveAudioUrl,
+  useGuide,
+} from '@/lib/tour/guides'
+import { useActiveTour } from '@/lib/tour/tours'
 import { bankSting, playSting } from '@/lib/tour/stings'
 import { isPaywalled } from '@/lib/tour/useTourProgress'
 import { VENUE_POSTERS } from '@/lib/tour/venuePosters'
@@ -100,7 +107,11 @@ function StoryBody({
   nextStopName?: string | null
 }) {
   const { lang } = useLanguage()
-  const { guideId, guide } = useGuide()
+  const { tourId } = useActiveTour()
+  const { guideId: chosenGuideId } = useGuide()
+  // Star guides only narrate the tours they cover; otherwise the house voice.
+  const guideId = effectiveGuideId(tourId, chosenGuideId)
+  const guide = getGuide(guideId)
   const guideUrl = resolveAudioUrl(stop.audioUrl, lang, guideId)
   const houseUrl = localizeAudioUrl(stop.audioUrl, lang)
   // A guide whose file for this stop is not recorded yet falls back to the

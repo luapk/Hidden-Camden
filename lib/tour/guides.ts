@@ -16,6 +16,10 @@ import { localizeAudioUrl, type Lang } from './language'
 
 export type GuideId = 'local' | 'sammie' | 'suggs' | 'yungblud' | 'carl-barat'
 
+/** Which tours a guide narrates. Star guides are a music-venue thing;
+ *  the house voice covers everything. */
+export type GuideTour = 'crawl' | 'culture'
+
 export interface TourGuide {
   id: GuideId
   name: string
@@ -26,6 +30,7 @@ export interface TourGuide {
   /** Portrait. Placeholder shots for guides not yet recorded. */
   image: string
   status: 'live' | 'coming-soon'
+  tours: GuideTour[]
 }
 
 // Portraits are placeholders reused from the app's proven Unsplash set until
@@ -38,6 +43,7 @@ export const GUIDES: TourGuide[] = [
     bio: 'Knows every back door and who got thrown out of it. Witches, boxers, and the lie about jazz, told straight.',
     image: 'https://images.unsplash.com/photo-1543832923-44667a44c804?w=600&q=80',
     status: 'live',
+    tours: ['crawl', 'culture'],
   },
   {
     id: 'sammie',
@@ -46,6 +52,7 @@ export const GUIDES: TourGuide[] = [
     bio: 'He has worked these rooms for a decade. Expect the bar stools that matter, the booth gossip, and what really happens after the shutters drop.',
     image: '/guides/sammie.png',
     status: 'live',
+    tours: ['crawl'],
   },
   {
     id: 'suggs',
@@ -54,6 +61,7 @@ export const GUIDES: TourGuide[] = [
     bio: 'The streets that built Madness, told by the man who walked them first. Ska, sharp suits, and the ballroom that nearly swallowed the band.',
     image: 'https://images.unsplash.com/photo-1563089145-599997674d42?w=600&q=80',
     status: 'coming-soon',
+    tours: ['crawl'],
   },
   {
     id: 'yungblud',
@@ -62,6 +70,7 @@ export const GUIDES: TourGuide[] = [
     bio: 'The new noise and where it hides. Sweat on the Underworld ceiling, eyeliner in the Ballroom toilets, and why Camden still bites.',
     image: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=600&q=80',
     status: 'coming-soon',
+    tours: ['crawl'],
   },
   {
     id: 'carl-barat',
@@ -70,6 +79,7 @@ export const GUIDES: TourGuide[] = [
     bio: 'Lock-ins, guerrilla gigs and the Good Old Days. He played half these rooms and got carried out of the rest.',
     image: 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=600&q=80',
     status: 'coming-soon',
+    tours: ['crawl'],
   },
 ]
 
@@ -77,6 +87,21 @@ export const DEFAULT_GUIDE_ID: GuideId = 'local'
 
 export function getGuide(id: GuideId): TourGuide {
   return GUIDES.find((g) => g.id === id) ?? GUIDES[0]
+}
+
+/** The roster for one tour's picker. */
+export function guidesForTour(tourId: GuideTour): TourGuide[] {
+  return GUIDES.filter((g) => g.tours.includes(tourId))
+}
+
+/**
+ * The guide who actually narrates a given tour. A chosen star guide only
+ * applies to tours they cover; everywhere else the house voice steps in.
+ * The stored choice is untouched, so Sammie resumes when you return to
+ * the venues route.
+ */
+export function effectiveGuideId(tourId: GuideTour, guideId: GuideId): GuideId {
+  return getGuide(guideId).tours.includes(tourId) ? guideId : DEFAULT_GUIDE_ID
 }
 
 const KEY = 'cc-guide'

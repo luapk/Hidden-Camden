@@ -2,8 +2,17 @@
 
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { CaretDown, Globe, Waveform } from '@phosphor-icons/react'
+import {
+  CaretDown,
+  Check,
+  FlagCheckered,
+  Globe,
+  LockSimple,
+  Waveform,
+} from '@phosphor-icons/react'
 import { LANGUAGES, useLanguage } from '@/lib/tour/language'
+import { TOURS, getTour, useActiveTour, type TourId } from '@/lib/tour/tours'
+import { useTourProgress } from '@/lib/tour/useTourProgress'
 import GuidePicker from '../GuidePicker'
 
 const FAQS: { q: string; a: string }[] = [
@@ -35,7 +44,44 @@ const FAQS: { q: string; a: string }[] = [
 
 export default function SettingsPage() {
   const { lang, setLang, hydrated } = useLanguage()
+  const {
+    tourId: activeTourId,
+    tour: activeTour,
+    setTour,
+    hydrated: tourHydrated,
+  } = useActiveTour()
+  const crawlProgress = useTourProgress('crawl')
+  const cultureProgress = useTourProgress('culture')
+  const [tabOverride, setTabOverride] = useState<TourId | null>(null)
   const [open, setOpen] = useState<number | null>(null)
+
+  const progressFor = (id: TourId) =>
+    id === 'crawl' ? crawlProgress : cultureProgress
+
+  // Switching routes mid-walk would be chaos: the streets are sequenced,
+  // the wallet is not. You change tours before you start, or after you
+  // finish, never in between.
+  const activeProgress = progressFor(activeTourId)
+  const activeTotal = activeTour.stops.length
+  const activeComplete = activeProgress.bankedStops.length >= activeTotal
+  const lockedIn =
+    tourHydrated && activeProgress.tourStarted && !activeComplete
+
+  const viewId: TourId = tabOverride ?? activeTourId
+  const viewTour = getTour(viewId)
+  const viewProgress = progressFor(viewId)
+  const viewTotal = viewTour.stops.length
+  const viewBanked = viewProgress.bankedStops.length
+
+  const viewStatus = !viewProgress.hydrated
+    ? ''
+    : viewBanked >= viewTotal
+      ? 'Complete'
+      : viewProgress.tourStarted
+        ? `In progress · ${String(viewBanked).padStart(2, '0')}/${String(viewTotal).padStart(2, '0')}`
+        : 'Not started'
+
+  const isViewingActive = viewId === activeTourId
 
   return (
     <main>
@@ -48,46 +94,156 @@ export default function SettingsPage() {
         </h1>
       </header>
 
-      {/* Settings card */}
-      <section className="mt-6 border border-white/10 bg-night-2 p-4">
-        <div>
-          <div className="flex items-center gap-1.5 font-grotesk text-[11px] uppercase tracking-[0.25em] text-label-2">
-            <Globe size={14} weight="bold" />
-            Language
-          </div>
-          <div className="mt-2.5 flex flex-wrap gap-2">
-            {LANGUAGES.map((l) => {
-              const active = hydrated && l.code === lang
-              return (
-                <button
-                  key={l.code}
-                  onClick={() => setLang(l.code)}
-                  className={`rounded-full border px-3 py-1.5 text-[12.5px] font-medium transition-colors ${
-                    active
-                      ? 'border-acid bg-acid text-black'
-                      : 'border-white/10 bg-night-3 text-label-1'
-                  }`}
-                >
-                  {l.label}
-                </button>
-              )
-            })}
-          </div>
-          <p className="mt-2.5 font-grotesk text-[10.5px] text-label-3">
-            Switches the narration for every stop. More languages landing soon.
-          </p>
+      {/* ── The tour: two routes, one at a time ── */}
+      <section className="mt-6">
+        {/* Route tabs, set like ticket stubs */}
+        <div
+          className="flex gap-1 border border-white/10 bg-night-2 p-1"
+          role="tablist"
+          aria-label="Routes"
+        >
+          {TOURS.map((t) => {
+            const selected = t.id === viewId
+            const isActiveTour = t.id === activeTourId
+            return (
+              <button
+                key={t.id}
+                role="tab"
+                aria-selected={selected}
+                onClick={() => setTabOverride(t.id)}
+                className={`relative flex-1 py-2.5 font-grotesk text-[11px] font-bold uppercase tracking-[0.18em] transition-colors ${
+                  selected ? 'bg-acid text-black' : 'text-label-2'
+                }`}
+              >
+                {t.id === 'crawl' ? 'Music venues' : 'Culture'}
+                {isActiveTour && !selected && (
+                  <span
+                    className="absolute right-2 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-acid"
+                    aria-hidden
+                  />
+                )}
+              </button>
+            )
+          })}
         </div>
 
-        <div id="guide" className="mt-5 scroll-mt-6">
-          <div className="flex items-center gap-1.5 font-grotesk text-[11px] uppercase tracking-[0.25em] text-label-2">
-            <Waveform size={14} weight="bold" />
-            Your guide
-          </div>
-          <GuidePicker />
-          <p className="mt-2.5 font-grotesk text-[10.5px] text-label-3">
-            Same route, same stops, a different voice in your ears. Guides narrate in English.
-          </p>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={viewId}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18 }}
+          >
+            {/* Tour card */}
+            <div
+              className={`relative mt-3 overflow-hidden border bg-night-2 p-4 ${
+                isViewingActive ? 'border-acid/50' : 'border-white/10'
+              }`}
+            >
+              {isViewingActive && (
+                <span
+                  className="absolute inset-y-0 left-0 w-[3px] bg-acid shadow-[0_0_12px_rgba(204,255,0,0.5)]"
+                  aria-hidden
+                />
+              )}
+              {/* Ghost stop count */}
+              <span
+                className="pointer-events-none absolute -top-2 right-3 font-grotesk text-[64px] font-bold leading-none text-white/[0.05]"
+                aria-hidden
+              >
+                {String(viewTotal).padStart(2, '0')}
+              </span>
+
+              <div className="flex items-center gap-2">
+                <span className="font-grotesk text-[9px] uppercase tracking-[0.3em] text-label-3">
+                  {viewStatus}
+                </span>
+              </div>
+              <h2 className="mt-1 font-jost text-[22px] font-bold uppercase leading-tight tracking-tight text-label-1">
+                {viewTour.name}
+              </h2>
+              <p className="mt-1 text-[12.5px] leading-relaxed text-label-2">
+                {viewTour.tagline}
+              </p>
+              <div className="mt-3 flex items-center gap-2 font-grotesk text-[10px] uppercase tracking-[0.12em] text-label-3">
+                <FlagCheckered size={12} weight="fill" color="#CCFF00" />
+                {viewTotal} stops · first two free · starts at Camden Town tube
+              </div>
+
+              {/* The decision surface */}
+              {isViewingActive ? (
+                <div className="mt-4 flex items-center gap-2 border border-acid/40 bg-acid/10 px-3 py-2.5">
+                  <Check size={14} weight="bold" color="#CCFF00" />
+                  <span className="font-grotesk text-[11px] font-bold uppercase tracking-[0.15em] text-acid">
+                    You are walking this one
+                  </span>
+                </div>
+              ) : lockedIn ? (
+                <div className="mt-4 border border-white/10 bg-night-3/70 px-3 py-3">
+                  <div className="flex items-center gap-2 font-grotesk text-[10px] font-bold uppercase tracking-[0.2em] text-label-2">
+                    <LockSimple size={12} weight="bold" />
+                    One walk at a time
+                  </div>
+                  <p className="mt-1.5 font-grotesk text-[11px] leading-relaxed text-label-3">
+                    You are {activeProgress.bankedStops.length} of {activeTotal}{' '}
+                    stops into {activeTour.name}. Finish it to change routes.
+                  </p>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setTour(viewId)}
+                  className="mt-4 w-full bg-acid px-4 py-3 font-jost text-[15px] font-bold uppercase tracking-[0.08em] text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]"
+                >
+                  Walk this one
+                </button>
+              )}
+            </div>
+
+            {/* The voice for this route */}
+            <div id="guide" className="mt-6 scroll-mt-6">
+              <div className="flex items-center gap-1.5 font-grotesk text-[11px] uppercase tracking-[0.25em] text-label-2">
+                <Waveform size={14} weight="bold" />
+                Your guide
+              </div>
+              <GuidePicker tourId={viewId} />
+              <p className="mt-2.5 font-grotesk text-[10.5px] text-label-3">
+                {viewId === 'culture'
+                  ? 'The house voice leads the Culture Cut. Star guides are a venues thing, for now.'
+                  : 'Same route, same stops, a different voice in your ears. Guides narrate in English.'}
+              </p>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </section>
+
+      {/* ── Language ── */}
+      <section className="mt-8 border border-white/10 bg-night-2 p-4">
+        <div className="flex items-center gap-1.5 font-grotesk text-[11px] uppercase tracking-[0.25em] text-label-2">
+          <Globe size={14} weight="bold" />
+          Language
         </div>
+        <div className="mt-2.5 flex flex-wrap gap-2">
+          {LANGUAGES.map((l) => {
+            const active = hydrated && l.code === lang
+            return (
+              <button
+                key={l.code}
+                onClick={() => setLang(l.code)}
+                className={`rounded-full border px-3 py-1.5 text-[12.5px] font-medium transition-colors ${
+                  active
+                    ? 'border-acid bg-acid text-black'
+                    : 'border-white/10 bg-night-3 text-label-1'
+                }`}
+              >
+                {l.label}
+              </button>
+            )
+          })}
+        </div>
+        <p className="mt-2.5 font-grotesk text-[10.5px] text-label-3">
+          Switches the narration for every stop. More languages landing soon.
+        </p>
       </section>
 
       {/* FAQ accordion */}

@@ -25,10 +25,15 @@ import {
   directionsHref,
   type TourStop,
 } from '@/lib/tour/launchRoute'
-import { TOURS, useActiveTour } from '@/lib/tour/tours'
+import { useActiveTour } from '@/lib/tour/tours'
 import Link from 'next/link'
 import { localizeAudioUrl, useLanguage } from '@/lib/tour/language'
-import { resolveAudioUrl, useGuide } from '@/lib/tour/guides'
+import {
+  effectiveGuideId,
+  getGuide,
+  resolveAudioUrl,
+  useGuide,
+} from '@/lib/tour/guides'
 import { arrivalSting, playSting, startSting } from '@/lib/tour/stings'
 import BrandLogo from './BrandLogo'
 import StoryPlayer from './StoryPlayer'
@@ -63,7 +68,9 @@ function distanceFigure(m: number): { value: string; unit: string } {
 export default function TourScreen({ stops }: { stops: TourStop[] }) {
   // The crawl's stops arrive from the server (DB-aware, falls back to the
   // static route); other tours are static client data from the registry.
-  const { tourId, tour, setTour } = useActiveTour()
+  // Tour selection happens in Settings, never here: switching mid-walk
+  // would be chaos, so the home screen simply serves whatever is chosen.
+  const { tourId, tour } = useActiveTour()
   const routeStops = tourId === 'crawl' ? stops : tour.stops
   const progress = useTourProgress(tourId)
   const {
@@ -80,7 +87,11 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   } = progress
 
   const { lang } = useLanguage()
-  const { guideId, guide } = useGuide()
+  const { guideId } = useGuide()
+  // Star guides only cover the venues route; everywhere else the house
+  // voice narrates, without touching the stored choice.
+  const effGuideId = effectiveGuideId(tourId, guideId)
+  const guide = getGuide(effGuideId)
 
   const sorted = useMemo(
     () => [...routeStops].sort((a, b) => a.position - b.position),
@@ -137,7 +148,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
       startTour()
       setMiniAudio({
         url:
-          resolveAudioUrl(tour.introAudioUrl, lang, guideId) ??
+          resolveAudioUrl(tour.introAudioUrl, lang, effGuideId) ??
           tour.introAudioUrl,
         fallbackUrl:
           localizeAudioUrl(tour.introAudioUrl, lang) ?? tour.introAudioUrl,
@@ -150,7 +161,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
       1_000,
     )
     return () => window.clearTimeout(id)
-  }, [startCountdown, startTour, lang, guideId, tour.introAudioUrl])
+  }, [startCountdown, startTour, lang, effGuideId, tour.introAudioUrl])
 
   // Switching tours mid-flight: clear every transient piece of UI so the
   // new route starts clean. Stored progress per tour is untouched.
@@ -329,7 +340,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     : null
   const directionsUrl =
     prevStop && unlockedStops.includes(prevStop.position)
-      ? resolveAudioUrl(prevStop.linkAudioUrl, lang, guideId)
+      ? resolveAudioUrl(prevStop.linkAudioUrl, lang, effGuideId)
       : null
 
   const hearDirections =
@@ -379,26 +390,11 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
             </span>
           </Link>
         </div>
-        {/* Tour switcher: two routes, one app. Progress is kept per tour. */}
-        <div className="mt-4 flex gap-1 border border-white/10 bg-night-2 p-1" role="group" aria-label="Choose your route">
-          {TOURS.map((t) => {
-            const active = t.id === tourId
-            return (
-              <button
-                key={t.id}
-                onClick={() => setTour(t.id)}
-                aria-pressed={active}
-                className={`flex-1 py-2 font-grotesk text-[11px] font-bold uppercase tracking-[0.18em] transition-colors ${
-                  active ? 'bg-acid text-black' : 'text-label-2'
-                }`}
-              >
-                {t.shortName}
-              </button>
-            )
-          })}
-        </div>
         <p className="mt-3 text-[13px] leading-relaxed text-label-2">
-          {tour.tagline}
+          <span className="font-grotesk text-[10px] uppercase tracking-[0.25em] text-acid">
+            {tour.name}
+          </span>
+          <span className="mt-1 block">{tour.tagline}</span>
         </p>
       </header>
 
@@ -903,7 +899,9 @@ function GuideProgressRing({
  */
 function GuideNudge() {
   const { lang } = useLanguage()
-  const { guide } = useGuide()
+  const { tourId } = useActiveTour()
+  const { guideId } = useGuide()
+  const guide = getGuide(effectiveGuideId(tourId, guideId))
 
   if (lang !== 'en') return null
 

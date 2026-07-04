@@ -3,25 +3,35 @@
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Check, LockSimple } from '@phosphor-icons/react'
-import { GUIDES, useGuide, type TourGuide } from '@/lib/tour/guides'
+import {
+  effectiveGuideId,
+  guidesForTour,
+  useGuide,
+  type GuideTour,
+  type TourGuide,
+} from '@/lib/tour/guides'
 
 /**
  * Guide chooser: same route, same stops, a different voice in your ears.
  * Lives in Settings; the tour screen only shows the current guide's face.
  * Poster-style cards: full-bleed portrait panel, name set like a bill
  * headline, bio underneath. Live guides are tappable; the rest tease.
+ * The roster is per tour: the star guides narrate the venues route, the
+ * house voice covers everything.
  */
-export default function GuidePicker() {
+export default function GuidePicker({ tourId }: { tourId: GuideTour }) {
   const { guideId, setGuide, hydrated } = useGuide()
+  const roster = guidesForTour(tourId)
+  const activeId = effectiveGuideId(tourId, guideId)
 
   return (
     <div className="mt-3 space-y-2.5">
-      {GUIDES.map((g, i) => (
+      {roster.map((g, i) => (
         <GuideCard
           key={g.id}
           guide={g}
           index={i}
-          active={hydrated && g.id === guideId}
+          active={hydrated && g.id === activeId}
           onPick={() => setGuide(g.id)}
         />
       ))}
