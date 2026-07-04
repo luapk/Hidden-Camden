@@ -8,13 +8,13 @@ const LNG_MIN = -0.16
 const LNG_MAX = -0.13
 
 describe('LAUNCH_ROUTE', () => {
-  it('has exactly 7 stops', () => {
-    expect(LAUNCH_ROUTE).toHaveLength(7)
+  it('has exactly 10 stops', () => {
+    expect(LAUNCH_ROUTE).toHaveLength(10)
   })
 
-  it('has unique positions 1..7', () => {
+  it('has unique positions 1..10', () => {
     const positions = LAUNCH_ROUTE.map((s) => s.position).sort((a, b) => a - b)
-    expect(positions).toEqual([1, 2, 3, 4, 5, 6, 7])
+    expect(positions).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
   })
 
   it('keeps every stop inside the Camden bounding box', () => {

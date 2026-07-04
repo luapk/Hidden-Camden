@@ -461,9 +461,10 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
                   Tour complete
                 </div>
                 <p className="mt-2 text-sm leading-relaxed text-label-1">
-                  A witch, a boxer, a lie about jazz, a pool table, a hiding place,
-                  and the night punk went overground. Your pin is waiting at
-                  Dingwalls. Wear it somewhere people will ask.
+                  A witch, a boxer, a lie about jazz, a pool table, a hiding
+                  place, the night punk went overground, a fortune teller, the
+                  room on every CV, and the bar where it happens next. Your pin
+                  is waiting at Dingwalls. Wear it somewhere people will ask.
                 </p>
               </div>
             )}

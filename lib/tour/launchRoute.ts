@@ -293,7 +293,84 @@ export const LAUNCH_ROUTE: TourStop[] = [
       'So that\'s your hour. A witch, a boxer, a lie about jazz, a pool table, a hiding place, and the night punk went overground. All within one half-mile, all still pouring.\n\n' +
       'Your final pint is waiting on the terrace over the lock, and your pin is claimable at the bar. Wear it somewhere people will ask about it.\n\n' +
       'Then tell them the one about the jazz band.',
-    linkAudioUrl: null,
+    linkAudioUrl: linkAudio(7, 8),
     audioUrl: stopAudio(7),
+  },
+  // ── Chalk Farm Road extension, added July 2026. Coordinates are desk
+  // estimates from the street addresses; nudge fenceLat/fenceLng after an
+  // on-site walk (the calibrate screen helps).
+  {
+    position: 8,
+    name: 'The Imperial Palace of Big Red',
+    subtitle: 'The temple of loud',
+    address: '40-42 Chalk Farm Rd, London NW1 8BG',
+    instagram: 'theimperialpalaceof.bigred',
+    lat: 51.54195,
+    lng: -0.1484,
+    radiusM: 30,
+    rewardLabel: 'House pint',
+    rewardWindow: '16:00 to 21:00, daily',
+    runtimeS: 120,
+    isFree: false,
+    accent: STOP_ACCENTS[1],
+    image: STOP_IMAGES[5],
+    transcript:
+      'Some bars book bands. This one built a shrine to them.\n\n' +
+      'Big Red was Camden\'s rock bar for years, the room where the leather jackets outnumbered the tourists and the jukebox never once apologised. Then it went dark, the way too many rooms here have. And in October 2024 the original owner got the keys back, gave the place a name with delusions of grandeur, and reopened it as the Imperial Palace of Big Red.\n\n' +
+      'The walls are the show. Posters on posters, memorabilia stacked like the room is trying to remember every gig Camden ever hosted at once. Animal print where you least expect it. A pool table waiting for your money. And horror B movies playing silently in the corner, all rubber monsters and screaming, because nothing pairs with a cold lager like a man in a latex suit menacing a cardboard spaceship.\n\n' +
+      'Then there is Zoltan, the fortune telling machine. Feed it a coin and it will tell you your future, which in this postcode is usually another round and a band you have never heard of becoming your new favourite.\n\n' +
+      'Rock bars are supposed to be extinct. Nobody told this one.\n\n' +
+      'Your pint is banked, the table is open, and the monsters are already screaming. Ask Zoltan about the next stop. He knows.',
+    linkAudioUrl: linkAudio(8, 9),
+    audioUrl: stopAudio(8),
+  },
+  {
+    position: 9,
+    name: 'Barfly',
+    subtitle: 'The room on every CV',
+    address: '49 Chalk Farm Rd, London NW1 8AN',
+    instagram: '',
+    lat: 51.54235,
+    lng: -0.1489,
+    radiusM: 30,
+    rewardLabel: 'House lager',
+    rewardWindow: 'Gig nights, before 20:00',
+    runtimeS: 130,
+    isFree: false,
+    accent: STOP_ACCENTS[2],
+    image: STOP_IMAGES[1],
+    transcript:
+      'Every big band has a small room on their CV. This is the one most of them share.\n\n' +
+      'From 1996 this was the Barfly. Two hundred capacity, sticky floor, and the sharpest scouting post in Britain. The names who sweated on that little stage on their way up read like a festival poster: Coldplay. Adele. Muse. Ed Sheeran. The deal was simple. If the industry wanted to know what was next, it stood at the back of this room with a warm beer and found out.\n\n' +
+      'Then in 2016 the name came off the door, and the building spent eight years answering to Camden Assembly, which never sounded right, and everybody knew it.\n\n' +
+      'On the twenty second of June, 2026, the sign went back up. Frank Turner played the first night of the reborn Barfly, which is about as correct as bookings get, and the new room keeps the old religion while upgrading the tools: a wall of fame with photographs nobody had seen before, blue plaques for the alumni, a proper new rig, and downstairs a vinyl listening bar built around a 1959 jukebox that is older than every record it plays.\n\n' +
+      'Two hundred capacity, same as ever. Statistically, somebody on this stage in the next twelve months will be filling arenas before your tour pin needs polishing. You get to say you saw them here, and this time the wall of fame is ready for them.\n\n' +
+      'Your lager is banked for gig nights, early doors, when the support band is soundchecking and hope is at its loudest.',
+    linkAudioUrl: linkAudio(9, 10),
+    audioUrl: stopAudio(9),
+  },
+  {
+    position: 10,
+    name: 'Spiritual Bar',
+    subtitle: 'Where legends come to listen',
+    address: '4-6 Ferdinand St, London NW1 8ER',
+    instagram: '',
+    lat: 51.54275,
+    lng: -0.1503,
+    radiusM: 35,
+    rewardLabel: 'House drink',
+    rewardWindow: 'Tue to Sun, 18:00 to 22:00',
+    runtimeS: 120,
+    isFree: false,
+    accent: STOP_ACCENTS[3],
+    image: STOP_IMAGES[3],
+    transcript:
+      'Ferdinand Street does not look like a launchpad. One room, run by a record label, live music six nights a week, and a Tuesday open mic that is quietly one of the most dangerous career moves in London. Dangerous because here, people actually listen.\n\n' +
+      'Ask Ann Liu Cannon. She was playing this room when Ethan Johns walked in, the producer behind records for Paul McCartney and Laura Marling. He heard her, and the publishing deal with BMG followed. From this floor, no stage worth mentioning, to editorial playlists and American tours. The bar carries the torch for grassroots music and every so often the torch catches.\n\n' +
+      'That is the trick of the Spiritual. The legends do not play here. They stand at the back with a drink, watching, because this is where the next ones surface first. Keep an eye on whoever looks too relaxed. That is usually somebody famous doing their listening.\n\n' +
+      'The tour ends here, and that is deliberate. You have spent the evening walking through rooms where it already happened. This is the room where it happens next.\n\n' +
+      'Your last drink is banked. Take it slow, face the stage, and if the person next to you hums along too precisely, buy them one as well. Chances are you own their records.',
+    linkAudioUrl: null,
+    audioUrl: stopAudio(10),
   },
 ]

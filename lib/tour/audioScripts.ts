@@ -169,6 +169,64 @@ Your final pint is waiting on the terrace over the lock, and your pin is claimab
 
 Then tell them the one about the jazz band.`,
   },
+  {
+    filename: 'link-07-08.mp3',
+    label: 'Link 7→8 — to the Imperial Palace of Big Red',
+    text: `Out of Dingwalls, back through the market and onto Chalk Farm Road, heading away from the tube. Under the railway bridge, and the red glow on your right is exactly what it looks like. Camden lost this bar once. It came back wearing a crown.`,
+  },
+  {
+    filename: 'stop-08.mp3',
+    label: 'Stop 8 — The Imperial Palace of Big Red',
+    text: `Some bars book bands. This one built a shrine to them.
+
+Big Red was Camden's rock bar for years, the room where the leather jackets outnumbered the tourists and the jukebox never once apologised. Then it went dark, the way too many rooms here have. And in October 2024 the original owner got the keys back, gave the place a name with delusions of grandeur, and reopened it as the Imperial Palace of Big Red.
+
+The walls are the show. Posters on posters, memorabilia stacked like the room is trying to remember every gig Camden ever hosted at once. Animal print where you least expect it. A pool table waiting for your money. And horror B movies playing silently in the corner, all rubber monsters and screaming, because nothing pairs with a cold lager like a man in a latex suit menacing a cardboard spaceship.
+
+Then there is Zoltan, the fortune telling machine. Feed it a coin and it will tell you your future, which in this postcode is usually another round and a band you have never heard of becoming your new favourite.
+
+Rock bars are supposed to be extinct. Nobody told this one.
+
+Your pint is banked, the table is open, and the monsters are already screaming. Ask Zoltan about the next stop. He knows.`,
+  },
+  {
+    filename: 'link-08-09.mp3',
+    label: 'Link 8→9 — to Barfly',
+    text: `Cross Chalk Farm Road and drift fifty steps north, to number forty nine. Small building, biggest guest list in Britain. Every arena act you have ever queued for started in rooms like this one. Most of them started in this one exactly.`,
+  },
+  {
+    filename: 'stop-09.mp3',
+    label: 'Stop 9 — Barfly',
+    text: `Every big band has a small room on their CV. This is the one most of them share.
+
+From 1996 this was the Barfly. Two hundred capacity, sticky floor, and the sharpest scouting post in Britain. The names who sweated on that little stage on their way up read like a festival poster: Coldplay. Adele. Muse. Ed Sheeran. The deal was simple. If the industry wanted to know what was next, it stood at the back of this room with a warm beer and found out.
+
+Then in 2016 the name came off the door, and the building spent eight years answering to Camden Assembly, which never sounded right, and everybody knew it.
+
+On the twenty second of June, 2026, the sign went back up. Frank Turner played the first night of the reborn Barfly, which is about as correct as bookings get, and the new room keeps the old religion while upgrading the tools: a wall of fame with photographs nobody had seen before, blue plaques for the alumni, a proper new rig, and downstairs a vinyl listening bar built around a 1959 jukebox that is older than every record it plays.
+
+Two hundred capacity, same as ever. Statistically, somebody on this stage in the next twelve months will be filling arenas before your tour pin needs polishing. You get to say you saw them here, and this time the wall of fame is ready for them.
+
+Your lager is banked for gig nights, early doors, when the support band is soundchecking and hope is at its loudest.`,
+  },
+  {
+    filename: 'link-09-10.mp3',
+    label: 'Link 9→10 — to Spiritual Bar',
+    text: `Keep climbing Chalk Farm Road and take the left into Ferdinand Street. It looks like nothing, which by now you know is Camden for something. The last room is the smallest, and it is the one the famous faces visit on their nights off.`,
+  },
+  {
+    filename: 'stop-10.mp3',
+    label: 'Stop 10 — Spiritual Bar (finale)',
+    text: `Ferdinand Street does not look like a launchpad. One room, run by a record label, live music six nights a week, and a Tuesday open mic that is quietly one of the most dangerous career moves in London. Dangerous because here, people actually listen.
+
+Ask Ann Liu Cannon. She was playing this room when Ethan Johns walked in, the producer behind records for Paul McCartney and Laura Marling. He heard her, and the publishing deal with BMG followed. From this floor, no stage worth mentioning, to editorial playlists and American tours. The bar carries the torch for grassroots music and every so often the torch catches.
+
+That is the trick of the Spiritual. The legends do not play here. They stand at the back with a drink, watching, because this is where the next ones surface first. Keep an eye on whoever looks too relaxed. That is usually somebody famous doing their listening.
+
+The tour ends here, and that is deliberate. You have spent the evening walking through rooms where it already happened. This is the room where it happens next.
+
+Your last drink is banked. Take it slow, face the stage, and if the person next to you hums along too precisely, buy them one as well. Chances are you own their records.`,
+  },
 ]
 
 /**
