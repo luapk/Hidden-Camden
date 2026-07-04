@@ -1,0 +1,71 @@
+name: Generate tour audio
+
+# Drives the app's ElevenLabs pipeline for every missing narration file.
+# Run it after adding scripts to lib/tour/audioScripts.ts and deploying.
+on:
+  workflow_dispatch:
+    inputs:
+      prefix:
+        description: Only generate filenames starting with this (empty = all missing)
+        required: false
+        default: ''
+      lang:
+        description: Language (en or es)
+        required: false
+        default: en
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Generate missing audio via the app API
+        env:
+          BASE: https://hidden-camden.vercel.app/api/admin/generate-audio
+          PREFIX: ${{ inputs.prefix }}
+          LANG_CODE: ${{ inputs.lang }}
+        run: |
+          set -u
+          echo "Listing manifest..."
+          manifest=$(curl -sf "$BASE?lang=$LANG_CODE") || { echo "Could not list manifest"; exit 1; }
+
+          missing=$(echo "$manifest" | jq -r '.[] | select(.exists == false) | .filename')
+          if [ -n "$PREFIX" ]; then
+            missing=$(echo "$missing" | grep "^$PREFIX" || true)
+          fi
+
+          if [ -z "$missing" ]; then
+            echo "Nothing to generate. All files exist."
+            exit 0
+          fi
+
+          echo "To generate:"
+          echo "$missing"
+          fails=0
+          for f in $missing; do
+            echo "── Generating $f ..."
+            ok=0
+            for attempt in 1 2 3; do
+              res=$(curl -s -X POST "$BASE" \
+                -H 'Content-Type: application/json' \
+                -d "{\"filename\":\"$f\",\"lang\":\"$LANG_CODE\"}" \
+                --max-time 280)
+              if echo "$res" | jq -e '.ok == true' > /dev/null 2>&1; then
+                size=$(echo "$res" | jq -r '.sizeKb')
+                echo "   done: ${size}KB"
+                ok=1
+                break
+              fi
+              echo "   attempt $attempt failed: $(echo "$res" | head -c 300)"
+              sleep 5
+            done
+            if [ "$ok" -eq 0 ]; then fails=$((fails+1)); fi
+            sleep 2
+          done
+
+          echo "Verifying..."
+          curl -sf "$BASE?lang=$LANG_CODE" | jq -r '.[] | "\(.exists)\t\(.filename)"'
+          if [ "$fails" -gt 0 ]; then
+            echo "$fails file(s) failed"
+            exit 1
+          fi
