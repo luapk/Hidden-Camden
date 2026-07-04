@@ -28,14 +28,24 @@ function textFor(lang: Lang, filename: string, english: string): string {
   return english
 }
 
-// GET — return status of all audio files in blob storage for a language
+// GET — return status of all audio files in blob storage for a language.
+// With ?make=<filename>, generate that file instead (same work as POST;
+// exists so server-side fetch tools that only speak GET can drive batch
+// generation while the admin auth bypass is in place).
 export async function GET(req: Request) {
   const ctx = await requireAdmin()
   if (isAdminError(ctx)) {
     return NextResponse.json({ error: ctx.error }, { status: ctx.status })
   }
 
-  const lang: Lang = new URL(req.url).searchParams.get('lang') === 'es' ? 'es' : 'en'
+  const url = new URL(req.url)
+  const lang: Lang = url.searchParams.get('lang') === 'es' ? 'es' : 'en'
+
+  const make = url.searchParams.get('make')
+  if (make) {
+    return generateOne(make, lang)
+  }
+
   const prefix = lang === 'en' ? 'audio/' : `audio/${lang}/`
 
   try {
@@ -69,21 +79,23 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: ctx.error }, { status: ctx.status })
   }
 
-  const apiKey = process.env.ELEVEN_API_KEY
-  if (!apiKey) {
-    return NextResponse.json({ error: 'ELEVEN_API_KEY not set in environment.' }, { status: 500 })
-  }
-
   const parse = bodySchema.safeParse(await req.json())
   if (!parse.success) {
     return NextResponse.json({ error: 'filename required' }, { status: 400 })
   }
 
-  const lang: Lang = parse.data.lang ?? 'en'
+  return generateOne(parse.data.filename, parse.data.lang ?? 'en')
+}
 
-  const file = AUDIO_FILES.find((f) => f.filename === parse.data.filename)
+async function generateOne(filename: string, lang: Lang): Promise<NextResponse> {
+  const apiKey = process.env.ELEVEN_API_KEY
+  if (!apiKey) {
+    return NextResponse.json({ error: 'ELEVEN_API_KEY not set in environment.' }, { status: 500 })
+  }
+
+  const file = AUDIO_FILES.find((f) => f.filename === filename)
   if (!file) {
-    return NextResponse.json({ error: `Unknown file: ${parse.data.filename}` }, { status: 404 })
+    return NextResponse.json({ error: `Unknown file: ${filename}` }, { status: 404 })
   }
 
   const voiceId = voiceFor(lang)
