@@ -227,6 +227,185 @@ The tour ends here, and that is deliberate. You have spent the evening walking t
 
 Your last drink is banked. Take it slow, face the stage, and if the person next to you hums along too precisely, buy them one as well. Chances are you own their records.`,
   },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // THE CULTURE CUT — the daylight route. Ten stops, no pint required.
+  // Record shops, boots, murals, muppets and the machinery behind the music.
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    filename: 'culture-intro.mp3',
+    label: 'Culture · Intro at the tube',
+    text: `Same tube, different Camden.
+
+The other tour walks you through the rooms where the music happened. This one walks you through everything around the music: the shops that armed the bands, the streets that hid them, the walls that remember them, and one warehouse full of monsters.
+
+Ten stops. No pint required, though nobody will stop you. Daylight suits this route. So do comfortable shoes and a tenner for the record crates, because you will not get past stop two without wanting something.
+
+Head down Camden High Street with the station behind you, then take the left into Delancey Street. We start with the tools.`,
+  },
+  {
+    filename: 'culture-stop-01.mp3',
+    label: 'Culture 1 — GuitarGuitar, Delancey Street',
+    text: `Every band you heard about on the other tour walked past this problem: you cannot start a band without a guitar, and you cannot afford one.
+
+This is GuitarGuitar, the London floor of the biggest guitar retailer in the country, parked in Delancey Street like a music shop pretending to be a warehouse. Walls of them. Telecasters the colour of taxis, Les Pauls the colour of pub ceilings, basses built for people with something to prove.
+
+Here is what matters about a guitar shop in Camden: it is a public rehearsal space with a returns policy. Somewhere on this floor right now there is a teenager playing the same four chords that got Madness out of Kentish Town, badly, through an amp they cannot afford, and absolutely nobody is asking them to stop. That is the whole social contract of this postcode in one room.
+
+Pick one up. Staff here have heard every bad rendition of every famous riff and their patience is industrial. The first pub gig starts with this exact awkward ten minutes.`,
+  },
+  {
+    filename: 'culture-link-01-02.mp3',
+    label: 'Culture · Link 1→2 — to All Ages Records',
+    text: `Out of the shop, cross over, and cut up through Bayham Street onto Pratt Street. You are one block from the high street and forty decibels quieter. The next stop is small, loud on the inside, and run on principle.`,
+  },
+  {
+    filename: 'culture-stop-02.mp3',
+    label: 'Culture 2 — All Ages Records, Pratt Street',
+    text: `All Ages Records. The name is a punk term of art: all ages means everyone gets in, no bar, no bouncer, no ID. Put it over the door of a record shop and it is a manifesto.
+
+This is Camden's punk and hardcore specialist, one room of vinyl run by people who can tell you which of the seven inches in the new arrivals crate was recorded in a bedroom in Watford and why that matters. No algorithm in the building. The recommendations engine is a human being leaning on the counter, and it has never once suggested something because you bought a toaster.
+
+Shops like this are how scenes survive between venues. The Underworld gives the bands a stage. This place gives them a shelf, and a poster in the window, and a human who will talk a fifteen year old into the record that rewires them.
+
+Buy the seven inch. You cannot stream a manifesto.`,
+  },
+  {
+    filename: 'culture-link-02-03.mp3',
+    label: 'Culture · Link 2→3 — to the British Boot Company',
+    text: `Back down Pratt Street to the high street, cross at the junction, and take the road that forks right of the station: Kentish Town Road. A few doors up on your left is a shoe shop that has been open since before the tube existed. The next story starts at your feet.`,
+  },
+  {
+    filename: 'culture-stop-03.mp3',
+    label: 'Culture 3 — British Boot Company, Kentish Town Road',
+    text: `Uniforms matter in music, and Camden's uniform starts at the ankle.
+
+The British Boot Company has been selling boots on this spot since 1851, back when it was Holts and the customers were working men who needed soles that outlasted the job. Then the nineteen sixties happened, Dr. Martens happened, and this little shop became the armoury for every youth movement that needed eight eyelets and attitude. Skinheads first. Then the two tone kids. Then the punks.
+
+Madness bought their boots here, walked them around the corner to the Dublin Castle, and stomped them through One Step Beyond. The Clash came through. So did half of every band photo you have ever seen where the trousers stop an inch short.
+
+Look at the window. That is not footwear, that is heritage in cherry red. And if you are wondering whether people still make the pilgrimage: ask inside how many languages they can say boot size in.`,
+  },
+  {
+    filename: 'culture-link-03-04.mp3',
+    label: "Culture · Link 3→4 — to Amy's first flat",
+    text: `Keep walking up Kentish Town Road, away from the junction. On the corner where Hawley Road meets it you will see Quinns, the pub painted like nowhere else on the street. Stop there, then look to the quiet turning just past it: Jeffrey's Street. Walk in a few doors and slow down. This one is residential, so we do it quietly.`,
+  },
+  {
+    filename: 'culture-stop-04.mp3',
+    label: "Culture 4 — Jeffrey's Street, Amy's first Camden address",
+    text: `Before Camden Square, before the beehive got famous, before the world decided it owned her, Amy Winehouse lived here, on Jeffrey's Street, in a flat she bought as a teenager with the first real money from singing.
+
+This is the Frank era address. The jazz records. The guitar on the sofa. The walk to the Good Mixer for pool and the Dublin Castle for everything else. When she sang about Camden it was not a brand, it was this actual street, these actual corners, that pub on the corner painted like a sunset that she could see from her front door.
+
+Neighbours from those years tell the same story: polite, funny, always about to be famous. The voice through the wall was free then.
+
+There is no plaque here and the people who live on this street would like it kept that way, so this stop has house rules. Look from the pavement. Keep your voice down. No photographs of doorways. Just stand a moment and hear Frank the way it was written, as a local record.
+
+Then walk back past Quinns and raise an imaginary glass. She would have taken the actual one.`,
+  },
+  {
+    filename: 'culture-link-04-05.mp3',
+    label: 'Culture · Link 4→5 — to the Amy mural',
+    text: `Back to Quinns and left along Hawley Road, following it as it bends towards the market. Where Castlehaven Road opens up behind the Hawley Arms, look up. Camden painted her back.`,
+  },
+  {
+    filename: 'culture-stop-05.mp3',
+    label: 'Culture 5 — the Amy mural, behind the Hawley Arms',
+    text: `Two storeys of her, watching the street.
+
+This is the Amy mural, painted by the street artist Mr Cenz on the wall behind the Hawley Arms, which was her pub, the one she served pints in when hiding in plain sight was easier than going home. The painting is all colour and motion, which is the right call. Camden did not want a memorial. It wanted a presence.
+
+Notice what happens at the base of the wall. Flowers, most weeks. Notes in biro. Setlists. People stand here for a minute longer than they meant to, and the street just works around them, the way Camden always worked around her.
+
+Here is the thing about murals versus statues. A statue says: this person is history. A mural says: this person is still on the wall of the neighbourhood, like a poster in a teenager's bedroom. For a singer who never wanted to be anyone's monument, the wall gets it right.
+
+Take the photo. Quietly is still the house style.`,
+  },
+  {
+    filename: 'culture-link-05-06.mp3',
+    label: 'Culture · Link 5→6 — to MTV',
+    text: `From the mural, cut down Castlehaven Road towards the railway and turn onto Hawley Crescent. You are looking for the building with giant egg cups on the roof. That is not a riddle. There are actual egg cups.`,
+  },
+  {
+    filename: 'culture-stop-06.mp3',
+    label: 'Culture 6 — MTV Studios, Hawley Crescent',
+    text: `The egg cups first. This building opened in 1983 as the home of TV-am, Britain's first breakfast television station, and the architect Terry Farrell put a dozen giant egg cups along the roofline because breakfast, television, why not. It is the most nineteen eighties sentence in architecture.
+
+Then in 1993 the eggs got new owners: MTV moved in, and this quiet crescent behind the market became the loudest address in British music television. The studios here pumped out the shows that decided what the country heard next, and the live sessions pulled every passing superstar off their tour bus and into Camden.
+
+Which changed the street outside. For two decades, loitering on this pavement was a legitimate fan strategy. Screaming teenagers, camera crews, pop stars smuggled in through loading bays. The market next door sold bootleg t-shirts of whoever was upstairs that afternoon.
+
+Television needed Camden more than Camden needed television. The eggs are still up there. Breakfast is long finished.`,
+  },
+  {
+    filename: 'culture-link-06-07.mp3',
+    label: 'Culture · Link 6→7 — to Out on the Floor',
+    text: `Back to the high street for one block, then duck into Inverness Street, the old fruit and veg market. Halfway down there is a doorway that smells of cardboard and forty years of Saturday afternoons. Trust the smell.`,
+  },
+  {
+    filename: 'culture-stop-07.mp3',
+    label: 'Culture 7 — Out on the Floor Records, Inverness Street',
+    text: `The name comes from a northern soul record, and that tells you everything about the religion practised here.
+
+Out on the Floor has been dealing vinyl on Inverness Street for decades: soul, reggae, ska, punk, and the kind of records that do not have a genre so much as a congregation. The crates are organised the way Camden is organised, which is to say roughly, and the finds are better for it. Serious collectors work this floor with their heads down like they are panning a river.
+
+Stand still for a second and listen to the shop. That flick flick flick sound, cardboard on cardboard, fingers walking through the crates. That is the actual sound of music discovery for most of a century, before the scroll replaced it. Every DJ on the other tour, every selector who ever filled a Camden dancefloor, learned their craft making exactly that noise.
+
+The rule of the crate: if a sleeve stops you, it stops you for a reason. Buy it, take it home, and let a stranger from 1971 change your evening.`,
+  },
+  {
+    filename: 'culture-link-07-08.mp3',
+    label: 'Culture · Link 7→8 — to Cyberdog',
+    text: `Out of Inverness Street, up the high street, over the bridge past the lock, and into the Stables Market. Follow the crowd until the crowd starts glowing. Two giant robots guard the next door. Walk between them.`,
+  },
+  {
+    filename: 'culture-stop-08.mp3',
+    label: 'Culture 8 — Cyberdog, Stables Market',
+    text: `Every subculture in this postcode got a monument. The punks got venues. The ska kids got a boot shop. The ravers got a spaceship.
+
+Cyberdog has traded in Camden since the mid nineties and lives here in the Stables like a nightclub that ate a shop. Two colossal robot guardians at the door. Bass inside at all hours. Staff dressed for a rave on a space station that is somehow also their Tuesday shift. Ultraviolet everything, reactive fabrics, goggles for eventualities that only make sense at four in the morning in a field.
+
+It is easy to read it as a tourist stop, and plenty do. But this is the last retail embassy of British rave culture, the free party scene, the warehouse years, the whole glowing chapter of music history that never had venues with plaques because its venues were fields and the plaques would have been evidence.
+
+Go down to the lower floor. The bass gets deeper the further you descend, like the building remembers what basements are for.`,
+  },
+  {
+    filename: 'culture-link-08-09.mp3',
+    label: 'Culture · Link 8→9 — to the Horse Hospital',
+    text: `Stay inside the Stables and drift towards the older brick, where the market gets quieter and the floors slope. The ramps you are walking on were not built for you. They were built for patients with four legs.`,
+  },
+  {
+    filename: 'culture-stop-09.mp3',
+    label: 'Culture 9 — the Horse Hospital, Stables Market',
+    text: `Before the market sold anything, it moved everything, and the whole operation ran on horses. Hundreds of them, hauling goods off the canal boats and the railway, clattering up and down these yards. And horses, like roadies, get injured on the job.
+
+So the Victorians built them a hospital. This building, eighteen eighties, with the long shallow ramps you just walked, engineered so an injured horse could limp to its ward without stairs. Look at the floor bricks: grooved, so hooves would not slip. The most considerate architecture in Camden was built for animals.
+
+Fast forward a century and the wards found a second life in the music business. For years this building housed a gallery famous for rock photography, the sacred contact sheets: Bowie shoots, Stones shoots, punk portraits blown up two metres tall in rooms built for convalescing carthorses. Camden does not demolish its history. It just changes the tenant.
+
+Run a hand along the brick on your way out. Everything in this market stands on the backs of the horses. The market knows it, too. Look up at what they put on top of the buildings.`,
+  },
+  {
+    filename: 'culture-link-09-10.mp3',
+    label: 'Culture · Link 9→10 — to The Henson',
+    text: `Leave the Stables on the canal side and take the towpath west, away from the market noise. Where the water bends, come up onto Oval Road. The last building does not look like the last building. It never did. That was the point.`,
+  },
+  {
+    filename: 'culture-stop-10.mp3',
+    label: 'Culture 10 — The Henson, Oval Road (finale)',
+    text: `The plainest stop on this tour made the strangest things in it.
+
+This warehouse at 30 Oval Road was Jim Henson's Creature Shop, the London workshop of the man who built the Muppets. From 1990, after Henson's death, his son Brian ran the operation here, and for fifteen years the monsters came out of Camden. The Teenage Mutant Ninja Turtles walked out of this building. The dinosaurs from the sitcom with the dinosaurs. Animatronic beasts for half the films of your childhood, sculpted, furred and wired a towpath away from the market crowds who never knew.
+
+Think about what that means for this tour. The same square half mile that gave Britain its loudest basements and its best pool table also built actual dragons, by the same logic: gather the weirdos, give them a warehouse, let them work.
+
+The shop moved out in 2005 and the flats that took over kept the name. It just says The Henson on the wall now, casual as anything, like the building is underselling the best story on the street.
+
+That is the Culture Cut. Ten stops, no hangover. The guitars, the boots, the records, the eggs, the robots, the horses, the girl from Jeffrey's Street and the man who built the monsters. Camden made all of it, mostly by accident, entirely on purpose.
+
+Go back for the record you left in the crate. You know the one.`,
+  },
 ]
 
 /**
