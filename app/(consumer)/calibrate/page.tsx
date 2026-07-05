@@ -5,10 +5,18 @@ import Map, { Marker, type MapLayerMouseEvent, type MapRef } from 'react-map-gl/
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { haversineDistance } from '@/lib/geo'
 import { LAUNCH_ROUTE, type TourStop } from '@/lib/tour/launchRoute'
+import { CULTURE_ROUTE } from '@/lib/tour/cultureRoute'
 
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/dark'
-const FENCE_KEY = 'cc-calib'
-const PIN_KEY = 'cc-calib-pins'
+
+// Each route calibrates into its own bucket; the crawl keeps the legacy keys.
+type RouteId = 'crawl' | 'culture'
+const ROUTES: Record<RouteId, { label: string; file: string; stops: TourStop[] }> = {
+  crawl: { label: 'Music venues', file: 'launchRoute.ts', stops: LAUNCH_ROUTE },
+  culture: { label: 'Culture Cut', file: 'cultureRoute.ts', stops: CULTURE_ROUTE },
+}
+const fenceKeyFor = (r: RouteId) => (r === 'crawl' ? 'cc-calib' : `cc-calib-${r}`)
+const pinKeyFor = (r: RouteId) => (r === 'crawl' ? 'cc-calib-pins' : `cc-calib-pins-${r}`)
 
 const CAMDEN_LAT = 51.5394
 const CAMDEN_LNG = -0.1429
@@ -54,9 +62,9 @@ function accuracyColour(m: number): string {
 
 // ── export ────────────────────────────────────────────────────────────────────
 
-function buildExport(fences: FenceData, pins: PinData): string {
+function buildExport(stops: TourStop[], fences: FenceData, pins: PinData): string {
   const lines: string[] = []
-  for (const stop of LAUNCH_ROUTE) {
+  for (const stop of stops) {
     const fence = fences[stop.position]
     const pin = pins[stop.position]
     if (!fence && !pin) continue
@@ -77,6 +85,8 @@ function buildExport(fences: FenceData, pins: PinData): string {
 // ── component ─────────────────────────────────────────────────────────────────
 
 export default function CalibratePage() {
+  const [routeId, setRouteId] = useState<RouteId>('crawl')
+  const route = ROUTES[routeId]
   const [fix, setFix] = useState<GpsFix | null>(null)
   const [watching, setWatching] = useState(false)
   const [gpsError, setGpsError] = useState<string | null>(null)
@@ -89,9 +99,10 @@ export default function CalibratePage() {
   const mapRef = useRef<MapRef>(null)
 
   useEffect(() => {
-    setFences(load<FenceData>(FENCE_KEY))
-    setPins(load<PinData>(PIN_KEY))
-  }, [])
+    setFences(load<FenceData>(fenceKeyFor(routeId)))
+    setPins(load<PinData>(pinKeyFor(routeId)))
+    setPinTarget(null)
+  }, [routeId])
 
   useEffect(() => {
     if (!fix || !mapRef.current || pinTarget !== null) return
@@ -125,13 +136,13 @@ export default function CalibratePage() {
   const setFenceHere = useCallback((stop: TourStop) => {
     if (!fix) return
     const next = { ...fences, [stop.position]: { fenceLat: fix.lat, fenceLng: fix.lng } }
-    setFences(next); save(FENCE_KEY, next)
-  }, [fix, fences])
+    setFences(next); save(fenceKeyFor(routeId), next)
+  }, [fix, fences, routeId])
 
   const clearFence = useCallback((position: number) => {
     const next = { ...fences }; delete next[position]
-    setFences(next); save(FENCE_KEY, next)
-  }, [fences])
+    setFences(next); save(fenceKeyFor(routeId), next)
+  }, [fences, routeId])
 
   // ── pin (map tap) ─────────────────────────────────────────────────────────────
 
@@ -139,23 +150,23 @@ export default function CalibratePage() {
     if (pinTarget === null) return
     const { lat, lng } = e.lngLat
     const next = { ...pins, [pinTarget]: { lat, lng } }
-    setPins(next); save(PIN_KEY, next)
+    setPins(next); save(pinKeyFor(routeId), next)
     setPinTarget(null)
-  }, [pinTarget, pins])
+  }, [pinTarget, pins, routeId])
 
   const clearPin = useCallback((position: number) => {
     const next = { ...pins }; delete next[position]
-    setPins(next); save(PIN_KEY, next)
-  }, [pins])
+    setPins(next); save(pinKeyFor(routeId), next)
+  }, [pins, routeId])
 
   // ── export ────────────────────────────────────────────────────────────────────
 
   const copyExport = useCallback(async () => {
-    const text = buildExport(fences, pins)
+    const text = buildExport(route.stops, fences, pins)
     if (!text) return
     await navigator.clipboard.writeText(text)
     setCopied(true); setTimeout(() => setCopied(false), 2000)
-  }, [fences, pins])
+  }, [route.stops, fences, pins])
 
   const hasChanges = Object.keys(fences).length > 0 || Object.keys(pins).length > 0
   const ageS = fix ? Math.round((Date.now() - fix.ts) / 1000) : null
@@ -170,6 +181,21 @@ export default function CalibratePage() {
           <p className="mt-0.5 font-mono text-[10px] text-smoke">
             Two separate jobs: tap the map to place the pin. Stand at the venue to set the fence.
           </p>
+        </div>
+
+        {/* Route selector — offsets save into a separate bucket per route */}
+        <div className="flex gap-1 rounded-lg bg-[#1e1a17] p-1">
+          {(Object.keys(ROUTES) as RouteId[]).map((id) => (
+            <button
+              key={id}
+              onClick={() => setRouteId(id)}
+              className={`flex-1 rounded px-2 py-1.5 font-mono text-[10px] uppercase tracking-[0.15em] transition-colors ${
+                routeId === id ? 'bg-brass text-ink' : 'text-smoke hover:text-paper'
+              }`}
+            >
+              {ROUTES[id].label}
+            </button>
+          ))}
         </div>
 
         {/* GPS status */}
@@ -248,7 +274,7 @@ export default function CalibratePage() {
               </Marker>
             )}
             {/* Map pins (lat/lng) */}
-            {LAUNCH_ROUTE.map((stop) => {
+            {route.stops.map((stop) => {
               const pos = effectivePin(stop, pins)
               const isPinSet = !!pins[stop.position]
               return (
@@ -266,7 +292,7 @@ export default function CalibratePage() {
               )
             })}
             {/* Fence centres */}
-            {LAUNCH_ROUTE.map((stop) => {
+            {route.stops.map((stop) => {
               const pos = effectiveFence(stop, fences)
               const isFenceSet = !!fences[stop.position]
               return (
@@ -302,7 +328,7 @@ export default function CalibratePage() {
 
         {/* Stop list */}
         <div className="space-y-2">
-          {LAUNCH_ROUTE.map((stop) => {
+          {route.stops.map((stop) => {
             const fencePos = effectiveFence(stop, fences)
             const pinPos = effectivePin(stop, pins)
             const dist = fix
@@ -399,7 +425,7 @@ export default function CalibratePage() {
           <div className="rounded-lg bg-[#1e1a17] p-4">
             <div className="flex items-center justify-between">
               <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-brass">
-                Export to launchRoute.ts
+                Export to {route.file}
               </span>
               <button
                 onClick={copyExport}
@@ -412,7 +438,7 @@ export default function CalibratePage() {
               lat/lng = map pin position. fenceLat/fenceLng = geofence centre.
             </p>
             <pre className="mt-2 overflow-x-auto whitespace-pre-wrap break-all rounded bg-black/30 p-2 font-mono text-[10px] leading-relaxed text-[#84CC16]">
-              {buildExport(fences, pins)}
+              {buildExport(route.stops, fences, pins)}
             </pre>
           </div>
         )}
