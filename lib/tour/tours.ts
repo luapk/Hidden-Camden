@@ -20,8 +20,12 @@ export interface TourDef {
   id: TourId
   /** Full name for headers and the wallet. */
   name: string
-  /** Short label for the switcher chip. */
+  /** Short label for chips and tags. */
   shortName: string
+  /** Plain descriptor that tells the two walks apart at a glance. */
+  descriptor: string
+  /** Suitable for all ages: rewards without the round. */
+  family: boolean
   /** One-line subhead under the logo. */
   tagline: string
   introAudioUrl: string
@@ -34,8 +38,10 @@ export interface TourDef {
 export const TOURS: TourDef[] = [
   {
     id: 'crawl',
-    name: 'The Crawl',
-    shortName: 'The Crawl',
+    name: 'The Music Venues Tour',
+    shortName: 'Music venues',
+    descriptor: 'Music venues tour',
+    family: false,
     tagline:
       'Your personal walking tour from a real Camden legend, with rewards waiting to be unlocked.',
     introAudioUrl: INTRO_AUDIO_URL,
@@ -47,6 +53,8 @@ export const TOURS: TourDef[] = [
     id: 'culture',
     name: 'The Culture Cut',
     shortName: 'Culture Cut',
+    descriptor: 'Family culture walk',
+    family: true,
     tagline:
       'The daylight route. Record shops, boots, murals and monsters, no pint required.',
     introAudioUrl: CULTURE_INTRO_AUDIO_URL,

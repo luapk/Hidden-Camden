@@ -42,7 +42,7 @@ export default function WalletPage() {
       .filter((s) => crawl.bankedStops.includes(s.position))
       .map((stop) => ({
         stop,
-        tourLabel: 'The Crawl',
+        tourLabel: 'Music venues',
         redeemHref: `/redeem/demo-${stop.position}`,
       })),
     ...CULTURE_ROUTE.filter((s) => culture.bankedStops.includes(s.position)).map(
