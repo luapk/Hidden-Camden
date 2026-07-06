@@ -363,12 +363,13 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
           <h1 className="m-0">
             <BrandLogo className="h-auto w-[141px]" priority />
           </h1>
-          {/* Guide avatar + stops counter, one unit. The acid ring around
-              the portrait IS the progress bar; the numbers make it exact. */}
+          {/* Guide avatar + stops counter, one acid unit. Black-on-acid,
+              same identity as the unlock flash. The ink ring around the
+              portrait IS the progress bar; the numbers make it exact. */}
           <Link
             href="/settings#guide"
             aria-label={`${bankedCount} of ${sorted.length} stops done. Your guide: ${guide.name}. Change in settings.`}
-            className="flex shrink-0 items-center gap-2.5 rounded-full border border-white/10 bg-night-2 py-1.5 pl-1.5 pr-4"
+            className="flex shrink-0 items-center gap-2.5 rounded-full bg-acid py-1.5 pl-1.5 pr-4 shadow-[0_0_24px_rgba(204,255,0,0.45)] ring-1 ring-black/15"
           >
             <GuideProgressRing
               image={lang === 'en' ? guide.image : null}
@@ -376,15 +377,13 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
               progress={sorted.length > 0 ? bankedCount / sorted.length : 0}
             />
             <span className="leading-none">
-              <span className="block font-grotesk text-[16px] font-bold tracking-tight">
-                <span className="text-acid">
-                  {String(bankedCount).padStart(2, '0')}
-                </span>
-                <span className="text-label-3">
+              <span className="block font-grotesk text-[17px] font-bold tracking-tight text-black">
+                {String(bankedCount).padStart(2, '0')}
+                <span className="text-black/40">
                   /{String(sorted.length).padStart(2, '0')}
                 </span>
               </span>
-              <span className="mt-1 block max-w-[96px] truncate font-grotesk text-[8px] uppercase tracking-[0.2em] text-label-3">
+              <span className="mt-1 block max-w-[96px] truncate font-grotesk text-[8px] font-bold uppercase tracking-[0.2em] text-black/70">
                 {lang === 'en' ? guide.name : 'Stops done'}
               </span>
             </span>
@@ -857,23 +856,25 @@ function GuideProgressRing({
   const C = 2 * Math.PI * R
   const clamped = Math.max(0, Math.min(1, progress))
 
+  // Rendered on the acid pill: an ink progress arc on a faint ink track,
+  // with a black-ringed portrait so it reads crisply against the green.
   return (
     <span className="relative flex h-10 w-10 shrink-0 items-center justify-center">
       <svg viewBox="0 0 40 40" className="absolute inset-0 -rotate-90" aria-hidden>
         <circle
           cx="20" cy="20" r={R}
-          fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="2.5"
+          fill="none" stroke="rgba(22,18,16,0.2)" strokeWidth="2.75"
         />
         <circle
           cx="20" cy="20" r={R}
-          fill="none" stroke="#CCFF00" strokeWidth="2.5" strokeLinecap="round"
+          fill="none" stroke="#161210" strokeWidth="2.75" strokeLinecap="round"
           strokeDasharray={C}
           strokeDashoffset={C * (1 - clamped)}
           style={{ transition: 'stroke-dashoffset 0.7s ease' }}
         />
       </svg>
       {image ? (
-        <span className="relative block h-[30px] w-[30px] overflow-hidden rounded-full">
+        <span className="relative block h-[30px] w-[30px] overflow-hidden rounded-full ring-2 ring-black">
           <Image
             src={image}
             alt={name}
@@ -884,7 +885,7 @@ function GuideProgressRing({
           />
         </span>
       ) : (
-        <span className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-night-3">
+        <span className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-black">
           <MapPin size={14} weight="fill" color="#CCFF00" />
         </span>
       )}
