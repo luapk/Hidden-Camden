@@ -40,7 +40,7 @@ export const TOURS: TourDef[] = [
     id: 'crawl',
     name: 'The Music Venues Tour',
     shortName: 'Music venues',
-    descriptor: 'Music venues tour',
+    descriptor: 'Music venues',
     family: false,
     tagline:
       'Your personal walking tour from a real Camden legend, with rewards waiting to be unlocked.',

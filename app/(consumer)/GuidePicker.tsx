@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Check, LockSimple, UsersThree } from '@phosphor-icons/react'
@@ -72,10 +73,14 @@ export default function WalkPicker() {
   const { tourId: activeTourId, tour: activeTour, setTour, hydrated: tourHydrated } = useActiveTour()
   const { guideId: chosenGuideId, setGuide, hydrated: guideHydrated } = useGuide()
   const activeProgress = useTourProgress(activeTourId)
+  // A locked card's first tap opens an explicit confirm instead of
+  // switching: no accidental swaps, no dead ends.
+  const [confirmKey, setConfirmKey] = useState<string | null>(null)
 
-  // Switching routes mid-walk would be chaos. You change walks before you
-  // start, or after you finish, never in between. Changing voice on the
-  // same route is always fine.
+  // Switching routes mid-walk needs a deliberate second tap. Progress is
+  // stored per tour, so the paused walk keeps every banked stop and
+  // resumes exactly where it left off. Changing voice on the same route
+  // is always free.
   const lockedIn =
     activeProgress.hydrated &&
     activeProgress.tourStarted &&
@@ -85,6 +90,12 @@ export default function WalkPicker() {
   const activeGuideId = effectiveGuideId(activeTourId, chosenGuideId)
 
   const options = buildOptions()
+
+  const pick = (option: WalkOption) => {
+    setGuide(option.guideId)
+    if (option.tourId !== activeTourId) setTour(option.tourId)
+    setConfirmKey(null)
+  }
 
   return (
     <div className="mt-3 space-y-2.5">
@@ -103,15 +114,18 @@ export default function WalkPicker() {
             index={i}
             active={isActive}
             locked={isLocked}
-            lockNote={
-              isLocked
-                ? `One walk at a time. Finish ${activeTour.shortName.toLowerCase()} to switch.`
-                : null
-            }
+            confirming={confirmKey === option.key}
+            activeTourLabel={activeTour.shortName}
+            stopsIn={activeProgress.bankedStops.length}
+            onConfirm={() => pick(option)}
+            onDismiss={() => setConfirmKey(null)}
             onPick={() => {
-              if (option.comingSoon || isLocked) return
-              setGuide(option.guideId)
-              if (option.tourId !== activeTourId) setTour(option.tourId)
+              if (option.comingSoon) return
+              if (isLocked) {
+                setConfirmKey(option.key)
+                return
+              }
+              pick(option)
             }}
           />
         )
@@ -125,21 +139,38 @@ function WalkCard({
   index,
   active,
   locked,
-  lockNote,
+  confirming,
+  activeTourLabel,
+  stopsIn,
+  onConfirm,
+  onDismiss,
   onPick,
 }: {
   option: WalkOption
   index: number
   active: boolean
   locked: boolean
-  lockNote: string | null
+  confirming: boolean
+  activeTourLabel: string
+  stopsIn: number
+  onConfirm: () => void
+  onDismiss: () => void
   onPick: () => void
 }) {
-  const disabled = option.comingSoon || locked
+  const disabled = option.comingSoon
 
   return (
-    <motion.button
+    <motion.div
+      role="button"
+      tabIndex={disabled ? -1 : 0}
       onClick={disabled ? undefined : onPick}
+      onKeyDown={(e) => {
+        if (disabled) return
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onPick()
+        }
+      }}
       whileTap={disabled ? undefined : { scale: 0.985 }}
       aria-pressed={active}
       aria-disabled={disabled}
@@ -147,14 +178,16 @@ function WalkCard({
         option.comingSoon
           ? `${option.headline}, coming soon`
           : locked
-            ? `${option.headline}, locked while a walk is in progress`
+            ? `${option.headline}, a walk is in progress, tap to switch anyway`
             : `Walk: ${option.headline}, ${option.eyebrow}`
       }
       className={`relative flex w-full items-stretch overflow-hidden border text-left transition-colors duration-300 ${
         active
           ? 'border-acid/70 bg-night-2 shadow-[0_0_28px_rgba(204,255,0,0.12)]'
-          : 'border-white/10 bg-night-2'
-      } ${disabled ? 'cursor-default' : ''}`}
+          : confirming
+            ? 'border-acid/40 bg-night-2'
+            : 'border-white/10 bg-night-2'
+      } ${disabled ? 'cursor-default' : 'cursor-pointer'}`}
     >
       {/* Portrait panel — full bleed, fades into the card */}
       <div className="relative w-[104px] shrink-0 self-stretch">
@@ -236,11 +269,42 @@ function WalkCard({
           {option.bio}
         </p>
 
-        {lockNote && (
+        {locked && !confirming && (
           <p className="mt-2 flex items-center gap-1.5 font-grotesk text-[9.5px] uppercase tracking-[0.12em] text-label-3">
             <LockSimple size={10} weight="bold" />
-            {lockNote}
+            {stopsIn > 0
+              ? `${stopsIn} stops into ${activeTourLabel.toLowerCase()}. Tap to switch`
+              : `Walking ${activeTourLabel.toLowerCase()}. Tap to switch`}
           </p>
+        )}
+
+        {confirming && (
+          <div className="mt-2.5 border border-acid/30 bg-night-3/70 p-2.5">
+            <p className="font-grotesk text-[10.5px] leading-relaxed text-label-2">
+              Pause {activeTourLabel.toLowerCase()} and switch? Your banked
+              stops stay safe and the walk resumes where you left it.
+            </p>
+            <div className="mt-2 flex gap-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onConfirm()
+                }}
+                className="flex-1 bg-acid py-2 font-jost text-[12px] font-bold uppercase tracking-[0.08em] text-black"
+              >
+                Switch walk
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDismiss()
+                }}
+                className="border border-white/10 px-3 py-2 font-grotesk text-[10px] uppercase tracking-[0.12em] text-label-2"
+              >
+                Keep walking
+              </button>
+            </div>
+          </div>
         )}
       </div>
 
@@ -253,6 +317,6 @@ function WalkCard({
           </span>
         </>
       )}
-    </motion.button>
+    </motion.div>
   )
 }

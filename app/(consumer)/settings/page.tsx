@@ -56,8 +56,8 @@ export default function SettingsPage() {
         </div>
         <WalkPicker />
         <p className="mt-2.5 font-grotesk text-[10.5px] text-label-3">
-          Guides narrate in English. One walk at a time: routes lock while a
-          tour is in progress, voices can change whenever.
+          Guides narrate in English. One walk at a time: switching routes
+          mid-tour asks first, and your banked stops always keep.
         </p>
       </section>
 
