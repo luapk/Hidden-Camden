@@ -1,0 +1,879 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hidden Camden — the most musical half-mile on Earth</title>
+  <meta name="description" content="A geofenced audio tour of Camden's music venues. Walk the route, stories unlock when your feet arrive, and a drink banks for later. Coming to iOS and Android." />
+  <meta property="og:title" content="Hidden Camden" />
+  <meta property="og:description" content="Camden's music history, unlocked on foot. Stories play when you arrive. Drinks bank for later." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#0A0A0A" />
+  <link rel="icon" href="/brand/logo-cut.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Jost:wght@400;500;600;700&family=Courier+Prime:wght@400;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+/* Hidden Camden — marketing site
+   Design tokens mirror the app (tailwind.config.ts). Committed dark identity,
+   acid on ink, paper for warmth. One accent: acid. */
+
+:root {
+  --ink: #161210;
+  --paper: #f0e6d2;
+  --cream: #efe7d6;
+  --camden: #d8432f;
+  --brass: #c9933c;
+  --smoke: #8a8077;
+  --acid: #ccff00;
+  --night-0: #000000;
+  --night-1: #0a0a0a;
+  --night-2: #111113;
+  --night-3: #16161a;
+  --label-1: #f5f5f7;
+  --label-2: #98989d;
+  --label-3: #5a5a5f;
+
+  --display: "Anton", "Arial Narrow", sans-serif;
+  --jost: "Jost", "Futura", sans-serif;
+  --mono: "Courier Prime", "Courier New", monospace;
+  --grotesk: "Space Grotesk", monospace;
+
+  --maxw: 1120px;
+  --pad: clamp(20px, 5vw, 64px);
+}
+
+* { box-sizing: border-box; margin: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: hidden; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  background: var(--night-1);
+  color: var(--label-1);
+  font-family: var(--jost);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+
+/* ── Type helpers ─────────────────────────────────────── */
+.eyebrow {
+  font-family: var(--grotesk);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--label-2);
+  margin-bottom: 14px;
+}
+.eyebrow--acid { color: var(--acid); }
+
+.section__head {
+  font-family: var(--display);
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: clamp(30px, 5.2vw, 58px);
+  line-height: 0.98;
+  letter-spacing: 0.005em;
+  text-wrap: balance;
+  color: var(--label-1);
+}
+.section__lead {
+  max-width: 60ch;
+  margin-top: 16px;
+  color: var(--label-2);
+  font-size: clamp(15px, 1.6vw, 18px);
+}
+
+/* ── Buttons ──────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--jost);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 14px;
+  padding: 14px 22px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease;
+}
+.btn--sm { padding: 10px 16px; font-size: 12px; }
+.btn--acid {
+  background: var(--acid);
+  color: #000;
+  box-shadow: 0 0 26px rgba(204, 255, 0, 0.28);
+}
+.btn--acid:hover { transform: translateY(-2px); }
+.btn--ghost {
+  border-color: rgba(240, 230, 210, 0.25);
+  color: var(--label-1);
+}
+.btn--ghost:hover { border-color: var(--acid); color: var(--acid); }
+
+/* ── Nav ──────────────────────────────────────────────── */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px var(--pad);
+  background: rgba(10, 10, 10, 0.78);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.nav__brand img { height: 30px; width: auto; }
+.nav__links {
+  display: flex;
+  gap: 26px;
+  margin-left: auto;
+  font-family: var(--grotesk);
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--label-2);
+}
+.nav__links a { transition: color 0.18s ease; }
+.nav__links a:hover { color: var(--acid); }
+@media (max-width: 760px) {
+  .nav__links { display: none; }
+  .nav__brand { margin-right: auto; }
+}
+
+/* ── Hero ─────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  padding: clamp(56px, 11vw, 130px) var(--pad) clamp(48px, 9vw, 104px);
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.hero__glow {
+  position: absolute;
+  top: -30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(900px, 100vw);
+  height: 620px;
+  background: radial-gradient(closest-side, rgba(204, 255, 0, 0.16), transparent 70%);
+  pointer-events: none;
+}
+.hero__inner { position: relative; max-width: var(--maxw); margin: 0 auto; }
+.hero__logo {
+  width: clamp(210px, 34vw, 360px);
+  height: auto;
+  margin: 6px 0 26px;
+  filter: drop-shadow(0 18px 44px rgba(0, 0, 0, 0.55));
+}
+.hero__head {
+  font-family: var(--display);
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: clamp(33px, 8.2vw, 96px);
+  line-height: 0.92;
+  letter-spacing: 0.004em;
+  text-wrap: balance;
+  max-width: 14ch;
+}
+.hero__sub {
+  max-width: 56ch;
+  margin-top: 22px;
+  font-size: clamp(15px, 1.9vw, 20px);
+  color: var(--label-2);
+}
+.hero__note {
+  margin-top: 18px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--smoke);
+}
+
+/* ── Store badges ─────────────────────────────────────── */
+.store-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+.store-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 210px;
+  padding: 11px 20px 11px 16px;
+  background: var(--label-1);
+  color: #000;
+  border-radius: 12px;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+.store-badge:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4); }
+.store-badge svg { width: 26px; height: 26px; fill: #000; flex: none; }
+.store-badge span {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--jost);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1.05;
+  text-transform: none;
+}
+.store-badge small {
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+  text-transform: uppercase;
+}
+
+/* ── Sections ─────────────────────────────────────────── */
+.section {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(56px, 9vw, 110px) var(--pad);
+}
+.section--paper,
+.section--dark,
+.section--charity { max-width: none; }
+.section--paper > *,
+.section--dark > *,
+.section--charity > * { max-width: var(--maxw); margin-left: auto; margin-right: auto; }
+.section--paper {
+  background: var(--paper);
+  color: var(--ink);
+}
+.section--paper .section__head { color: var(--ink); }
+.section--paper .eyebrow { color: var(--camden); }
+.section--dark { background: var(--night-2); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+/* ── How it works ─────────────────────────────────────── */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 42px;
+}
+.step {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--night-2);
+  padding: 26px 24px 28px;
+  position: relative;
+  overflow: hidden;
+}
+.step__num {
+  font-family: var(--display);
+  font-size: 46px;
+  color: var(--acid);
+  line-height: 1;
+  display: block;
+  margin-bottom: 14px;
+}
+.step h3 {
+  font-family: var(--jost);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 19px;
+  margin-bottom: 8px;
+}
+.step p { color: var(--label-2); font-size: 15px; }
+
+/* ── Tours ────────────────────────────────────────────── */
+.tours {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  margin-top: 42px;
+}
+.tour {
+  border: 1px solid rgba(22, 18, 16, 0.14);
+  background: rgba(255, 255, 255, 0.4);
+  padding: 28px 26px 30px;
+}
+.tour__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--grotesk);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--ink);
+  background: rgba(22, 18, 16, 0.08);
+  padding: 5px 11px;
+  margin-bottom: 16px;
+}
+.tour__tag--family { background: var(--acid); }
+.tour__tag svg { width: 13px; height: 13px; fill: var(--ink); }
+.tour h3 {
+  font-family: var(--display);
+  text-transform: uppercase;
+  font-size: 30px;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+.tour p { color: #5a4d3c; font-size: 15.5px; }
+.tour__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+  list-style: none;
+  padding: 0;
+}
+.tour__meta li {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: 1px solid rgba(22, 18, 16, 0.2);
+  padding: 4px 10px;
+}
+
+/* ── Voices ───────────────────────────────────────────── */
+.voices {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 42px;
+}
+.voice {
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--night-2);
+  padding: 22px 22px 24px;
+  overflow: hidden;
+}
+.voice::before {
+  /* Monogram plate — swap for a real portrait by adding a .voice img */
+  content: attr(data-initials);
+  position: absolute;
+  top: -18px;
+  right: -6px;
+  font-family: var(--display);
+  font-size: 96px;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.04);
+  letter-spacing: -0.02em;
+}
+.voice--live { border-color: rgba(204, 255, 0, 0.4); }
+.voice--live::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--acid);
+  box-shadow: 0 0 12px rgba(204, 255, 0, 0.5);
+}
+.voice__status {
+  font-family: var(--grotesk);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  color: var(--acid);
+  margin-bottom: 10px;
+}
+.voice__status--soon { color: var(--label-3); }
+.voice h3 {
+  font-family: var(--jost);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  font-size: 21px;
+  margin-bottom: 7px;
+  position: relative;
+}
+.voice p { color: var(--label-2); font-size: 14px; position: relative; }
+
+/* ── Logo tiles (sponsors + charity) ──────────────────── */
+.logo-wall {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 20px;
+}
+.logo-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 96px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--night-3);
+}
+.logo-tile--lg { min-height: 130px; }
+.logo-tile--onlight { background: var(--paper); border-color: rgba(22,18,16,0.12); }
+.logo-img { max-height: 54px; width: auto; object-fit: contain; }
+.logo-word {
+  display: none; /* shown by onerror when no asset present */
+  align-items: center;
+  font-family: var(--display);
+  text-transform: uppercase;
+  font-size: 26px;
+  letter-spacing: 0.02em;
+  color: var(--label-1);
+}
+.logo-word--dark { color: var(--ink); }
+
+.sponsor-lead {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 28px;
+  align-items: center;
+  margin-top: 40px;
+}
+.sponsor-lead p { color: var(--label-2); font-size: 16px; }
+.sponsor-row-label {
+  font-family: var(--grotesk);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  color: var(--label-3);
+  margin-top: 44px;
+}
+
+/* ── Charity ──────────────────────────────────────────── */
+.section--charity { background: var(--night-1); }
+.charity {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 40px;
+  align-items: center;
+}
+.charity__body p { color: var(--label-2); font-size: 16px; margin: 16px 0 24px; max-width: 52ch; }
+.charity__logo { display: flex; justify-content: center; }
+.charity__logo .logo-tile { width: 100%; }
+
+/* ── Tiers (listings model) ───────────────────────────── */
+.promise {
+  max-width: 62ch;
+  margin-top: 18px;
+  font-size: clamp(16px, 2vw, 21px);
+  color: var(--label-1);
+}
+.promise em { color: var(--acid); font-style: normal; }
+.tiers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 40px;
+}
+.tier {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--night-1);
+  padding: 26px 24px 26px;
+  display: flex;
+  flex-direction: column;
+}
+.tier--feature {
+  border-color: rgba(204, 255, 0, 0.45);
+  box-shadow: 0 0 30px rgba(204, 255, 0, 0.08);
+}
+.tier__tag {
+  font-family: var(--grotesk);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  color: var(--acid);
+  margin-bottom: 14px;
+}
+.tier h3 {
+  font-family: var(--display);
+  text-transform: uppercase;
+  font-size: 27px;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+.tier p { color: var(--label-2); font-size: 15px; flex: 1; }
+.tier__price {
+  margin-top: 20px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--acid);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 14px;
+}
+.partners-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 24px;
+  margin-top: 32px;
+}
+.partners-cta p { color: var(--label-3); font-family: var(--grotesk); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; max-width: 30ch; }
+
+/* ── Download ─────────────────────────────────────────── */
+.download {
+  position: relative;
+  text-align: center;
+  overflow: hidden;
+}
+.download__glow {
+  position: absolute;
+  bottom: -40%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(760px, 100vw);
+  height: 520px;
+  background: radial-gradient(closest-side, rgba(204, 255, 0, 0.14), transparent 70%);
+  pointer-events: none;
+}
+.download > * { position: relative; }
+.download__logo { width: clamp(150px, 22vw, 220px); height: auto; margin: 0 auto 26px; }
+.download .section__head { margin-inline: auto; }
+.download .section__lead { margin-inline: auto; }
+.download .store-row { justify-content: center; }
+
+/* ── Footer ───────────────────────────────────────────── */
+.footer {
+  background: var(--night-0);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 54px var(--pad) 34px;
+}
+.footer__grid {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 34px;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.footer__logo { height: 40px; width: auto; margin-bottom: 14px; }
+.footer__promise { color: var(--smoke); font-size: 13px; max-width: 34ch; }
+.footer nav { display: flex; flex-direction: column; gap: 10px; font-family: var(--grotesk); font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--label-2); }
+.footer nav a:hover { color: var(--acid); }
+.footer__base {
+  max-width: var(--maxw);
+  margin: 40px auto 0;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--label-3);
+}
+
+/* ── Reveal on scroll ─────────────────────────────────── */
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+
+/* ── Responsive ───────────────────────────────────────── */
+@media (max-width: 900px) {
+  .steps, .voices, .tiers, .logo-wall { grid-template-columns: repeat(2, 1fr); }
+  .tours, .charity, .sponsor-lead { grid-template-columns: 1fr; }
+  .sponsor-lead { gap: 18px; }
+}
+@media (max-width: 560px) {
+  .steps, .voices, .tiers, .logo-wall { grid-template-columns: 1fr; }
+  .store-row { flex-direction: column; align-items: stretch; }
+  .store-badge { min-width: 0; width: 100%; }
+}
+
+:focus-visible { outline: 2px solid var(--acid); outline-offset: 3px; }
+
+  </style>
+</head>
+<body>
+
+  <!-- ── Nav ─────────────────────────────────────────────── -->
+  <header class="nav" id="top">
+    <a class="nav__brand" href="#top" aria-label="Hidden Camden home">
+      <img src="/brand/logo-cut.png" alt="Hidden Camden" />
+    </a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="#how">How it works</a>
+      <a href="#tours">Tours</a>
+      <a href="#voices">Voices</a>
+      <a href="#partners">For venues</a>
+    </nav>
+    <a href="#download" class="btn btn--acid btn--sm">Get the app</a>
+  </header>
+
+  <!-- ── Hero ────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero__glow" aria-hidden="true"></div>
+    <div class="hero__inner">
+      <p class="eyebrow eyebrow--acid">Walking tour · Camden · NW1</p>
+      <img class="hero__logo" src="/brand/logo-cut.png" alt="Hidden Camden" />
+      <h1 class="hero__head">The most musical half-mile on Earth.</h1>
+      <p class="hero__sub">
+        A geofenced audio tour of Camden's music venues. Walk the route,
+        stories unlock the moment your feet arrive, and a real drink banks
+        to your phone for later. No QR codes. No tickets to fumble. Just walk.
+      </p>
+      <div class="store-row" id="download-hero">
+        <a class="store-badge" href="#download" aria-label="Download on the App Store (coming soon)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.365 1.43c0 1.14-.417 2.2-1.25 3.06-.99 1.02-2.18 1.61-3.47 1.5-.15-1.13.42-2.32 1.2-3.11.87-.9 2.36-1.57 3.52-1.45zM20.6 17.02c-.6 1.38-.89 1.99-1.66 3.21-1.08 1.71-2.6 3.84-4.48 3.86-1.67.02-2.1-1.09-4.37-1.08-2.27.01-2.74 1.1-4.41 1.08-1.88-.02-3.32-1.94-4.4-3.65C-.02 17.5-.34 12.36 1.5 9.63c1.3-1.94 3.36-3.07 5.3-3.07 1.97 0 3.21 1.09 4.84 1.09 1.58 0 2.54-1.09 4.82-1.09 1.72 0 3.55.94 4.85 2.56-4.26 2.34-3.57 8.43-.71 7.9z"/></svg>
+          <span><small>Coming soon to the</small>App Store</span>
+        </a>
+        <a class="store-badge" href="#download" aria-label="Get it on Google Play (coming soon)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.6 1.8 13.9 12 3.6 22.2c-.35-.2-.6-.6-.6-1.1V2.9c0-.5.25-.9.6-1.1zM15.3 13.4l2.7 2.7-9.4 5.4 6.7-8.1zM19.8 10.7c.8.45.8 1.6 0 2.05l-2 1.15-3-3 3-3 2 1.2zM15.3 10.6 8.6 2.5 18 7.9l-2.7 2.7z"/></svg>
+          <span><small>Coming soon to</small>Google Play</span>
+        </a>
+      </div>
+      <p class="hero__note">£4.99. Stops one and two are on the house.</p>
+    </div>
+  </section>
+
+  <!-- ── How it works ────────────────────────────────────── -->
+  <section class="section" id="how">
+    <p class="eyebrow">How it works</p>
+    <h2 class="section__head">Three beats. No hardware. No fuss.</h2>
+    <div class="steps">
+      <article class="step">
+        <span class="step__num">01</span>
+        <h3>Walk to the venue</h3>
+        <p>Follow the route from Camden Town tube. Each stop stays locked until you are physically standing in front of it. Forty metres, eight seconds, and it opens.</p>
+      </article>
+      <article class="step">
+        <span class="step__num">02</span>
+        <h3>The story unlocks</h3>
+        <p>Your phone buzzes and a two-minute story plays. The witch, the boxer, the lie about jazz. The history that never got a blue plaque, told straight.</p>
+      </article>
+      <article class="step">
+        <span class="step__num">03</span>
+        <h3>Bank the drink</h3>
+        <p>A real drink lands in your pocket, redeemable inside the venue when you want it. The rewards bank, so you do not have to drink your way round in an hour.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── Tours ───────────────────────────────────────────── -->
+  <section class="section section--paper" id="tours">
+    <p class="eyebrow">Two ways to walk it</p>
+    <h2 class="section__head">Pick your Camden.</h2>
+    <div class="tours">
+      <article class="tour">
+        <div class="tour__tag">Music venues</div>
+        <h3>The Music Venues Tour</h3>
+        <p>Ten stops through the rooms that built British music. World's End to Dingwalls, the Ballroom to the Barfly. A pint banked at every stop, told by a real Camden voice.</p>
+        <ul class="tour__meta">
+          <li>10 stops</li><li>~1 hour</li><li>Drinks included</li>
+        </ul>
+      </article>
+      <article class="tour">
+        <div class="tour__tag tour__tag--family">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-4 0-8 2-8 5v1h16v-1c0-3-4-5-8-5z"/></svg>
+          Family
+        </div>
+        <h3>The Culture Cut</h3>
+        <p>Ten daylight stops with no round required. Record shops, boots, murals and the warehouse where they built the Muppets. Rewards without the booze, so bring the kids.</p>
+        <ul class="tour__meta">
+          <li>10 stops</li><li>Daytime</li><li>All ages</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── Voices ──────────────────────────────────────────── -->
+  <section class="section" id="voices">
+    <p class="eyebrow eyebrow--acid">Your guide</p>
+    <h2 class="section__head">Same route. Different voice in your ears.</h2>
+    <p class="section__lead">The house voice walks you round today. A bill of Camden legends is joining, each telling the streets their own way.</p>
+    <div class="voices">
+      <article class="voice voice--live" data-initials="TL">
+        <div class="voice__status">Live now</div>
+        <h3>The Local</h3>
+        <p>Dry, North London. Knows every back door and who got thrown out of it.</p>
+      </article>
+      <article class="voice voice--live" data-initials="SS">
+        <div class="voice__status">Live now</div>
+        <h3>DJ Sammie Star</h3>
+        <p>Spins the Dublin Castle and the Good Mixer. The booth gossip and the after-hours.</p>
+      </article>
+      <article class="voice" data-initials="YB">
+        <div class="voice__status voice__status--soon">Coming soon</div>
+        <h3>Yungblud</h3>
+        <p>Loud, restless, Underworld approved. The new noise and where it hides.</p>
+      </article>
+      <article class="voice" data-initials="CB">
+        <div class="voice__status voice__status--soon">Coming soon</div>
+        <h3>Carl Barât</h3>
+        <p>The Libertines. Lock-ins, guerrilla gigs and the Dublin Castle stage by heart.</p>
+      </article>
+      <article class="voice" data-initials="SU">
+        <div class="voice__status voice__status--soon">Coming soon</div>
+        <h3>Suggs</h3>
+        <p>Madness frontman, Camden royalty. The streets that built the band, from the man who walked them first.</p>
+      </article>
+      <article class="voice" data-initials="LS">
+        <div class="voice__status voice__status--soon">Coming soon</div>
+        <h3>Little Simz</h3>
+        <p>North London to the world. A newer Camden, told by one of its sharpest.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── Sponsors ────────────────────────────────────────── -->
+  <section class="section section--dark" id="sponsors">
+    <p class="eyebrow eyebrow--acid">In partnership with</p>
+    <h2 class="section__head">The people who pour the drinks.</h2>
+    <p class="section__lead">Sponsors fund every reward on the tour, so the walk stays cheap and the venues pay nothing for stock.</p>
+
+    <div class="sponsor-lead">
+      <div class="logo-tile logo-tile--lg">
+        <img class="logo-img" src="assets/logos/dr-martens.svg" alt="Dr. Martens" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <span class="logo-word">Dr. Martens</span>
+      </div>
+      <p>Headline partner. Camden's boot of choice since the skinheads, the two-tone kids and the punks laced up on Kentish Town Road.</p>
+    </div>
+
+    <p class="sponsor-row-label">Drinks poured by</p>
+    <div class="logo-wall">
+      <div class="logo-tile">
+        <img class="logo-img" src="assets/logos/guinness.svg" alt="Guinness" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <span class="logo-word">Guinness</span>
+      </div>
+      <div class="logo-tile">
+        <img class="logo-img" src="assets/logos/tanqueray.svg" alt="Tanqueray" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <span class="logo-word">Tanqueray</span>
+      </div>
+      <div class="logo-tile">
+        <img class="logo-img" src="assets/logos/diageo.svg" alt="Diageo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <span class="logo-word">Diageo</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Charity / Roundhouse ────────────────────────────── -->
+  <section class="section section--charity" id="community">
+    <div class="charity">
+      <div class="charity__body">
+        <p class="eyebrow">Giving back</p>
+        <h2 class="section__head">A share of every tour goes to the Roundhouse.</h2>
+        <p>Camden made the music. The next generation should get the same shot. A portion of every ticket supports the Roundhouse's work getting young people from the borough into music, radio and the arts, in the room that started it all up the road.</p>
+        <a class="btn btn--ghost" href="https://www.roundhouse.org.uk" target="_blank" rel="noreferrer">About the Roundhouse</a>
+      </div>
+      <div class="charity__logo">
+        <div class="logo-tile logo-tile--lg logo-tile--onlight">
+          <img class="logo-img" src="assets/logos/roundhouse.svg" alt="The Roundhouse" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+          <span class="logo-word logo-word--dark">Roundhouse</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── For venues & brands (the listings model) ────────── -->
+  <section class="section section--dark" id="partners">
+    <p class="eyebrow eyebrow--acid">For venues &amp; brands</p>
+    <h2 class="section__head">Get found. Not sold.</h2>
+    <p class="promise">
+      The tour is editorial. No venue can buy its way onto the route. Everything
+      below sits <em>around</em> the walk, clearly marked, and never inside the story.
+    </p>
+
+    <div class="tiers">
+      <article class="tier">
+        <div class="tier__tag">Live layer</div>
+        <h3>What's On</h3>
+        <p>List your gigs. We put them in front of people already standing in NW1 with headphones in and a night ahead of them. Promoted slots and ticket links available.</p>
+        <div class="tier__price">Free to list · commission on tickets</div>
+      </article>
+      <article class="tier tier--feature">
+        <div class="tier__tag">Free + paid</div>
+        <h3>The Directory</h3>
+        <p>Every Camden venue gets a free pin on the map. Verified Partners unlock a full profile, a live gig feed, a walk-in offer and a booking link.</p>
+        <div class="tier__price">Free pin · Verified Partner from £49/mo</div>
+      </article>
+      <article class="tier">
+        <div class="tier__tag">Brand</div>
+        <h3>Sponsored moments</h3>
+        <p>Fund a reward, not an ad. Your brand pours the drink at the end of a story people will actually remember, billed only on drinks redeemed.</p>
+        <div class="tier__price">Per verified redemption</div>
+      </article>
+    </div>
+
+    <div class="partners-cta">
+      <a class="btn btn--acid" href="mailto:partners@hiddencamden.com?subject=Listings%20%26%20partnership">Talk to us about listings</a>
+      <p>No cold route-buying. We only work with rooms and brands that fit the walk.</p>
+    </div>
+  </section>
+
+  <!-- ── Download ────────────────────────────────────────── -->
+  <section class="section download" id="download">
+    <div class="download__glow" aria-hidden="true"></div>
+    <img class="download__logo" src="/brand/logo-cut.png" alt="Hidden Camden" />
+    <h2 class="section__head">Camden is waiting. Bring headphones.</h2>
+    <p class="section__lead">Coming to iPhone and Android. Be first through the door.</p>
+    <div class="store-row">
+      <a class="store-badge" href="#" aria-label="Download on the App Store (coming soon)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.365 1.43c0 1.14-.417 2.2-1.25 3.06-.99 1.02-2.18 1.61-3.47 1.5-.15-1.13.42-2.32 1.2-3.11.87-.9 2.36-1.57 3.52-1.45zM20.6 17.02c-.6 1.38-.89 1.99-1.66 3.21-1.08 1.71-2.6 3.84-4.48 3.86-1.67.02-2.1-1.09-4.37-1.08-2.27.01-2.74 1.1-4.41 1.08-1.88-.02-3.32-1.94-4.4-3.65C-.02 17.5-.34 12.36 1.5 9.63c1.3-1.94 3.36-3.07 5.3-3.07 1.97 0 3.21 1.09 4.84 1.09 1.58 0 2.54-1.09 4.82-1.09 1.72 0 3.55.94 4.85 2.56-4.26 2.34-3.57 8.43-.71 7.9z"/></svg>
+        <span><small>Coming soon to the</small>App Store</span>
+      </a>
+      <a class="store-badge" href="#" aria-label="Get it on Google Play (coming soon)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.6 1.8 13.9 12 3.6 22.2c-.35-.2-.6-.6-.6-1.1V2.9c0-.5.25-.9.6-1.1zM15.3 13.4l2.7 2.7-9.4 5.4 6.7-8.1zM19.8 10.7c.8.45.8 1.6 0 2.05l-2 1.15-3-3 3-3 2 1.2zM15.3 10.6 8.6 2.5 18 7.9l-2.7 2.7z"/></svg>
+        <span><small>Coming soon to</small>Google Play</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ── Footer ──────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="footer__grid">
+      <div>
+        <img class="footer__logo" src="/brand/logo-cut.png" alt="Hidden Camden" />
+        <p class="footer__promise">The route is editorial. Always has been. No venue buys its way onto the walk.</p>
+      </div>
+      <nav aria-label="Footer">
+        <a href="#how">How it works</a>
+        <a href="#tours">Tours</a>
+        <a href="#voices">Voices</a>
+        <a href="#partners">For venues</a>
+        <a href="mailto:hello@hiddencamden.com">Contact</a>
+      </nav>
+    </div>
+    <div class="footer__base">
+      <span>Hidden Camden · NW1</span>
+      <span>Made on the most musical half-mile on Earth.</span>
+    </div>
+  </footer>
+
+  <script>
+// Hidden Camden marketing site — light touches only.
+
+// Reveal-on-scroll: tag the major blocks, fade them up as they enter.
+(function () {
+  var targets = document.querySelectorAll(
+    '.step, .tour, .voice, .tier, .charity, .sponsor-lead, .logo-wall, .section__head'
+  )
+  targets.forEach(function (el) { el.classList.add('reveal') })
+
+  if (!('IntersectionObserver' in window)) {
+    targets.forEach(function (el) { el.classList.add('in') })
+    return
+  }
+
+  var io = new IntersectionObserver(
+    function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in')
+          io.unobserve(entry.target)
+        }
+      })
+    },
+    { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
+  )
+  targets.forEach(function (el) { io.observe(el) })
+})()
+
+// Store buttons are stubs until the apps ship. Keep the anchor jump for the
+// footer/download CTA, but make the "coming soon" honest on the store badges.
+document.querySelectorAll('.store-badge[href="#"]').forEach(function (a) {
+  a.addEventListener('click', function (e) {
+    e.preventDefault()
+    a.setAttribute('data-tapped', '1')
+  })
+})
+
+  </script>
+</body>
+</html>
