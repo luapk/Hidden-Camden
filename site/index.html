@@ -4,9 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Hidden Camden — the most musical half-mile on Earth</title>
-  <meta name="description" content="A geofenced audio tour of Camden's music venues. Walk the route, stories unlock when your feet arrive, and a drink banks for later. Coming to iOS and Android." />
+  <meta name="description" content="A geofenced audio tour of Camden's music venues, narrated by the people who made it. Walk the route, stories unlock when your feet arrive, and a drink banks for later. Coming to iOS and Android." />
   <meta property="og:title" content="Hidden Camden" />
-  <meta property="og:description" content="Camden's music history, unlocked on foot. Stories play when you arrive. Drinks bank for later." />
+  <meta property="og:description" content="Camden's music history, unlocked on foot. Narrated by the people who made it. Stories play when you arrive. Drinks bank for later." />
   <meta property="og:type" content="website" />
   <meta name="theme-color" content="#0A0A0A" />
   <link rel="icon" href="assets/logo.png" />
@@ -24,26 +24,40 @@
     </a>
     <nav class="nav__links" aria-label="Primary">
       <a href="#how">How it works</a>
-      <a href="#tours">Tours</a>
       <a href="#voices">Voices</a>
       <a href="#partners">For venues</a>
+      <a href="#download" class="btn btn--acid btn--sm">Get the app</a>
     </nav>
-    <a href="#download" class="btn btn--acid btn--sm">Get the app</a>
+    <button class="nav__burger" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+      <span></span><span></span><span></span>
+    </button>
   </header>
+
+  <!-- Mobile menu overlay -->
+  <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+    <a href="#how">How it works</a>
+    <a href="#voices">Voices</a>
+    <a href="#partners">For venues</a>
+    <a href="#download" class="btn btn--acid">Get the app</a>
+  </div>
 
   <!-- ── Hero ────────────────────────────────────────────── -->
   <section class="hero">
-    <div class="hero__glow" aria-hidden="true"></div>
+    <!-- High-impact visual placeholder: swap for a hero film still or shoot -->
+    <div class="hero__bg ph" aria-hidden="true">
+      <span class="ph__tag">Hero image / film still</span>
+    </div>
+    <div class="hero__scrim" aria-hidden="true"></div>
     <div class="hero__inner">
       <p class="eyebrow eyebrow--acid">Walking tour · Camden · NW1</p>
       <img class="hero__logo" src="assets/logo.png" alt="Hidden Camden" />
       <h1 class="hero__head">The most musical half-mile on Earth.</h1>
       <p class="hero__sub">
-        A geofenced audio tour of Camden's music venues. Walk the route,
-        stories unlock the moment your feet arrive, and a real drink banks
-        to your phone for later. No QR codes. No tickets to fumble. Just walk.
+        A geofenced audio tour of Camden's music venues, told by the people
+        who made it. Walk the route, stories unlock the moment your feet
+        arrive, and a real drink banks to your phone for later.
       </p>
-      <div class="store-row" id="download-hero">
+      <div class="store-row">
         <a class="store-badge" href="#download" aria-label="Download on the App Store (coming soon)">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.365 1.43c0 1.14-.417 2.2-1.25 3.06-.99 1.02-2.18 1.61-3.47 1.5-.15-1.13.42-2.32 1.2-3.11.87-.9 2.36-1.57 3.52-1.45zM20.6 17.02c-.6 1.38-.89 1.99-1.66 3.21-1.08 1.71-2.6 3.84-4.48 3.86-1.67.02-2.1-1.09-4.37-1.08-2.27.01-2.74 1.1-4.41 1.08-1.88-.02-3.32-1.94-4.4-3.65C-.02 17.5-.34 12.36 1.5 9.63c1.3-1.94 3.36-3.07 5.3-3.07 1.97 0 3.21 1.09 4.84 1.09 1.58 0 2.54-1.09 4.82-1.09 1.72 0 3.55.94 4.85 2.56-4.26 2.34-3.57 8.43-.71 7.9z"/></svg>
           <span><small>Coming soon to the</small>App Store</span>
@@ -57,10 +71,20 @@
     </div>
   </section>
 
+  <!-- ── Film strip (high-impact visual) ─────────────────── -->
+  <section class="section film-section">
+    <div class="film ph">
+      <span class="ph__tag">The 60-second film</span>
+      <button class="film__play" aria-label="Play the film (coming soon)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+    </div>
+  </section>
+
   <!-- ── How it works ────────────────────────────────────── -->
   <section class="section" id="how">
     <p class="eyebrow">How it works</p>
-    <h2 class="section__head">Three beats. No hardware. No fuss.</h2>
+    <h2 class="section__head">Walk up. Story unlocks. Drink banked.</h2>
     <div class="steps">
       <article class="step">
         <span class="step__num">01</span>
@@ -80,74 +104,83 @@
     </div>
   </section>
 
-  <!-- ── Tours ───────────────────────────────────────────── -->
-  <section class="section section--paper" id="tours">
-    <p class="eyebrow">Two ways to walk it</p>
-    <h2 class="section__head">Pick your Camden.</h2>
-    <div class="tours">
-      <article class="tour">
-        <div class="tour__tag">Music venues</div>
-        <h3>The Music Venues Tour</h3>
-        <p>Ten stops through the rooms that built British music. World's End to Dingwalls, the Ballroom to the Barfly. A pint banked at every stop, told by a real Camden voice.</p>
-        <ul class="tour__meta">
-          <li>10 stops</li><li>~1 hour</li><li>Drinks included</li>
-        </ul>
-      </article>
-      <article class="tour">
-        <div class="tour__tag tour__tag--family">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-4 0-8 2-8 5v1h16v-1c0-3-4-5-8-5z"/></svg>
-          Family
-        </div>
-        <h3>The Culture Cut</h3>
-        <p>Ten daylight stops with no round required. Record shops, boots, murals and the warehouse where they built the Muppets. Rewards without the booze, so bring the kids.</p>
-        <ul class="tour__meta">
-          <li>10 stops</li><li>Daytime</li><li>All ages</li>
-        </ul>
-      </article>
-    </div>
-  </section>
-
-  <!-- ── Voices ──────────────────────────────────────────── -->
-  <section class="section" id="voices">
-    <p class="eyebrow eyebrow--acid">Your guide</p>
-    <h2 class="section__head">Same route. Different voice in your ears.</h2>
-    <p class="section__lead">The house voice walks you round today. A bill of Camden legends is joining, each telling the streets their own way.</p>
+  <!-- ── Voices (the bill) ───────────────────────────────── -->
+  <section class="section section--dark" id="voices">
+    <p class="eyebrow eyebrow--acid">The bill</p>
+    <h2 class="section__head">Camden, in their own words.</h2>
+    <p class="section__lead">The same route, told by the people who lived it. New voices drop into the app over the coming months. The house voice walks you round today.</p>
     <div class="voices">
-      <article class="voice voice--live" data-initials="TL">
-        <div class="voice__status">Live now</div>
-        <h3>The Local</h3>
-        <p>Dry, North London. Knows every back door and who got thrown out of it.</p>
+      <article class="voice">
+        <div class="voice__portrait ph">
+          <span class="voice__mono" aria-hidden="true">YB</span>
+          <span class="ph__tag">Portrait</span>
+        </div>
+        <div class="voice__body">
+          <div class="voice__status voice__status--soon">Coming soon</div>
+          <h3>Yungblud</h3>
+          <p>Loud, restless, Underworld approved. The new noise and where it hides.</p>
+        </div>
       </article>
-      <article class="voice voice--live" data-initials="SS">
-        <div class="voice__status">Live now</div>
-        <h3>DJ Sammie Star</h3>
-        <p>Spins the Dublin Castle and the Good Mixer. The booth gossip and the after-hours.</p>
+      <article class="voice">
+        <div class="voice__portrait ph">
+          <span class="voice__mono" aria-hidden="true">CB</span>
+          <span class="ph__tag">Portrait</span>
+        </div>
+        <div class="voice__body">
+          <div class="voice__status voice__status--soon">Coming soon</div>
+          <h3>Carl Barât</h3>
+          <p>The Libertines. Lock-ins, guerrilla gigs and the Dublin Castle stage by heart.</p>
+        </div>
       </article>
-      <article class="voice" data-initials="YB">
-        <div class="voice__status voice__status--soon">Coming soon</div>
-        <h3>Yungblud</h3>
-        <p>Loud, restless, Underworld approved. The new noise and where it hides.</p>
+      <article class="voice">
+        <div class="voice__portrait ph">
+          <span class="voice__mono" aria-hidden="true">SU</span>
+          <span class="ph__tag">Portrait</span>
+        </div>
+        <div class="voice__body">
+          <div class="voice__status voice__status--soon">Coming soon</div>
+          <h3>Suggs</h3>
+          <p>Madness frontman, Camden royalty. The streets that built the band, from the man who walked them first.</p>
+        </div>
       </article>
-      <article class="voice" data-initials="CB">
-        <div class="voice__status voice__status--soon">Coming soon</div>
-        <h3>Carl Barât</h3>
-        <p>The Libertines. Lock-ins, guerrilla gigs and the Dublin Castle stage by heart.</p>
+      <article class="voice">
+        <div class="voice__portrait ph">
+          <span class="voice__mono" aria-hidden="true">LS</span>
+          <span class="ph__tag">Portrait</span>
+        </div>
+        <div class="voice__body">
+          <div class="voice__status voice__status--soon">Coming soon</div>
+          <h3>Little Simz</h3>
+          <p>North London to the world. A newer Camden, told by one of its sharpest.</p>
+        </div>
       </article>
-      <article class="voice" data-initials="SU">
-        <div class="voice__status voice__status--soon">Coming soon</div>
-        <h3>Suggs</h3>
-        <p>Madness frontman, Camden royalty. The streets that built the band, from the man who walked them first.</p>
+      <article class="voice voice--live">
+        <div class="voice__portrait ph">
+          <span class="voice__mono" aria-hidden="true">TL</span>
+          <span class="ph__tag">Portrait</span>
+        </div>
+        <div class="voice__body">
+          <div class="voice__status">Live now</div>
+          <h3>The Local</h3>
+          <p>The house voice. Dry, North London. Knows every back door and who got thrown out of it.</p>
+        </div>
       </article>
-      <article class="voice" data-initials="LS">
-        <div class="voice__status voice__status--soon">Coming soon</div>
-        <h3>Little Simz</h3>
-        <p>North London to the world. A newer Camden, told by one of its sharpest.</p>
+      <article class="voice voice--live">
+        <div class="voice__portrait ph">
+          <span class="voice__mono" aria-hidden="true">SS</span>
+          <span class="ph__tag">Portrait</span>
+        </div>
+        <div class="voice__body">
+          <div class="voice__status">Live now</div>
+          <h3>DJ Sammie Star</h3>
+          <p>Spins the Dublin Castle and the Good Mixer. The booth gossip and the after-hours.</p>
+        </div>
       </article>
     </div>
   </section>
 
   <!-- ── Sponsors ────────────────────────────────────────── -->
-  <section class="section section--dark" id="sponsors">
+  <section class="section" id="sponsors">
     <p class="eyebrow eyebrow--acid">In partnership with</p>
     <h2 class="section__head">The people who pour the drinks.</h2>
     <p class="section__lead">Sponsors fund every reward on the tour, so the walk stays cheap and the venues pay nothing for stock.</p>
@@ -178,7 +211,7 @@
   </section>
 
   <!-- ── Charity / Roundhouse ────────────────────────────── -->
-  <section class="section section--charity" id="community">
+  <section class="section section--dark" id="community">
     <div class="charity">
       <div class="charity__body">
         <p class="eyebrow">Giving back</p>
@@ -195,8 +228,8 @@
     </div>
   </section>
 
-  <!-- ── For venues & brands (the listings model) ────────── -->
-  <section class="section section--dark" id="partners">
+  <!-- ── For venues & brands (listings) ──────────────────── -->
+  <section class="section" id="partners">
     <p class="eyebrow eyebrow--acid">For venues &amp; brands</p>
     <h2 class="section__head">Get found. Not sold.</h2>
     <p class="promise">
@@ -258,7 +291,6 @@
       </div>
       <nav aria-label="Footer">
         <a href="#how">How it works</a>
-        <a href="#tours">Tours</a>
         <a href="#voices">Voices</a>
         <a href="#partners">For venues</a>
         <a href="mailto:hello@hiddencamden.com">Contact</a>
