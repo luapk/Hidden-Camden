@@ -274,6 +274,14 @@ body.nav-open { overflow: hidden; }
   font-size: clamp(15px, 1.9vw, 20px);
   color: var(--label-2);
 }
+.hero__link {
+  color: var(--acid);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: opacity 0.15s ease;
+}
+.hero__link:hover { opacity: 0.78; }
 .hero__note {
   margin-top: 18px;
   font-family: var(--mono);
@@ -463,6 +471,24 @@ body.nav-open { overflow: hidden; }
   letter-spacing: 0.28em;
   color: var(--label-3);
   margin-top: 44px;
+}
+.sponsor-cta {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 24px;
+}
+.sponsor-cta p {
+  font-family: var(--jost);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  font-size: clamp(18px, 2.4vw, 24px);
+  color: var(--label-1);
+  margin: 0;
 }
 
 /* ── Charity ──────────────────────────────────────────── */
