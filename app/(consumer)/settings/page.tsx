@@ -25,7 +25,7 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: 'Is the tour accessible without audio?',
-    a: 'Yes. Every stop has a full transcript, and you can mark a story as listened to bank the drink. The route is step-free apart from the market cobbles.',
+    a: 'Yes. Every stop has a full transcript, and you can mark a story as listened to bank the reward. The route is step-free apart from the market cobbles.',
   },
   {
     q: 'Can I get a refund?',

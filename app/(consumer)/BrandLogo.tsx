@@ -16,8 +16,8 @@ export default function BrandLogo({
     <Image
       src="/brand/logo-cut.png"
       alt="Hidden Camden"
-      width={693}
-      height={433}
+      width={1250}
+      height={720}
       priority={priority}
       className={className}
     />
