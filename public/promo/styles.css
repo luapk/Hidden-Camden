@@ -251,9 +251,10 @@ body.nav-open { overflow: hidden; }
   margin: 0 auto;
 }
 .hero__logo {
-  width: clamp(300px, 46vw, 540px);
+  display: block;
+  width: clamp(216px, 36vw, 424px);
   height: auto;
-  margin: 6px 0 26px;
+  margin: 0 0 22px -2px;
   filter: drop-shadow(0 18px 44px rgba(0, 0, 0, 0.55));
 }
 .hero__head {
@@ -266,6 +267,7 @@ body.nav-open { overflow: hidden; }
   text-wrap: balance;
   max-width: 14ch;
 }
+.hero__nowrap { white-space: nowrap; }
 .hero__sub {
   max-width: 56ch;
   margin-top: 22px;
