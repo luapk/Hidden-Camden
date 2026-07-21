@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>What's Hot? — Hidden Camden</title>
+  <meta name="description" content="The map to the real Camden. Record shops, guitar meccas, taco joints and the loudest basements in Britain, pinned and told straight." />
+  <meta name="theme-color" content="#0A0A0A" />
+  <link rel="icon" href="assets/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Jost:wght@400;500;600;700&family=Courier+Prime:wght@400;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header class="nav" id="top">
+    <a class="nav__brand" href="index.html" aria-label="Hidden Camden home">
+      <img src="assets/logo.png" alt="Hidden Camden" />
+    </a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#voices">Voices</a>
+      <a href="whats-hot.html" aria-current="page" class="is-active">What's Hot?</a>
+      <a href="partners.html">For venues</a>
+      <a href="index.html#download" class="btn btn--acid btn--sm">Get the app</a>
+    </nav>
+    <button class="nav__burger" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+    <a href="index.html#how">How it works</a>
+    <a href="index.html#voices">Voices</a>
+    <a href="whats-hot.html">What's Hot?</a>
+    <a href="partners.html">For venues</a>
+    <a href="index.html#download" class="btn btn--acid">Get the app</a>
+  </div>
+
+  <section class="wh-head">
+    <p class="eyebrow eyebrow--acid">What's Hot? · Camden NW1</p>
+    <h1 class="section__head">The map to the real Camden.</h1>
+    <p class="section__lead">Not the tourist tat. The record crates, the guitar mecca, the taco counter and the basements that made the noise. Tap a pin, read the story, go.</p>
+  </section>
+
+  <section class="wh-layout">
+    <div class="wh-map" id="wh-map" role="application" aria-label="Map of Camden places"></div>
+    <ol class="wh-list" id="wh-list" aria-label="Places"></ol>
+  </section>
+
+  <footer class="footer">
+    <div class="footer__grid">
+      <div>
+        <img class="footer__logo" src="assets/logo.png" alt="Hidden Camden" />
+        <p class="footer__promise">The route is editorial. Always has been. No venue buys its way onto the walk.</p>
+      </div>
+      <nav aria-label="Footer">
+        <a href="index.html#how">How it works</a>
+        <a href="index.html#voices">Voices</a>
+        <a href="whats-hot.html">What's Hot?</a>
+        <a href="partners.html">For venues</a>
+        <a href="mailto:hello@hiddencamden.com">Contact</a>
+      </nav>
+    </div>
+    <div class="footer__base">
+      <span>Hidden Camden · NW1</span>
+      <span>Map data © OpenStreetMap contributors · Tiles by OpenFreeMap</span>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script>
+    // Ten real Camden places. Coords are approximate; acid pins, app-style map.
+    var PLACES = [
+      { n: 1, name: 'GuitarGuitar', cat: 'Instruments', lat: 51.5368, lng: -0.1433,
+        blurb: 'Walls of Telecasters off Camden High Street. Every band on the tour started with an awkward ten minutes exactly like the one you can have here.', partner: true },
+      { n: 2, name: 'Universal Music Store', cat: 'Music shop', lat: 51.5416, lng: -0.1466,
+        blurb: 'Camden Market. Vinyl, cassettes and merch from the labels that pressed half the records in the story. Buy the thing you cannot stream.', partner: true },
+      { n: 3, name: 'El Centre Taco', cat: 'Eats', lat: 51.5410, lng: -0.1459,
+        blurb: 'Tacos and a cold one two minutes from the lock. Line the stomach before the basement, or debrief in it after.', partner: false },
+      { n: 4, name: 'All Ages Records', cat: 'Record shop', lat: 51.5379, lng: -0.1418,
+        blurb: 'Pratt Street punk and hardcore specialist. The recommendation engine is a human leaning on the counter. You cannot stream a manifesto.', partner: true },
+      { n: 5, name: 'The Underworld', cat: 'Live venue', lat: 51.5391, lng: -0.1423,
+        blurb: 'The loudest basement in Britain, under the World’s End. Every metal and hardcore band you love played it, pillar in the middle and all.', partner: false },
+      { n: 6, name: 'Out on the Floor Records', cat: 'Record shop', lat: 51.5393, lng: -0.1442,
+        blurb: 'Inverness Street. Soul, reggae, ska and the flick-flick-flick of forty years of Saturdays. Serious diggers work this floor head down.', partner: false },
+      { n: 7, name: 'Cyberdog', cat: 'Rave & retail', lat: 51.5421, lng: -0.1468,
+        blurb: 'Two giant robots guard the Stables door. The last retail embassy of British rave culture. The bass gets deeper the further you descend.', partner: true },
+      { n: 8, name: 'KOKO', cat: 'Live venue', lat: 51.5349, lng: -0.1385,
+        blurb: 'The old Camden Theatre turned red-velvet palace. Madonna, Prince, Coldplay. Restored and back on the circuit at the Mornington end.', partner: false },
+      { n: 9, name: 'Electric Ballroom', cat: 'Live venue', lat: 51.5397, lng: -0.1432,
+        blurb: 'A boxer built it out of Blitz rubble. Sid, the Clash, and Prince to seventy people in 2014. Two thousand cap, wear black.', partner: false },
+      { n: 10, name: 'The Dublin Castle', cat: 'Live venue', lat: 51.5374, lng: -0.1456,
+        blurb: 'The most important back room in British pop, hidden behind hanging baskets. Madness lied about being a jazz band. It worked.', partner: true },
+    ];
+
+    var map = null;
+    var markers = {};
+
+    function select(n, fly) {
+      document.querySelectorAll('.wh-card').forEach(function (c) {
+        c.classList.toggle('is-active', Number(c.dataset.n) === n);
+      });
+      Object.keys(markers).forEach(function (k) {
+        markers[k].classList.toggle('is-active', Number(k) === n);
+      });
+      var p = PLACES.find(function (x) { return x.n === n; });
+      if (p && fly && map) map.flyTo({ center: [p.lng, p.lat], zoom: 15.6, speed: 0.9 });
+      var card = document.querySelector('.wh-card[data-n="' + n + '"]');
+      if (card && fly) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Build the list first — independent of the map, so it always renders.
+    var list = document.getElementById('wh-list');
+    PLACES.forEach(function (p) {
+      var li = document.createElement('li');
+      li.className = 'wh-card';
+      li.dataset.n = p.n;
+      li.innerHTML =
+        '<span class="wh-card__n">' + String(p.n).padStart(2, '0') + '</span>' +
+        '<div class="wh-card__body">' +
+        '<div class="wh-card__top"><span class="wh-cat">' + p.cat + '</span>' +
+        (p.partner ? '<span class="wh-verified">Verified partner</span>' : '') + '</div>' +
+        '<h3>' + p.name + '</h3><p>' + p.blurb + '</p></div>';
+      li.addEventListener('click', function () { select(p.n, true); });
+      list.appendChild(li);
+    });
+
+    // Then the app-style map, if the library loaded.
+    if (typeof maplibregl !== 'undefined') {
+      map = new maplibregl.Map({
+        container: 'wh-map',
+        style: 'https://tiles.openfreemap.org/styles/dark',
+        center: [-0.1445, 51.539],
+        zoom: 14.4,
+        attributionControl: false,
+        cooperativeGestures: true,
+      });
+      map.on('load', function () {
+        var bounds = new maplibregl.LngLatBounds();
+        PLACES.forEach(function (p) {
+          var el = document.createElement('button');
+          el.className = 'wh-pin';
+          el.type = 'button';
+          el.textContent = p.n;
+          el.setAttribute('aria-label', p.name);
+          el.addEventListener('click', function (e) { e.stopPropagation(); select(p.n, true); });
+          new maplibregl.Marker({ element: el }).setLngLat([p.lng, p.lat]).addTo(map);
+          markers[p.n] = el;
+          bounds.extend([p.lng, p.lat]);
+        });
+        map.fitBounds(bounds, { padding: 64, maxZoom: 15.4, duration: 0 });
+      });
+    } else {
+      // Library blocked: show a note rather than an empty panel.
+      document.getElementById('wh-map').innerHTML =
+        '<div class="wh-map__fallback">Map loads on the live site.</div>';
+    }
+  </script>
+</body>
+</html>

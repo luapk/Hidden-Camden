@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hidden Camden — the most musical half-mile on Earth</title>
+  <meta name="description" content="A geofenced audio tour of Camden's music venues, narrated by the people who made it. Walk the route, stories unlock when your feet arrive, and a drink banks for later. Coming to iOS and Android." />
+  <meta property="og:title" content="Hidden Camden" />
+  <meta property="og:description" content="Camden's music history, unlocked on foot. Narrated by the people who made it. Stories play when you arrive. Drinks bank for later." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#0A0A0A" />
+  <link rel="icon" href="assets/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Jost:wght@400;500;600;700&family=Courier+Prime:wght@400;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ── Nav ─────────────────────────────────────────────── -->
+  <header class="nav" id="top">
+    <a class="nav__brand" href="#top" aria-label="Hidden Camden home">
+      <img src="assets/logo.png" alt="Hidden Camden" />
+    </a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="#how">How it works</a>
+      <a href="#voices">Voices</a>
+      <a href="whats-hot.html">What's Hot?</a>
+      <a href="partners.html">For venues</a>
+      <a href="#download" class="btn btn--acid btn--sm">Get the app</a>
+    </nav>
+    <button class="nav__burger" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <!-- Mobile menu overlay -->
+  <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+    <a href="#how">How it works</a>
+    <a href="#voices">Voices</a>
+    <a href="whats-hot.html">What's Hot?</a>
+    <a href="partners.html">For venues</a>
+    <a href="#download" class="btn btn--acid">Get the app</a>
+  </div>
+
+  <!-- ── Hero ────────────────────────────────────────────── -->
+  <section class="hero">
+    <img class="hero__bg" src="assets/hero-camden.jpg" alt="" aria-hidden="true" />
+    <div class="hero__scrim" aria-hidden="true"></div>
+    <div class="hero__inner">
+      <p class="eyebrow eyebrow--acid">Walking tour · Camden · NW1</p>
+      <img class="hero__logo" src="assets/logo.png" alt="Hidden Camden" />
+      <h1 class="hero__head">The most musical half-mile on Earth.</h1>
+      <p class="hero__sub">
+        A geofenced audio tour of Camden's music venues, told by the people
+        who made it. Walk the route, stories unlock the moment your feet
+        arrive, and a real drink banks to your phone for later.
+      </p>
+      <div class="store-row">
+        <a class="store-badge" href="#download" aria-label="Download on the App Store (coming soon)">
+          <img src="assets/badges/app-store.png" alt="Download on the App Store" />
+        </a>
+        <a class="store-badge" href="#download" aria-label="Get it on Google Play (coming soon)">
+          <img src="assets/badges/google-play.png" alt="Get it on Google Play" />
+        </a>
+      </div>
+      <p class="hero__note">£4.99. Stops one and two are on the house.</p>
+    </div>
+  </section>
+
+  <!-- ── Film strip (high-impact visual) ─────────────────── -->
+  <section class="section film-section">
+    <div class="film ph">
+      <span class="ph__tag">The 60-second film</span>
+      <button class="film__play" aria-label="Play the film (coming soon)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ── How it works ────────────────────────────────────── -->
+  <section class="section" id="how">
+    <p class="eyebrow">How it works</p>
+    <h2 class="section__head">Walk up. Story unlocks. Drink banked.</h2>
+    <div class="steps">
+      <article class="step">
+        <span class="step__num">01</span>
+        <h3>Walk to the venue</h3>
+        <p>Follow the route from Camden Town tube. Each stop stays locked until you are physically standing in front of it. Forty metres, eight seconds, and it opens.</p>
+      </article>
+      <article class="step">
+        <span class="step__num">02</span>
+        <h3>The story unlocks</h3>
+        <p>Your phone buzzes and a two-minute story plays. The witch, the boxer, the lie about jazz. The history that never got a blue plaque, told straight.</p>
+      </article>
+      <article class="step">
+        <span class="step__num">03</span>
+        <h3>Bank the drink</h3>
+        <p>A real drink lands in your pocket, redeemable inside the venue when you want it. The rewards bank, so you do not have to drink your way round in an hour.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── Voices (the bill) ───────────────────────────────── -->
+  <section class="section section--dark" id="voices">
+    <p class="eyebrow eyebrow--acid">The bill</p>
+    <h2 class="section__head">Camden, in their own words.</h2>
+    <p class="section__lead">The same route, told by the people who lived it. New voices drop into the app over the coming months. The house voice walks you round today.</p>
+    <div class="voices">
+      <article class="voice">
+        <div class="voice__portrait">
+          <img class="voice__img" src="assets/portraits/yungblud.jpg" alt="Yungblud" loading="lazy" />
+        </div>
+        <div class="voice__body">
+          <div class="voice__status voice__status--soon">Coming soon</div>
+          <h3>Yungblud</h3>
+          <p>Loud, restless, Underworld approved. The new noise and where it hides.</p>
+        </div>
+      </article>
+      <article class="voice">
+        <div class="voice__portrait">
+          <img class="voice__img" src="assets/portraits/carl-barat.jpg" alt="Carl Barât" loading="lazy" />
+        </div>
+        <div class="voice__body">
+          <div class="voice__status voice__status--soon">Coming soon</div>
+          <h3>Carl Barât</h3>
+          <p>The Libertines. Lock-ins, guerrilla gigs and the Dublin Castle stage by heart.</p>
+        </div>
+      </article>
+      <article class="voice">
+        <div class="voice__portrait">
+          <img class="voice__img" src="assets/portraits/suggs.jpg" alt="Suggs" loading="lazy" />
+        </div>
+        <div class="voice__body">
+          <div class="voice__status voice__status--soon">Coming soon</div>
+          <h3>Suggs</h3>
+          <p>Madness frontman, Camden royalty. The streets that built the band, from the man who walked them first.</p>
+        </div>
+      </article>
+      <article class="voice">
+        <div class="voice__portrait">
+          <img class="voice__img" src="assets/portraits/little-simz.jpg" alt="Little Simz" loading="lazy" />
+        </div>
+        <div class="voice__body">
+          <div class="voice__status voice__status--soon">Coming soon</div>
+          <h3>Little Simz</h3>
+          <p>North London to the world. A newer Camden, told by one of its sharpest.</p>
+        </div>
+      </article>
+      <article class="voice voice--live">
+        <div class="voice__portrait">
+          <img class="voice__img" src="assets/portraits/the-local.jpg" alt="The Local" loading="lazy" />
+        </div>
+        <div class="voice__body">
+          <div class="voice__status">Live now</div>
+          <h3>The Local</h3>
+          <p>The house voice. Dry, North London. Knows every back door and who got thrown out of it.</p>
+        </div>
+      </article>
+      <article class="voice voice--live">
+        <div class="voice__portrait">
+          <img class="voice__img" src="assets/portraits/sammie.jpg" alt="DJ Sammie Star" loading="lazy" />
+        </div>
+        <div class="voice__body">
+          <div class="voice__status">Live now</div>
+          <h3>DJ Sammie Star</h3>
+          <p>Spins the Dublin Castle and the Good Mixer. The booth gossip and the after-hours.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── Sponsors ────────────────────────────────────────── -->
+  <section class="section" id="sponsors">
+    <p class="eyebrow eyebrow--acid">In partnership with</p>
+    <h2 class="section__head">The people who pour the drinks.</h2>
+    <p class="section__lead">Sponsors fund every reward on the tour, so the walk stays cheap and the venues pay nothing for stock.</p>
+
+    <div class="sponsor-lead">
+      <div class="logo-tile logo-tile--lg">
+        <img class="logo-img" src="assets/logos/dr-martens.png" alt="Dr. Martens" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <span class="logo-word">Dr. Martens</span>
+      </div>
+      <p>Headline partner. Camden's boot of choice since the skinheads, the two-tone kids and the punks laced up on Kentish Town Road.</p>
+    </div>
+
+    <p class="sponsor-row-label">Drinks poured by</p>
+    <div class="logo-wall">
+      <div class="logo-tile">
+        <img class="logo-img" src="assets/logos/guinness.svg" alt="Guinness" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <span class="logo-word">Guinness</span>
+      </div>
+      <div class="logo-tile">
+        <img class="logo-img" src="assets/logos/tanqueray.svg" alt="Tanqueray" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <span class="logo-word">Tanqueray</span>
+      </div>
+      <div class="logo-tile">
+        <img class="logo-img" src="assets/logos/diageo.svg" alt="Diageo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <span class="logo-word">Diageo</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Charity / Roundhouse ────────────────────────────── -->
+  <section class="section section--dark" id="community">
+    <div class="charity">
+      <div class="charity__body">
+        <p class="eyebrow">Giving back</p>
+        <h2 class="section__head">A share of every tour goes to the Roundhouse.</h2>
+        <p>Camden made the music. The next generation should get the same shot. A portion of every ticket supports the Roundhouse's work getting young people from the borough into music, radio and the arts, in the room that started it all up the road.</p>
+        <a class="btn btn--ghost" href="https://www.roundhouse.org.uk" target="_blank" rel="noreferrer">About the Roundhouse</a>
+      </div>
+      <div class="charity__logo">
+        <div class="logo-tile logo-tile--lg">
+          <img class="logo-img" src="assets/logos/roundhouse.svg" alt="The Roundhouse" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+          <span class="logo-word">Roundhouse</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── What's Hot teaser (links to the directory) ──────── -->
+  <section class="section" id="whats-hot-teaser">
+    <div class="teaser">
+      <div class="teaser__body">
+        <p class="eyebrow eyebrow--acid">What's Hot?</p>
+        <h2 class="section__head">The map to the real Camden.</h2>
+        <p class="section__lead">Record shops, taco joints, guitar meccas and the loudest basements in Britain. The places worth your afternoon, pinned and told straight.</p>
+        <a class="btn btn--acid" href="whats-hot.html">Open the map</a>
+      </div>
+      <a class="teaser__map" href="whats-hot.html" aria-label="Open What's Hot map">
+        <span class="teaser__pin" style="left:22%;top:34%"></span>
+        <span class="teaser__pin" style="left:58%;top:26%"></span>
+        <span class="teaser__pin" style="left:44%;top:58%"></span>
+        <span class="teaser__pin" style="left:74%;top:62%"></span>
+        <span class="teaser__pin" style="left:33%;top:74%"></span>
+        <span class="ph__tag">Camden · NW1</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ── Download ────────────────────────────────────────── -->
+  <section class="section download" id="download">
+    <div class="download__glow" aria-hidden="true"></div>
+    <img class="download__logo" src="assets/logo.png" alt="Hidden Camden" />
+    <h2 class="section__head">Camden is waiting. Bring headphones.</h2>
+    <p class="section__lead">Coming to iPhone and Android. Be first through the door.</p>
+    <div class="store-row">
+      <a class="store-badge" href="#" aria-label="Download on the App Store (coming soon)">
+        <img src="assets/badges/app-store.png" alt="Download on the App Store" />
+      </a>
+      <a class="store-badge" href="#" aria-label="Get it on Google Play (coming soon)">
+        <img src="assets/badges/google-play.png" alt="Get it on Google Play" />
+      </a>
+    </div>
+  </section>
+
+  <!-- ── Footer ──────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="footer__grid">
+      <div>
+        <img class="footer__logo" src="assets/logo.png" alt="Hidden Camden" />
+        <p class="footer__promise">The route is editorial. Always has been. No venue buys its way onto the walk.</p>
+      </div>
+      <nav aria-label="Footer">
+        <a href="#how">How it works</a>
+        <a href="#voices">Voices</a>
+        <a href="whats-hot.html">What's Hot?</a>
+        <a href="partners.html">For venues</a>
+        <a href="mailto:hello@hiddencamden.com">Contact</a>
+      </nav>
+    </div>
+    <div class="footer__base">
+      <span>Hidden Camden · NW1</span>
+      <span>Made on the most musical half-mile on Earth.</span>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

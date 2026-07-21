@@ -1,19 +1,3 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hidden Camden — the most musical half-mile on Earth</title>
-  <meta name="description" content="A geofenced audio tour of Camden's music venues, narrated by the people who made it. Walk the route, stories unlock when your feet arrive, and a drink banks for later. Coming to iOS and Android." />
-  <meta property="og:title" content="Hidden Camden" />
-  <meta property="og:description" content="Camden's music history, unlocked on foot. Narrated by the people who made it. Stories play when you arrive. Drinks bank for later." />
-  <meta property="og:type" content="website" />
-  <meta name="theme-color" content="#0A0A0A" />
-  <link rel="icon" href="/brand/logo-cut.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Jost:wght@400;500;600;700&family=Courier+Prime:wght@400;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
-  <style>
 /* Hidden Camden — marketing site
    Design tokens mirror the app (tailwind.config.ts). Committed dark identity,
    acid on ink, paper for warmth. One accent: acid. */
@@ -625,344 +609,195 @@ body.nav-open { overflow: hidden; }
 
 :focus-visible { outline: 2px solid var(--acid); outline-offset: 3px; }
 
-  </style>
-</head>
-<body>
+/* ═══ Multi-page additions ═══════════════════════════════ */
 
-  <!-- ── Nav ─────────────────────────────────────────────── -->
-  <header class="nav" id="top">
-    <a class="nav__brand" href="#top" aria-label="Hidden Camden home">
-      <img src="/brand/logo-cut.png" alt="Hidden Camden" />
-    </a>
-    <nav class="nav__links" aria-label="Primary">
-      <a href="#how">How it works</a>
-      <a href="#voices">Voices</a>
-      <a href="#partners">For venues</a>
-      <a href="#download" class="btn btn--acid btn--sm">Get the app</a>
-    </nav>
-    <button class="nav__burger" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
-      <span></span><span></span><span></span>
-    </button>
-  </header>
+.nav__links a.is-active { color: var(--acid); }
 
-  <!-- Mobile menu overlay -->
-  <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
-    <a href="#how">How it works</a>
-    <a href="#voices">Voices</a>
-    <a href="#partners">For venues</a>
-    <a href="#download" class="btn btn--acid">Get the app</a>
-  </div>
+/* ── Home: What's Hot teaser ──────────────────────────── */
+.teaser { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 5vw, 56px); align-items: center; }
+.teaser__map {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 11;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    radial-gradient(60% 60% at 40% 30%, rgba(204,255,0,0.06), transparent 70%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0 1px, transparent 1px 46px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0 1px, transparent 1px 46px),
+    var(--night-2);
+  overflow: hidden;
+}
+.teaser__pin {
+  position: absolute;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--acid);
+  border: 2px solid #000;
+  box-shadow: 0 0 0 2px var(--acid), 0 0 16px rgba(204, 255, 0, 0.6);
+  transform: translate(-50%, -50%);
+}
+@media (max-width: 820px) { .teaser { grid-template-columns: 1fr; } }
 
-  <!-- ── Hero ────────────────────────────────────────────── -->
-  <section class="hero">
-    <img class="hero__bg" src="/promo-assets/hero-camden.jpg" alt="" aria-hidden="true" />
-    <div class="hero__scrim" aria-hidden="true"></div>
-    <div class="hero__inner">
-      <p class="eyebrow eyebrow--acid">Walking tour · Camden · NW1</p>
-      <img class="hero__logo" src="/brand/logo-cut.png" alt="Hidden Camden" />
-      <h1 class="hero__head">The most musical half-mile on Earth.</h1>
-      <p class="hero__sub">
-        A geofenced audio tour of Camden's music venues, told by the people
-        who made it. Walk the route, stories unlock the moment your feet
-        arrive, and a real drink banks to your phone for later.
-      </p>
-      <div class="store-row">
-        <a class="store-badge" href="#download" aria-label="Download on the App Store (coming soon)">
-          <img src="/promo-assets/badges/app-store.png" alt="Download on the App Store" />
-        </a>
-        <a class="store-badge" href="#download" aria-label="Get it on Google Play (coming soon)">
-          <img src="/promo-assets/badges/google-play.png" alt="Get it on Google Play" />
-        </a>
-      </div>
-      <p class="hero__note">£4.99. Stops one and two are on the house.</p>
-    </div>
-  </section>
+/* ── What's Hot page ──────────────────────────────────── */
+.wh-head {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(38px, 6vw, 76px) var(--pad) clamp(20px, 3vw, 34px);
+}
+.wh-layout {
+  display: grid;
+  grid-template-columns: 1fr 440px;
+  align-items: start;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.wh-map {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  background: var(--night-2);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+.wh-map .maplibregl-ctrl-bottom-left,
+.wh-map .maplibregl-ctrl-bottom-right { display: none; }
+.wh-list { list-style: none; margin: 0; padding: 0; }
+.wh-card {
+  display: flex;
+  gap: 14px;
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.wh-card:hover { background: var(--night-2); }
+.wh-card.is-active { background: var(--night-2); box-shadow: inset 3px 0 0 var(--acid); }
+.wh-card__n {
+  font-family: var(--display);
+  font-size: 26px;
+  line-height: 1;
+  color: rgba(204, 255, 0, 0.55);
+  min-width: 32px;
+}
+.wh-card__top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 7px; }
+.wh-cat {
+  font-family: var(--grotesk);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--label-2);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 3px 8px;
+}
+.wh-verified {
+  font-family: var(--grotesk);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #000;
+  background: var(--acid);
+  padding: 3px 8px;
+}
+.wh-card h3 {
+  font-family: var(--jost);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  font-size: 17px;
+  margin-bottom: 5px;
+}
+.wh-card p { color: var(--label-2); font-size: 13px; line-height: 1.5; }
 
-  <!-- ── Film strip (high-impact visual) ─────────────────── -->
-  <section class="section film-section">
-    <div class="film ph">
-      <span class="ph__tag">The 60-second film</span>
-      <button class="film__play" aria-label="Play the film (coming soon)">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-      </button>
-    </div>
-  </section>
+/* Acid map pin (app style) */
+.wh-pin {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--acid);
+  color: #000;
+  font-family: var(--grotesk);
+  font-weight: 700;
+  font-size: 12px;
+  border: 2px solid #000;
+  box-shadow: 0 0 0 2px var(--acid), 0 0 14px rgba(204, 255, 0, 0.55);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.15s ease;
+}
+.wh-pin:hover { transform: scale(1.12); }
+.wh-pin.is-active { transform: scale(1.28); z-index: 3; }
 
-  <!-- ── How it works ────────────────────────────────────── -->
-  <section class="section" id="how">
-    <p class="eyebrow">How it works</p>
-    <h2 class="section__head">Walk up. Story unlocks. Drink banked.</h2>
-    <div class="steps">
-      <article class="step">
-        <span class="step__num">01</span>
-        <h3>Walk to the venue</h3>
-        <p>Follow the route from Camden Town tube. Each stop stays locked until you are physically standing in front of it. Forty metres, eight seconds, and it opens.</p>
-      </article>
-      <article class="step">
-        <span class="step__num">02</span>
-        <h3>The story unlocks</h3>
-        <p>Your phone buzzes and a two-minute story plays. The witch, the boxer, the lie about jazz. The history that never got a blue plaque, told straight.</p>
-      </article>
-      <article class="step">
-        <span class="step__num">03</span>
-        <h3>Bank the drink</h3>
-        <p>A real drink lands in your pocket, redeemable inside the venue when you want it. The rewards bank, so you do not have to drink your way round in an hour.</p>
-      </article>
-    </div>
-  </section>
+@media (max-width: 900px) {
+  .wh-layout { grid-template-columns: 1fr; }
+  .wh-map { position: relative; height: 58vh; min-height: 340px; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); }
+}
 
-  <!-- ── Voices (the bill) ───────────────────────────────── -->
-  <section class="section section--dark" id="voices">
-    <p class="eyebrow eyebrow--acid">The bill</p>
-    <h2 class="section__head">Camden, in their own words.</h2>
-    <p class="section__lead">The same route, told by the people who lived it. New voices drop into the app over the coming months. The house voice walks you round today.</p>
-    <div class="voices">
-      <article class="voice">
-        <div class="voice__portrait">
-          <img class="voice__img" src="/promo-assets/portraits/yungblud.jpg" alt="Yungblud" loading="lazy" />
-        </div>
-        <div class="voice__body">
-          <div class="voice__status voice__status--soon">Coming soon</div>
-          <h3>Yungblud</h3>
-          <p>Loud, restless, Underworld approved. The new noise and where it hides.</p>
-        </div>
-      </article>
-      <article class="voice">
-        <div class="voice__portrait">
-          <img class="voice__img" src="/promo-assets/portraits/carl-barat.jpg" alt="Carl Barât" loading="lazy" />
-        </div>
-        <div class="voice__body">
-          <div class="voice__status voice__status--soon">Coming soon</div>
-          <h3>Carl Barât</h3>
-          <p>The Libertines. Lock-ins, guerrilla gigs and the Dublin Castle stage by heart.</p>
-        </div>
-      </article>
-      <article class="voice">
-        <div class="voice__portrait">
-          <img class="voice__img" src="/promo-assets/portraits/suggs.jpg" alt="Suggs" loading="lazy" />
-        </div>
-        <div class="voice__body">
-          <div class="voice__status voice__status--soon">Coming soon</div>
-          <h3>Suggs</h3>
-          <p>Madness frontman, Camden royalty. The streets that built the band, from the man who walked them first.</p>
-        </div>
-      </article>
-      <article class="voice">
-        <div class="voice__portrait">
-          <img class="voice__img" src="/promo-assets/portraits/little-simz.jpg" alt="Little Simz" loading="lazy" />
-        </div>
-        <div class="voice__body">
-          <div class="voice__status voice__status--soon">Coming soon</div>
-          <h3>Little Simz</h3>
-          <p>North London to the world. A newer Camden, told by one of its sharpest.</p>
-        </div>
-      </article>
-      <article class="voice voice--live">
-        <div class="voice__portrait">
-          <img class="voice__img" src="/promo-assets/portraits/the-local.jpg" alt="The Local" loading="lazy" />
-        </div>
-        <div class="voice__body">
-          <div class="voice__status">Live now</div>
-          <h3>The Local</h3>
-          <p>The house voice. Dry, North London. Knows every back door and who got thrown out of it.</p>
-        </div>
-      </article>
-      <article class="voice voice--live">
-        <div class="voice__portrait">
-          <img class="voice__img" src="/promo-assets/portraits/sammie.jpg" alt="DJ Sammie Star" loading="lazy" />
-        </div>
-        <div class="voice__body">
-          <div class="voice__status">Live now</div>
-          <h3>DJ Sammie Star</h3>
-          <p>Spins the Dublin Castle and the Good Mixer. The booth gossip and the after-hours.</p>
-        </div>
-      </article>
-    </div>
-  </section>
+/* ── Partners page ────────────────────────────────────── */
+.pt-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(60px, 11vw, 132px) var(--pad) clamp(40px, 7vw, 84px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.pt-hero__glow {
+  position: absolute; top: -30%; left: 50%; transform: translateX(-50%);
+  width: min(900px, 100vw); height: 560px;
+  background: radial-gradient(closest-side, rgba(204, 255, 0, 0.14), transparent 70%);
+  pointer-events: none;
+}
+.pt-hero__inner { position: relative; max-width: var(--maxw); margin: 0 auto; }
+.pt-hero__head {
+  font-family: var(--display);
+  text-transform: uppercase;
+  font-size: clamp(40px, 8vw, 92px);
+  line-height: 0.92;
+  text-wrap: balance;
+  max-width: 15ch;
+}
+.pt-hero__sub { max-width: 54ch; margin-top: 20px; font-size: clamp(15px, 1.9vw, 20px); color: var(--label-2); }
+.pt-hero__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
 
-  <!-- ── Sponsors ────────────────────────────────────────── -->
-  <section class="section" id="sponsors">
-    <p class="eyebrow eyebrow--acid">In partnership with</p>
-    <h2 class="section__head">The people who pour the drinks.</h2>
-    <p class="section__lead">Sponsors fund every reward on the tour, so the walk stays cheap and the venues pay nothing for stock.</p>
+.why { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 42px; }
+.why__item { border: 1px solid rgba(255, 255, 255, 0.1); background: var(--night-2); padding: 24px 22px; }
+.why__k {
+  display: block;
+  font-family: var(--display);
+  text-transform: uppercase;
+  font-size: 22px;
+  color: var(--acid);
+  margin-bottom: 10px;
+}
+.why__item p { color: var(--label-2); font-size: 14.5px; }
 
-    <div class="sponsor-lead">
-      <div class="logo-tile logo-tile--lg">
-        <img class="logo-img" src="/promo-assets/logos/dr-martens.png" alt="Dr. Martens" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
-        <span class="logo-word">Dr. Martens</span>
-      </div>
-      <p>Headline partner. Camden's boot of choice since the skinheads, the two-tone kids and the punks laced up on Kentish Town Road.</p>
-    </div>
+.offers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 42px; align-items: start; }
+.offer { border: 1px solid rgba(255, 255, 255, 0.1); background: var(--night-1); padding: 26px 24px 28px; display: flex; flex-direction: column; }
+.offer--feature { border-color: rgba(204, 255, 0, 0.5); box-shadow: 0 0 34px rgba(204, 255, 0, 0.1); }
+.offer__tag {
+  font-family: var(--grotesk); font-size: 9px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.24em; color: var(--acid); margin-bottom: 14px;
+}
+.offer h3 { font-family: var(--display); text-transform: uppercase; font-size: 30px; line-height: 1; margin-bottom: 10px; }
+.offer__lead { color: var(--label-1); font-size: 15px; margin-bottom: 16px; }
+.offer__list { list-style: none; margin: 0 0 20px; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.offer__list li { position: relative; padding-left: 20px; color: var(--label-2); font-size: 13.5px; line-height: 1.45; }
+.offer__list li::before { content: ""; position: absolute; left: 0; top: 7px; width: 8px; height: 8px; background: var(--acid); }
+.offer__price { font-family: var(--mono); font-size: 13px; color: var(--acid); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 14px; margin-bottom: 18px; margin-top: auto; }
+.offer .btn { align-self: flex-start; }
 
-    <p class="sponsor-row-label">Drinks poured by</p>
-    <div class="logo-wall">
-      <div class="logo-tile">
-        <img class="logo-img" src="/promo-assets/logos/guinness.svg" alt="Guinness" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
-        <span class="logo-word">Guinness</span>
-      </div>
-      <div class="logo-tile">
-        <img class="logo-img" src="/promo-assets/logos/tanqueray.svg" alt="Tanqueray" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
-        <span class="logo-word">Tanqueray</span>
-      </div>
-      <div class="logo-tile">
-        <img class="logo-img" src="/promo-assets/logos/diageo.svg" alt="Diageo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
-        <span class="logo-word">Diageo</span>
-      </div>
-    </div>
-  </section>
+.pt-integrity { display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; align-items: center; }
+.pt-integrity p { color: var(--label-2); font-size: 16px; margin-top: 16px; max-width: 54ch; }
+.pt-integrity__kicker { color: var(--label-1); font-weight: 600; }
+.pt-callout { border: 1px solid rgba(204, 255, 0, 0.4); background: var(--night-2); padding: 30px 28px; text-align: center; }
+.pt-callout__big { font-family: var(--display); font-size: 96px; line-height: 0.9; color: var(--acid); text-shadow: 0 0 34px rgba(204, 255, 0, 0.35); }
+.pt-callout p { color: var(--label-2); font-size: 14px; margin: 10px 0 20px; }
 
-  <!-- ── Charity / Roundhouse ────────────────────────────── -->
-  <section class="section section--dark" id="community">
-    <div class="charity">
-      <div class="charity__body">
-        <p class="eyebrow">Giving back</p>
-        <h2 class="section__head">A share of every tour goes to the Roundhouse.</h2>
-        <p>Camden made the music. The next generation should get the same shot. A portion of every ticket supports the Roundhouse's work getting young people from the borough into music, radio and the arts, in the room that started it all up the road.</p>
-        <a class="btn btn--ghost" href="https://www.roundhouse.org.uk" target="_blank" rel="noreferrer">About the Roundhouse</a>
-      </div>
-      <div class="charity__logo">
-        <div class="logo-tile logo-tile--lg">
-          <img class="logo-img" src="/promo-assets/logos/roundhouse.svg" alt="The Roundhouse" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
-          <span class="logo-word">Roundhouse</span>
-        </div>
-      </div>
-    </div>
-  </section>
+.pt-final { position: relative; text-align: center; overflow: hidden; }
+.pt-final__glow { position: absolute; bottom: -40%; left: 50%; transform: translateX(-50%); width: min(760px, 100vw); height: 520px; background: radial-gradient(closest-side, rgba(204,255,0,0.14), transparent 70%); pointer-events: none; }
+.pt-final > * { position: relative; }
+.pt-final .section__head, .pt-final .section__lead { margin-inline: auto; }
+.pt-final .btn { margin-top: 26px; font-family: var(--mono); text-transform: none; letter-spacing: 0; }
 
-  <!-- ── For venues & brands (listings) ──────────────────── -->
-  <section class="section" id="partners">
-    <p class="eyebrow eyebrow--acid">For venues &amp; brands</p>
-    <h2 class="section__head">Get found. Not sold.</h2>
-    <p class="promise">
-      The tour is editorial. No venue can buy its way onto the route. Everything
-      below sits <em>around</em> the walk, clearly marked, and never inside the story.
-    </p>
-
-    <div class="tiers">
-      <article class="tier">
-        <div class="tier__tag">Live layer</div>
-        <h3>What's On</h3>
-        <p>List your gigs. We put them in front of people already standing in NW1 with headphones in and a night ahead of them. Promoted slots and ticket links available.</p>
-        <div class="tier__price">Free to list · commission on tickets</div>
-      </article>
-      <article class="tier tier--feature">
-        <div class="tier__tag">Free + paid</div>
-        <h3>The Directory</h3>
-        <p>Every Camden venue gets a free pin on the map. Verified Partners unlock a full profile, a live gig feed, a walk-in offer and a booking link.</p>
-        <div class="tier__price">Free pin · Verified Partner from £49/mo</div>
-      </article>
-      <article class="tier">
-        <div class="tier__tag">Brand</div>
-        <h3>Sponsored moments</h3>
-        <p>Fund a reward, not an ad. Your brand pours the drink at the end of a story people will actually remember, billed only on drinks redeemed.</p>
-        <div class="tier__price">Per verified redemption</div>
-      </article>
-    </div>
-
-    <div class="partners-cta">
-      <a class="btn btn--acid" href="mailto:partners@hiddencamden.com?subject=Listings%20%26%20partnership">Talk to us about listings</a>
-      <p>No cold route-buying. We only work with rooms and brands that fit the walk.</p>
-    </div>
-  </section>
-
-  <!-- ── Download ────────────────────────────────────────── -->
-  <section class="section download" id="download">
-    <div class="download__glow" aria-hidden="true"></div>
-    <img class="download__logo" src="/brand/logo-cut.png" alt="Hidden Camden" />
-    <h2 class="section__head">Camden is waiting. Bring headphones.</h2>
-    <p class="section__lead">Coming to iPhone and Android. Be first through the door.</p>
-    <div class="store-row">
-      <a class="store-badge" href="#" aria-label="Download on the App Store (coming soon)">
-        <img src="/promo-assets/badges/app-store.png" alt="Download on the App Store" />
-      </a>
-      <a class="store-badge" href="#" aria-label="Get it on Google Play (coming soon)">
-        <img src="/promo-assets/badges/google-play.png" alt="Get it on Google Play" />
-      </a>
-    </div>
-  </section>
-
-  <!-- ── Footer ──────────────────────────────────────────── -->
-  <footer class="footer">
-    <div class="footer__grid">
-      <div>
-        <img class="footer__logo" src="/brand/logo-cut.png" alt="Hidden Camden" />
-        <p class="footer__promise">The route is editorial. Always has been. No venue buys its way onto the walk.</p>
-      </div>
-      <nav aria-label="Footer">
-        <a href="#how">How it works</a>
-        <a href="#voices">Voices</a>
-        <a href="#partners">For venues</a>
-        <a href="mailto:hello@hiddencamden.com">Contact</a>
-      </nav>
-    </div>
-    <div class="footer__base">
-      <span>Hidden Camden · NW1</span>
-      <span>Made on the most musical half-mile on Earth.</span>
-    </div>
-  </footer>
-
-  <script>
-// Hidden Camden marketing site — light touches only.
-
-// Burger menu: toggle the full-screen mobile overlay.
-(function () {
-  var burger = document.querySelector('.nav__burger')
-  var menu = document.getElementById('mobile-menu')
-  if (!burger || !menu) return
-
-  function setOpen(open) {
-    document.body.classList.toggle('nav-open', open)
-    burger.setAttribute('aria-expanded', String(open))
-    burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu')
-    menu.setAttribute('aria-hidden', String(!open))
-  }
-
-  burger.addEventListener('click', function () {
-    setOpen(!document.body.classList.contains('nav-open'))
-  })
-  // Close when a menu link is tapped, or on Escape.
-  menu.querySelectorAll('a').forEach(function (a) {
-    a.addEventListener('click', function () { setOpen(false) })
-  })
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') setOpen(false)
-  })
-})()
-
-// Reveal-on-scroll: tag the major blocks, fade them up as they enter.
-(function () {
-  var targets = document.querySelectorAll(
-    '.film, .step, .voice, .tier, .charity, .sponsor-lead, .logo-wall, .section__head'
-  )
-  targets.forEach(function (el) { el.classList.add('reveal') })
-
-  if (!('IntersectionObserver' in window)) {
-    targets.forEach(function (el) { el.classList.add('in') })
-    return
-  }
-
-  var io = new IntersectionObserver(
-    function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('in')
-          io.unobserve(entry.target)
-        }
-      })
-    },
-    { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
-  )
-  targets.forEach(function (el) { io.observe(el) })
-})()
-
-// Store buttons and the film are stubs until the assets ship. Keep the anchor
-// jump for the download CTA, but stop the dead "#" links from jumping.
-document.querySelectorAll('.store-badge[href="#"], .film__play').forEach(function (el) {
-  el.addEventListener('click', function (e) {
-    e.preventDefault()
-  })
-})
-
-  </script>
-</body>
-</html>
+@media (max-width: 900px) {
+  .why, .offers { grid-template-columns: 1fr; }
+  .pt-integrity { grid-template-columns: 1fr; }
+}
+.wh-map__fallback { display: flex; align-items: center; justify-content: center; height: 100%; font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--label-3); }
