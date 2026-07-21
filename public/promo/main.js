@@ -56,6 +56,50 @@
   targets.forEach(function (el) { io.observe(el) })
 })()
 
+// Voice preview: one shared clip of the house guide voice, played from the
+// button seated over each portrait. Tapping another card hands the audio over.
+;(function () {
+  var buttons = document.querySelectorAll('.voice__play')
+  if (!buttons.length) return
+  var audio = new Audio('/promo/assets/voice-preview.mp3')
+  audio.preload = 'none'
+  var active = null
+
+  function reset(btn) {
+    if (!btn) return
+    btn.classList.remove('is-playing')
+    btn.setAttribute('aria-pressed', 'false')
+    var t = btn.querySelector('.voice__play-txt')
+    if (t) t.textContent = 'Preview voice'
+  }
+  function activate(btn) {
+    btn.classList.add('is-playing')
+    btn.setAttribute('aria-pressed', 'true')
+    var t = btn.querySelector('.voice__play-txt')
+    if (t) t.textContent = 'Playing'
+  }
+
+  buttons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (active === btn && !audio.paused) {
+        audio.pause()
+        return
+      }
+      reset(active)
+      active = btn
+      activate(btn)
+      audio.currentTime = 0
+      var play = audio.play()
+      if (play && play.catch) {
+        play.catch(function () { reset(btn); active = null })
+      }
+    })
+  })
+
+  audio.addEventListener('pause', function () { reset(active) })
+  audio.addEventListener('ended', function () { reset(active); active = null })
+})()
+
 // Stub links: stop the dead "#" jumps.
 ;(function () {
   document.querySelectorAll('.store-badge[href="#"], .film__play').forEach(function (el) {
