@@ -73,29 +73,39 @@
   <script src="/promo/main.js"></script>
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script>
-    // Ten real Camden places. Coords are approximate; acid pins, app-style map.
+    // Ten real Camden places, coordinates from their street addresses.
     var PLACES = [
-      { n: 1, name: 'GuitarGuitar', cat: 'Instruments', lat: 51.5368, lng: -0.1433,
-        blurb: 'Walls of Telecasters off Camden High Street. Every band on the tour started with an awkward ten minutes exactly like the one you can have here.', partner: true },
-      { n: 2, name: 'Universal Music Store', cat: 'Music shop', lat: 51.5416, lng: -0.1466,
-        blurb: 'Camden Market. Vinyl, cassettes and merch from the labels that pressed half the records in the story. Buy the thing you cannot stream.', partner: true },
-      { n: 3, name: 'El Centre Taco', cat: 'Eats', lat: 51.5410, lng: -0.1459,
-        blurb: 'Tacos and a cold one two minutes from the lock. Line the stomach before the basement, or debrief in it after.', partner: false },
-      { n: 4, name: 'All Ages Records', cat: 'Record shop', lat: 51.5379, lng: -0.1418,
+      { n: 1, name: 'GuitarGuitar', cat: 'Instruments', lat: 51.53668, lng: -0.14275,
+        blurb: 'Walls of Telecasters at 16 Delancey Street, off Camden High Street. Every band on the tour started with an awkward ten minutes exactly like the one you can have here.', partner: true },
+      { n: 2, name: 'Universal Music Store', cat: 'Music shop', lat: 51.54155, lng: -0.14685,
+        blurb: 'Camden Lock Market. Vinyl, cassettes and merch from the labels that pressed half the records in the story. Buy the thing you cannot stream.', partner: true },
+      { n: 3, name: 'El Cenote', cat: 'Eats', lat: 51.53905, lng: -0.14385,
+        blurb: 'Tacos, mezcal and margaritas where Bar Gansa used to be, just down Inverness Street. Line the stomach before the basement, or debrief in it after.', partner: true },
+      { n: 4, name: 'All Ages Records', cat: 'Record shop', lat: 51.53775, lng: -0.14140,
         blurb: 'Pratt Street punk and hardcore specialist. The recommendation engine is a human leaning on the counter. You cannot stream a manifesto.', partner: true },
-      { n: 5, name: 'The Underworld', cat: 'Live venue', lat: 51.5391, lng: -0.1423,
-        blurb: 'The loudest basement in Britain, under the World’s End. Every metal and hardcore band you love played it, pillar in the middle and all.', partner: false },
-      { n: 6, name: 'Out on the Floor Records', cat: 'Record shop', lat: 51.5393, lng: -0.1442,
-        blurb: 'Inverness Street. Soul, reggae, ska and the flick-flick-flick of forty years of Saturdays. Serious diggers work this floor head down.', partner: false },
-      { n: 7, name: 'Cyberdog', cat: 'Rave & retail', lat: 51.5421, lng: -0.1468,
-        blurb: 'Two giant robots guard the Stables door. The last retail embassy of British rave culture. The bass gets deeper the further you descend.', partner: true },
-      { n: 8, name: 'KOKO', cat: 'Live venue', lat: 51.5349, lng: -0.1385,
-        blurb: 'The old Camden Theatre turned red-velvet palace. Madonna, Prince, Coldplay. Restored and back on the circuit at the Mornington end.', partner: false },
-      { n: 9, name: 'Electric Ballroom', cat: 'Live venue', lat: 51.5397, lng: -0.1432,
-        blurb: 'A boxer built it out of Blitz rubble. Sid, the Clash, and Prince to seventy people in 2014. Two thousand cap, wear black.', partner: false },
-      { n: 10, name: 'The Dublin Castle', cat: 'Live venue', lat: 51.5374, lng: -0.1456,
-        blurb: 'The most important back room in British pop, hidden behind hanging baskets. Madness lied about being a jazz band. It worked.', partner: true },
+      { n: 5, name: 'The Underworld', cat: 'Live venue', lat: 51.53918, lng: -0.14230,
+        blurb: 'The loudest basement in Britain, under the World’s End at 174 Camden High Street. Every metal and hardcore band you love played it, pillar in the middle and all.', partner: false },
+      { n: 6, name: 'Out on the Floor Records', cat: 'Record shop', lat: 51.53918, lng: -0.14455,
+        blurb: '10 Inverness Street. Soul, reggae, ska and the flick-flick-flick of forty years of Saturdays. Serious diggers work this floor head down.', partner: false },
+      { n: 7, name: 'Cyberdog', cat: 'Rave & retail', lat: 51.54180, lng: -0.14650,
+        blurb: 'Two giant robots guard the Stables Market door. The last retail embassy of British rave culture. The bass gets deeper the further you descend.', partner: true },
+      { n: 8, name: 'KOKO', cat: 'Live venue', lat: 51.53480, lng: -0.13835,
+        blurb: 'The old Camden Theatre turned red-velvet palace at the Mornington Crescent end. Madonna, Prince, Coldplay. Restored and back on the circuit.', partner: false },
+      { n: 9, name: 'Electric Ballroom', cat: 'Live venue', lat: 51.53964, lng: -0.14320,
+        blurb: 'A boxer built it out of Blitz rubble at 184 Camden High Street. Sid, the Clash, and Prince to seventy people in 2014. Two thousand cap, wear black.', partner: false },
+      { n: 10, name: 'The Dublin Castle', cat: 'Live venue', lat: 51.53744, lng: -0.14557,
+        blurb: 'The most important back room in British pop, 94 Parkway, hidden behind hanging baskets. Madness lied about being a jazz band. It worked.', partner: true },
     ];
+
+    // Category icons (inline SVG, acid).
+    var ICONS = {
+      'Instruments': '<svg viewBox="0 0 24 24" class="wh-ico" aria-hidden="true"><path d="M9 17V5l10-2v12" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="6.5" cy="17.5" r="2.6" fill="currentColor"/><circle cx="16.5" cy="15.5" r="2.6" fill="currentColor"/></svg>',
+      'Music shop': '<svg viewBox="0 0 24 24" class="wh-ico" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2.3" fill="currentColor"/></svg>',
+      'Record shop': '<svg viewBox="0 0 24 24" class="wh-ico" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2.3" fill="currentColor"/></svg>',
+      'Eats': '<svg viewBox="0 0 24 24" class="wh-ico" aria-hidden="true"><path d="M6 2v6a2.5 2.5 0 0 0 5 0V2M8.5 10v12M17 2c-1.5 0-2.5 2.5-2.5 5s1 3.5 2.5 3.5V22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+      'Live venue': '<svg viewBox="0 0 24 24" class="wh-ico" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 17.5V21M8 21h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+      'Rave & retail': '<svg viewBox="0 0 24 24" class="wh-ico" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6z" fill="currentColor"/></svg>',
+    };
 
     var map = null;
     var markers = {};
@@ -122,7 +132,7 @@
       li.innerHTML =
         '<span class="wh-card__n">' + String(p.n).padStart(2, '0') + '</span>' +
         '<div class="wh-card__body">' +
-        '<div class="wh-card__top"><span class="wh-cat">' + p.cat + '</span>' +
+        '<div class="wh-card__top"><span class="wh-cat">' + (ICONS[p.cat] || '') + p.cat + '</span>' +
         (p.partner ? '<span class="wh-verified">Verified partner</span>' : '') + '</div>' +
         '<h3>' + p.name + '</h3><p>' + p.blurb + '</p></div>';
       li.addEventListener('click', function () { select(p.n, true); });

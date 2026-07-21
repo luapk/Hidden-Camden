@@ -678,6 +678,9 @@ body.nav-open { overflow: hidden; }
 }
 .wh-card__top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 7px; }
 .wh-cat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-family: var(--grotesk);
   font-size: 9px;
   font-weight: 700;
@@ -685,8 +688,9 @@ body.nav-open { overflow: hidden; }
   letter-spacing: 0.2em;
   color: var(--label-2);
   border: 1px solid rgba(255, 255, 255, 0.14);
-  padding: 3px 8px;
+  padding: 3px 8px 3px 6px;
 }
+.wh-ico { width: 13px; height: 13px; flex: none; color: var(--acid); }
 .wh-verified {
   font-family: var(--grotesk);
   font-size: 9px;
@@ -806,6 +810,6 @@ body.nav-open { overflow: hidden; }
 .logo-wall .logo-img { max-height: 88px; }
 /* Boxless partner logos, larger */
 .sponsor-lead .logo-img { max-height: 112px; }
-.logo-wall .logo-tile { min-height: 110px; justify-content: flex-start; }
+.logo-wall .logo-tile { min-height: 110px; justify-content: center; }
 .logo-wall .logo-img { max-height: 92px; }
 .charity__logo .logo-img { max-height: 158px; }
