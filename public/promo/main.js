@@ -61,9 +61,17 @@
 ;(function () {
   var buttons = document.querySelectorAll('.voice__play')
   if (!buttons.length) return
+  var grid = document.querySelector('.voices')
   var audio = new Audio('/promo/assets/voice-preview.mp3')
-  audio.preload = 'none'
+  audio.preload = 'metadata'
   var active = null
+
+  // Only reveal the buttons once the clip is confirmed present and playable.
+  // Until /promo/assets/voice-preview.mp3 exists, the cards stay clean.
+  audio.addEventListener('loadedmetadata', function () {
+    if (grid) grid.classList.add('voices--has-preview')
+  })
+  audio.load()
 
   function reset(btn) {
     if (!btn) return
