@@ -250,7 +250,7 @@ body.nav-open { overflow: hidden; }
   overflow: hidden;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
-.hero__bg { position: absolute; inset: 0; z-index: 0; }
+.hero__bg { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; }
 .hero__scrim {
   position: absolute;
   inset: 0;
@@ -324,36 +324,13 @@ body.nav-open { overflow: hidden; }
 .film__play svg { width: 34px; height: 34px; fill: #000; margin-left: 4px; }
 
 /* ── Store badges ─────────────────────────────────────── */
-.store-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+.store-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 30px; }
 .store-badge {
   display: inline-flex;
-  align-items: center;
-  gap: 11px;
-  min-width: 210px;
-  padding: 11px 20px 11px 16px;
-  background: var(--label-1);
-  color: #000;
-  border-radius: 12px;
-  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  transition: transform 0.15s ease, filter 0.2s ease;
 }
-.store-badge:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4); }
-.store-badge svg { width: 26px; height: 26px; fill: #000; flex: none; }
-.store-badge span {
-  display: flex;
-  flex-direction: column;
-  font-family: var(--jost);
-  font-weight: 700;
-  font-size: 18px;
-  line-height: 1.05;
-  text-transform: none;
-}
-.store-badge small {
-  font-weight: 500;
-  font-size: 10px;
-  letter-spacing: 0.04em;
-  opacity: 0.7;
-  text-transform: uppercase;
-}
+.store-badge img { height: 54px; width: auto; display: block; }
+.store-badge:hover { transform: translateY(-2px); filter: brightness(1.12); }
 
 /* ── Sections ─────────────────────────────────────────── */
 .section {
@@ -367,12 +344,6 @@ body.nav-open { overflow: hidden; }
 .section--paper > *,
 .section--dark > *,
 .section--charity > * { max-width: var(--maxw); margin-left: auto; margin-right: auto; }
-.section--paper {
-  background: var(--paper);
-  color: var(--ink);
-}
-.section--paper .section__head { color: var(--ink); }
-.section--paper .eyebrow { color: var(--camden); }
 .section--dark { background: var(--night-2); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
 
 /* ── How it works ─────────────────────────────────────── */
@@ -423,21 +394,27 @@ body.nav-open { overflow: hidden; }
   flex-direction: column;
 }
 .voice__portrait {
+  position: relative;
   aspect-ratio: 4 / 5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
+  background: var(--night-3);
 }
-.voice__mono {
-  font-family: var(--display);
-  font-size: clamp(64px, 11vw, 104px);
-  line-height: 1;
-  color: rgba(204, 255, 0, 0.12);
-  letter-spacing: -0.01em;
+.voice__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 .voice__body { padding: 18px 20px 22px; }
-.voice--live { border-color: rgba(204, 255, 0, 0.4); }
-.voice--live .voice__portrait { box-shadow: inset 3px 0 0 var(--acid); }
+.voice--live { border-color: rgba(204, 255, 0, 0.45); }
+.voice--live .voice__portrait::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--acid);
+  box-shadow: 0 0 12px rgba(204, 255, 0, 0.6);
+}
 .voice__status {
   font-family: var(--grotesk);
   font-size: 9px;
@@ -447,7 +424,7 @@ body.nav-open { overflow: hidden; }
   color: var(--acid);
   margin-bottom: 9px;
 }
-.voice__status--soon { color: var(--brass); }
+.voice__status--soon { color: var(--label-2); }
 .voice h3 {
   font-family: var(--display);
   text-transform: uppercase;
@@ -475,7 +452,6 @@ body.nav-open { overflow: hidden; }
   background: var(--night-3);
 }
 .logo-tile--lg { min-height: 130px; }
-.logo-tile--onlight { background: var(--paper); border-color: rgba(22,18,16,0.12); }
 .logo-img { max-height: 54px; width: auto; object-fit: contain; }
 .logo-word {
   display: none; /* shown by onerror when no asset present */
@@ -486,7 +462,6 @@ body.nav-open { overflow: hidden; }
   letter-spacing: 0.02em;
   color: var(--label-1);
 }
-.logo-word--dark { color: var(--ink); }
 
 .sponsor-lead {
   display: grid;
@@ -644,8 +619,8 @@ body.nav-open { overflow: hidden; }
 }
 @media (max-width: 560px) {
   .steps, .voices, .tiers, .logo-wall { grid-template-columns: 1fr; }
-  .store-row { flex-direction: column; align-items: stretch; }
-  .store-badge { min-width: 0; width: 100%; }
+  .store-row { flex-direction: column; align-items: flex-start; }
+  .store-badge img { height: 50px; }
 }
 
 :focus-visible { outline: 2px solid var(--acid); outline-offset: 3px; }
@@ -680,10 +655,7 @@ body.nav-open { overflow: hidden; }
 
   <!-- ── Hero ────────────────────────────────────────────── -->
   <section class="hero">
-    <!-- High-impact visual placeholder: swap for a hero film still or shoot -->
-    <div class="hero__bg ph" aria-hidden="true">
-      <span class="ph__tag">Hero image / film still</span>
-    </div>
+    <img class="hero__bg" src="/promo-assets/hero-camden.jpg" alt="" aria-hidden="true" />
     <div class="hero__scrim" aria-hidden="true"></div>
     <div class="hero__inner">
       <p class="eyebrow eyebrow--acid">Walking tour · Camden · NW1</p>
@@ -696,12 +668,10 @@ body.nav-open { overflow: hidden; }
       </p>
       <div class="store-row">
         <a class="store-badge" href="#download" aria-label="Download on the App Store (coming soon)">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.365 1.43c0 1.14-.417 2.2-1.25 3.06-.99 1.02-2.18 1.61-3.47 1.5-.15-1.13.42-2.32 1.2-3.11.87-.9 2.36-1.57 3.52-1.45zM20.6 17.02c-.6 1.38-.89 1.99-1.66 3.21-1.08 1.71-2.6 3.84-4.48 3.86-1.67.02-2.1-1.09-4.37-1.08-2.27.01-2.74 1.1-4.41 1.08-1.88-.02-3.32-1.94-4.4-3.65C-.02 17.5-.34 12.36 1.5 9.63c1.3-1.94 3.36-3.07 5.3-3.07 1.97 0 3.21 1.09 4.84 1.09 1.58 0 2.54-1.09 4.82-1.09 1.72 0 3.55.94 4.85 2.56-4.26 2.34-3.57 8.43-.71 7.9z"/></svg>
-          <span><small>Coming soon to the</small>App Store</span>
+          <img src="/promo-assets/badges/app-store.png" alt="Download on the App Store" />
         </a>
         <a class="store-badge" href="#download" aria-label="Get it on Google Play (coming soon)">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.6 1.8 13.9 12 3.6 22.2c-.35-.2-.6-.6-.6-1.1V2.9c0-.5.25-.9.6-1.1zM15.3 13.4l2.7 2.7-9.4 5.4 6.7-8.1zM19.8 10.7c.8.45.8 1.6 0 2.05l-2 1.15-3-3 3-3 2 1.2zM15.3 10.6 8.6 2.5 18 7.9l-2.7 2.7z"/></svg>
-          <span><small>Coming soon to</small>Google Play</span>
+          <img src="/promo-assets/badges/google-play.png" alt="Get it on Google Play" />
         </a>
       </div>
       <p class="hero__note">£4.99. Stops one and two are on the house.</p>
@@ -748,9 +718,8 @@ body.nav-open { overflow: hidden; }
     <p class="section__lead">The same route, told by the people who lived it. New voices drop into the app over the coming months. The house voice walks you round today.</p>
     <div class="voices">
       <article class="voice">
-        <div class="voice__portrait ph">
-          <span class="voice__mono" aria-hidden="true">YB</span>
-          <span class="ph__tag">Portrait</span>
+        <div class="voice__portrait">
+          <img class="voice__img" src="/promo-assets/portraits/yungblud.jpg" alt="Yungblud" loading="lazy" />
         </div>
         <div class="voice__body">
           <div class="voice__status voice__status--soon">Coming soon</div>
@@ -759,9 +728,8 @@ body.nav-open { overflow: hidden; }
         </div>
       </article>
       <article class="voice">
-        <div class="voice__portrait ph">
-          <span class="voice__mono" aria-hidden="true">CB</span>
-          <span class="ph__tag">Portrait</span>
+        <div class="voice__portrait">
+          <img class="voice__img" src="/promo-assets/portraits/carl-barat.jpg" alt="Carl Barât" loading="lazy" />
         </div>
         <div class="voice__body">
           <div class="voice__status voice__status--soon">Coming soon</div>
@@ -770,9 +738,8 @@ body.nav-open { overflow: hidden; }
         </div>
       </article>
       <article class="voice">
-        <div class="voice__portrait ph">
-          <span class="voice__mono" aria-hidden="true">SU</span>
-          <span class="ph__tag">Portrait</span>
+        <div class="voice__portrait">
+          <img class="voice__img" src="/promo-assets/portraits/suggs.jpg" alt="Suggs" loading="lazy" />
         </div>
         <div class="voice__body">
           <div class="voice__status voice__status--soon">Coming soon</div>
@@ -781,9 +748,8 @@ body.nav-open { overflow: hidden; }
         </div>
       </article>
       <article class="voice">
-        <div class="voice__portrait ph">
-          <span class="voice__mono" aria-hidden="true">LS</span>
-          <span class="ph__tag">Portrait</span>
+        <div class="voice__portrait">
+          <img class="voice__img" src="/promo-assets/portraits/little-simz.jpg" alt="Little Simz" loading="lazy" />
         </div>
         <div class="voice__body">
           <div class="voice__status voice__status--soon">Coming soon</div>
@@ -792,9 +758,8 @@ body.nav-open { overflow: hidden; }
         </div>
       </article>
       <article class="voice voice--live">
-        <div class="voice__portrait ph">
-          <span class="voice__mono" aria-hidden="true">TL</span>
-          <span class="ph__tag">Portrait</span>
+        <div class="voice__portrait">
+          <img class="voice__img" src="/promo-assets/portraits/the-local.jpg" alt="The Local" loading="lazy" />
         </div>
         <div class="voice__body">
           <div class="voice__status">Live now</div>
@@ -803,9 +768,8 @@ body.nav-open { overflow: hidden; }
         </div>
       </article>
       <article class="voice voice--live">
-        <div class="voice__portrait ph">
-          <span class="voice__mono" aria-hidden="true">SS</span>
-          <span class="ph__tag">Portrait</span>
+        <div class="voice__portrait">
+          <img class="voice__img" src="/promo-assets/portraits/sammie.jpg" alt="DJ Sammie Star" loading="lazy" />
         </div>
         <div class="voice__body">
           <div class="voice__status">Live now</div>
@@ -824,7 +788,7 @@ body.nav-open { overflow: hidden; }
 
     <div class="sponsor-lead">
       <div class="logo-tile logo-tile--lg">
-        <img class="logo-img" src="assets/logos/dr-martens.svg" alt="Dr. Martens" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <img class="logo-img" src="/promo-assets/logos/dr-martens.png" alt="Dr. Martens" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
         <span class="logo-word">Dr. Martens</span>
       </div>
       <p>Headline partner. Camden's boot of choice since the skinheads, the two-tone kids and the punks laced up on Kentish Town Road.</p>
@@ -833,15 +797,15 @@ body.nav-open { overflow: hidden; }
     <p class="sponsor-row-label">Drinks poured by</p>
     <div class="logo-wall">
       <div class="logo-tile">
-        <img class="logo-img" src="assets/logos/guinness.svg" alt="Guinness" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <img class="logo-img" src="/promo-assets/logos/guinness.svg" alt="Guinness" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
         <span class="logo-word">Guinness</span>
       </div>
       <div class="logo-tile">
-        <img class="logo-img" src="assets/logos/tanqueray.svg" alt="Tanqueray" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <img class="logo-img" src="/promo-assets/logos/tanqueray.svg" alt="Tanqueray" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
         <span class="logo-word">Tanqueray</span>
       </div>
       <div class="logo-tile">
-        <img class="logo-img" src="assets/logos/diageo.svg" alt="Diageo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <img class="logo-img" src="/promo-assets/logos/diageo.svg" alt="Diageo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
         <span class="logo-word">Diageo</span>
       </div>
     </div>
@@ -857,9 +821,9 @@ body.nav-open { overflow: hidden; }
         <a class="btn btn--ghost" href="https://www.roundhouse.org.uk" target="_blank" rel="noreferrer">About the Roundhouse</a>
       </div>
       <div class="charity__logo">
-        <div class="logo-tile logo-tile--lg logo-tile--onlight">
-          <img class="logo-img" src="assets/logos/roundhouse.svg" alt="The Roundhouse" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
-          <span class="logo-word logo-word--dark">Roundhouse</span>
+        <div class="logo-tile logo-tile--lg">
+          <img class="logo-img" src="/promo-assets/logos/roundhouse.svg" alt="The Roundhouse" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+          <span class="logo-word">Roundhouse</span>
         </div>
       </div>
     </div>
@@ -909,12 +873,10 @@ body.nav-open { overflow: hidden; }
     <p class="section__lead">Coming to iPhone and Android. Be first through the door.</p>
     <div class="store-row">
       <a class="store-badge" href="#" aria-label="Download on the App Store (coming soon)">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.365 1.43c0 1.14-.417 2.2-1.25 3.06-.99 1.02-2.18 1.61-3.47 1.5-.15-1.13.42-2.32 1.2-3.11.87-.9 2.36-1.57 3.52-1.45zM20.6 17.02c-.6 1.38-.89 1.99-1.66 3.21-1.08 1.71-2.6 3.84-4.48 3.86-1.67.02-2.1-1.09-4.37-1.08-2.27.01-2.74 1.1-4.41 1.08-1.88-.02-3.32-1.94-4.4-3.65C-.02 17.5-.34 12.36 1.5 9.63c1.3-1.94 3.36-3.07 5.3-3.07 1.97 0 3.21 1.09 4.84 1.09 1.58 0 2.54-1.09 4.82-1.09 1.72 0 3.55.94 4.85 2.56-4.26 2.34-3.57 8.43-.71 7.9z"/></svg>
-        <span><small>Coming soon to the</small>App Store</span>
+        <img src="/promo-assets/badges/app-store.png" alt="Download on the App Store" />
       </a>
       <a class="store-badge" href="#" aria-label="Get it on Google Play (coming soon)">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.6 1.8 13.9 12 3.6 22.2c-.35-.2-.6-.6-.6-1.1V2.9c0-.5.25-.9.6-1.1zM15.3 13.4l2.7 2.7-9.4 5.4 6.7-8.1zM19.8 10.7c.8.45.8 1.6 0 2.05l-2 1.15-3-3 3-3 2 1.2zM15.3 10.6 8.6 2.5 18 7.9l-2.7 2.7z"/></svg>
-        <span><small>Coming soon to</small>Google Play</span>
+        <img src="/promo-assets/badges/google-play.png" alt="Get it on Google Play" />
       </a>
     </div>
   </section>
