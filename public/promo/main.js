@@ -23,31 +23,19 @@
   })
 })()
 
-// Hero carousel: cross-fade slides on an interval, with dot navigation.
+// Hero carousel: cross-fade the slides on an interval (no dots).
 ;(function () {
   var car = document.getElementById('hero-carousel')
-  var dotsWrap = document.getElementById('hero-dots')
-  if (!car || !dotsWrap) return
+  if (!car) return
   var slides = car.querySelectorAll('.hero__slide')
   if (slides.length < 2) return
-  var i = 0, dots = [], timer
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  slides.forEach(function (s, idx) {
-    var d = document.createElement('button')
-    d.className = 'hero__dot' + (idx === 0 ? ' is-active' : '')
-    d.setAttribute('aria-label', 'Show image ' + (idx + 1))
-    d.addEventListener('click', function () { go(idx); restart() })
-    dotsWrap.appendChild(d)
-    dots.push(d)
-  })
-  function go(n) {
-    slides[i].classList.remove('is-active'); dots[i].classList.remove('is-active')
-    i = (n + slides.length) % slides.length
-    slides[i].classList.add('is-active'); dots[i].classList.add('is-active')
-  }
-  function start() { if (!reduce) timer = setInterval(function () { go(i + 1) }, 4500) }
-  function restart() { clearInterval(timer); start() }
-  start()
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  var i = 0
+  setInterval(function () {
+    slides[i].classList.remove('is-active')
+    i = (i + 1) % slides.length
+    slides[i].classList.add('is-active')
+  }, 4500)
 })()
 
 // Reveal-on-scroll: fade the major blocks up as they enter.
