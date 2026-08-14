@@ -121,11 +121,10 @@ export const LAUNCH_ROUTE: TourStop[] = [
     image: STOP_IMAGES[0],
     transcript:
       'Before the bands. Before the market. Before Camden was even Camden, there was a cottage on this corner, and in it lived a woman called Jinny Bingham.\n\n' +
-      'Seventeenth century. The locals called her Mother Damnable, then later Mother Red Cap, and they gave her a wide berth. Partly manners. Mostly because the men in her life kept dying. One vanished. One went into the oven, according to the kinder versions. And the story goes that on the night Jinny herself died, witnesses saw the devil walk in through her front door.\n\n' +
-      'Nobody saw him leave.\n\n' +
-      'The pub that grew up on this spot traded as The Mother Red Cap for the next three centuries, a coaching halt at the edge of London, the last drink before the countryside. The world\'s end. Hence the name on the wall now. These days it\'s the biggest boozer in Camden, the pre-gig waiting room for every show in NW1, and if the jukebox sounds harder than your average pub, there\'s a reason.\n\n' +
-      'That\'s coming from under your feet. Down the stairs is The Underworld, and for more than thirty years it\'s been the loudest basement in Britain. Every metal, punk and hardcore band you\'ve ever loved either played that room on the way up or came back to it on the way down, close enough to touch and twice as sweaty. There\'s a pillar in the middle of the floor, holding up the pub above. Veterans navigate around it by instinct, in the dark, mid-mosh. Tourists find it with their faces.\n\n' +
-      'Your first reward just landed. One pint, on us, any time before five. Jinny\'s round.',
+      'Seventeenth century. The locals called her Mother Damnable, then Mother Red Cap, and they kept their distance. Partly manners. Mostly because the men in her life kept dying. One vanished. One went into the oven, according to the kinder versions. And on the night Jinny died, witnesses swore the devil himself walked in through her front door.\n\n' +
+      'Nobody saw him leave. He presumably had a quiet one and slipped out the back.\n\n' +
+      'The pub that grew up here traded as the Mother Red Cap for three centuries, the last drink before the open countryside. The world\'s end. Hence the name on the wall. Today it\'s the biggest boozer in Camden, the pre-gig holding pen for every show in NW1, and if the jukebox sounds harder than your average pub, there\'s a reason.\n\n' +
+      'It\'s coming from under your feet. Down the stairs is the Underworld, and for thirty years it\'s been the loudest basement in Britain. Every metal, punk and hardcore band you love played that room on the way up or crawled back to it on the way down, close enough to touch and twice as sweaty. There\'s a pillar in the middle of the floor, holding up the pub above. Veterans navigate it by instinct, in the dark, mid-mosh. Tourists find it with their faces.',
     linkAudioUrl: linkAudio(1, 2),
     audioUrl: stopAudio(1),
   },
@@ -147,14 +146,13 @@ export const LAUNCH_ROUTE: TourStop[] = [
     accent: STOP_ACCENTS[1],
     image: STOP_IMAGES[1],
     transcript:
-      'In 1938, a Kerry-born builder and amateur boxer called Bill Fuller took over a rough little Irish club on this site called the Buffalo. The main entrance was round the back on Kentish Town Road. Business was steady. Space was tight.\n\n' +
+      'In 1938, a Kerry-born builder and amateur boxer called Bill Fuller took over a rough little Irish club on this site called the Buffalo. The entrance was round the back on Kentish Town Road. Business was steady. Space was tight.\n\n' +
       'Then the war came, and the Luftwaffe bombed the terrace next door.\n\n' +
-      'Most people saw tragedy. Bill Fuller saw site clearance. He bought the rubble, knocked through, and built himself a two-thousand-capacity ballroom where Irish London came to dance for the next forty years.\n\n' +
-      'By 1978, the dancing had changed. The relaunch night starred The Greedies, a supergroup built around Phil Lynott of Thin Lizzy plus half the Sex Pistols. They got the name because they demanded three quarters of the door money and Fuller called them a crowd of greedy bastards. To their credit, they kept it.\n\n' +
-      'Two weeks later, Sid Vicious played a one-off here with a pickup band. The gig was billed as Sid Sods Off, and the door money had a specific purpose: raising the airfare to get Sid and Nancy to New York. Camden crowdfunded the most doomed relocation in rock history, at a fiver a head.\n\n' +
-      'Since then: Joy Division. The Clash, who rehearsed here for a week. Madness. The Smiths. Public Enemy. And one night in 2014, with a few hours\' notice and rumours flying on Twitter, Prince walked in and played to about seventy people, while a queue of the disbelieving wrapped around the block outside.\n\n' +
-      'This is a two-thousand-cap room. He used roughly four percent of it. The other ninety-six queued.\n\n' +
-      'Your voucher\'s banked. It works on club nights, after seven. Wear black. You\'ll want to blend in.',
+      'Most people saw a tragedy. Bill Fuller saw available square footage. He bought the rubble, knocked through, and built a two-thousand-capacity ballroom where Irish London danced for the next forty years.\n\n' +
+      'By 1978 the dancing had changed. The relaunch starred the Greedies, a supergroup built around Phil Lynott of Thin Lizzy and half the Sex Pistols. They got the name because they demanded three quarters of the door money and Fuller called them a crowd of greedy bastards. To their credit, they kept it.\n\n' +
+      'Two weeks later Sid Vicious played a one-off with a pickup band, billed as Sid Sods Off. The door money had a purpose: the airfare to get Sid and Nancy to New York. Camden crowdfunded the most doomed relocation in rock history, at a fiver a head, and never once asked for a progress report.\n\n' +
+      'Then: Joy Division. The Clash, who rehearsed here for a week. Madness. The Smiths. Public Enemy. And one night in 2014, on a few hours\' notice, Prince walked in and played to about seventy people while a queue of the disbelieving wrapped round the block.\n\n' +
+      'A two-thousand-capacity room. He used roughly four percent of it. The other ninety-six percent queued.',
     linkAudioUrl: linkAudio(2, 3),
     audioUrl: stopAudio(2),
   },
@@ -177,11 +175,10 @@ export const LAUNCH_ROUTE: TourStop[] = [
     image: STOP_IMAGES[2],
     transcript:
       'Not everything in Camden is loud.\n\n' +
-      'This corner has been the Jazz Café since 1990, and it runs on a single idea: take the artists who fill arenas, and put them in a room where the back row is closer than the front row anywhere else. Four hundred people. A balcony where you can eat dinner while a legend works below you, close enough to read the setlist, and close enough to feel guilty ordering the calamari mid-ballad.\n\n' +
-      'The room\'s reputation was sealed in 1995, when a young singer from Virginia called D\'Angelo played a run of nights here and taped them. That recording got passed between musicians for years like contraband, the sound of neo-soul being born in NW1, and it put a permanent question mark over the idea that the great soul rooms were all in America.\n\n' +
-      'Since then the walls have absorbed everyone. Soul royalty, funk pioneers on farewell laps, rappers doing the one small show of the tour, and now and then a north London girl with a beehive, back when only Camden knew her name.\n\n' +
-      'Here\'s the thing about this room: it\'s at its best in the first hour, when the lights are low and the band is checking levels and you can still get the rail. Which is exactly when your drink works. Doors hour, seven till eight, a proper gin and tonic at the brass rail while everyone else is still queueing.\n\n' +
-      'Arrive early. The room rewards it. So do we.',
+      'This corner has been the Jazz Café since 1990, and it runs on a single idea: take the artists who fill arenas, and put them in a room where the back row is closer than the front row of anywhere else. Four hundred people. A balcony where you can eat dinner while a legend works below you, close enough to read the setlist, and close enough to feel judged for ordering the calamari mid-ballad.\n\n' +
+      'The reputation was sealed in 1995, when a young singer from Virginia called D\'Angelo played a run of nights here and taped them. That recording passed between musicians for years like contraband, the sound of neo-soul being born in NW1, and it quietly ended the idea that all the great soul rooms were in America.\n\n' +
+      'Since then the walls have absorbed everyone. Soul royalty. Funk pioneers on farewell laps they have since gone back on. Rappers doing the one small show of the tour. And now and then a north London girl with a beehive, back when only Camden knew her name.\n\n' +
+      'The room is at its best in the first hour, lights low, the band still finding the levels, nobody in yet who came to talk over the quiet bits. Get there for doors. The good seats do not care that you own the album.',
     linkAudioUrl: linkAudio(3, 4),
     audioUrl: stopAudio(3),
   },
@@ -208,7 +205,7 @@ export const LAUNCH_ROUTE: TourStop[] = [
       'Now. January 1979. Seven young men walk in and tell the landlord, Alo Conlon, that they\'re a jazz band. Alo thinks: jazz, lovely, respectable. Friday night comes, and a wall of skinheads turns up at the door. The band was Madness. Alo gave them a year-long residency anyway, and the back room behind you became the launchpad for One Step Beyond. They shot the video for My Girl in here. That\'s Alo at the start of it, wearing the face of a man who has worked out he was lied to and decided he can live with it.\n\n' +
       'The lying-about-jazz trick worked so well the room never stopped. Blur played in there. Coldplay. Supergrass. The Killers. Muse got signed off the back of one electrifying set. The Libertines did a residency that nobody fully remembers, including the Libertines.\n\n' +
       'And then there\'s Amy. Winehouse loved this pub so much that when the paparazzi made a normal night impossible, she\'d come in and get behind the bar, pulling pints for startled customers. Hiding in plain sight, dressed as her own barmaid. In 2007, already conquering the world with Back to Black, she played a secret homecoming gig in that back room. Crammed in hip to hip. Suggs was there. So was Pete Doherty, cap down at the back, which in 2007 Camden barely counted as a sighting. Nobody bothered either of them. That\'s the whole pub in one image.\n\n' +
-      'Your reward is live. One pint of Guinness, the same black stuff that\'s been settling on this bar since before Madness talked their way in. And there are four bands on in the back tonight. Statistically, one of them is the next Coldplay. The other three will spend twenty years telling people they knew them first.',
+      'There are usually four bands on in the back tonight. Statistically, one of them is the next Coldplay. The other three will spend twenty years telling people they knew them first.',
     linkAudioUrl: linkAudio(4, 5),
     audioUrl: stopAudio(4),
   },
@@ -234,8 +231,7 @@ export const LAUNCH_ROUTE: TourStop[] = [
       'Formica tables. A pool table. A telly for the football. In any other postcode, you\'d walk straight past. But for about five years in the 1990s, this little boozer was the centre of the British music industry, and the pool table behind that window was the most influential piece of furniture in the country.\n\n' +
       'Blur drank here. Not occasionally. Residentially. Graham Coxon lived around the corner and treated the Mixer as an extension of his front room, and where Blur drank, everyone followed: journalists, A&R men, photographers, and a steady supply of skinny young hopefuls in charity-shop suits. Legend says Menswear were less a band that formed than a band that condensed, out of cigarette smoke, somewhere between that pool table and the bar. They had a record deal before they had songs.\n\n' +
       'And because every scene needs a war, this is where Britpop\'s cold front ran. When Oasis came down from Manchester, this pub is where the two tribes actually had to share a room, and depending on who\'s telling it, that ended with words, or a squaring-up, or the Gallaghers barred outright. Nobody agrees on the details. Everyone agrees on the venue.\n\n' +
-      'One more regular, years later. A local girl who\'d come in, put her money on the table, and quietly run it. Amy was, by all accounts, very good at pool. People only remember the voice. The pool arm deserves a plaque, and like most things round here, it won\'t get one.\n\n' +
-      'Your reward fits the room: a pint and a free rack. Weekday afternoons, when the table\'s empty and the light comes in sideways. Bring someone you want to beat.',
+      'One more regular, years later. A local girl who\'d come in, put her money on the table, and quietly run it. Amy was, by all accounts, very good at pool. People only remember the voice. The pool arm deserves a plaque, and like most things round here, it will not get one.',
     linkAudioUrl: linkAudio(5, 6),
     audioUrl: stopAudio(5),
   },
@@ -258,12 +254,11 @@ export const LAUNCH_ROUTE: TourStop[] = [
     image: STOP_IMAGES[5],
     transcript:
       'Every pub on this tour has famous customers. This one had a family.\n\n' +
-      'Through the 2000s, the Hawley Arms was the indie aristocracy\'s living room. Kate Moss at the bar. Noel Fielding in the corner. Half the bands you owned on CD, in here on a Tuesday, being left alone. That was the deal at the Hawley. You could be anyone, and they\'d treat you like no one, in the nicest possible way.\n\n' +
+      'Through the 2000s the Hawley Arms was the indie aristocracy\'s living room, if the aristocracy smoked indoors and never quite got a round in. Kate Moss at the bar. Noel Fielding in the corner. Half the bands you owned on CD, in on a Tuesday, being studiously left alone, which in Camden is the highest compliment going.\n\n' +
       'Which is why Amy Winehouse loved it.\n\n' +
-      'She didn\'t come here to be seen. She came here to disappear. And when even sitting at the bar got complicated, she did the most Amy thing imaginable: she got up, walked round, and started serving. The biggest soul voice of her generation, pulling pints for tourists who couldn\'t believe what they were looking at. The bar wasn\'t a stage. It was a hiding place where she could be the version of herself she liked best.\n\n' +
-      'Then, in February 2008, the great Camden fire tore through the market, and the Hawley burned with it. Ten days later, Amy stood up at the Grammys, in the biggest moment of her career, with the whole world finally watching, and used it to send a message home: that Camden Town was still standing. Her pub. On that stage. That night.\n\n' +
-      'The Hawley rebuilt. Amy kept coming back until she couldn\'t. And now, behind the pub, there\'s a mural of her, two storeys tall, watching over the street she never really left. Go and see it after the audio ends. People leave flowers. It\'s the only stop on this tour where we\'d ask you to take the photo quietly.\n\n' +
-      'Your pint is banked for a calm weekday afternoon, which is when this pub is most itself. Raise it to the family.',
+      'She didn\'t come here to be seen. She came here to disappear. And when even sitting at the bar got complicated, she did the most Amy thing imaginable: she got up, walked round, and started serving. The biggest soul voice of her generation, pulling pints for tourists too stunned to order. The bar wasn\'t a stage. It was a hiding place where she could be the version of herself she liked best.\n\n' +
+      'Then, in February 2008, the great Camden fire tore through the market, and the Hawley burned with it. Ten days later Amy stood up at the Grammys, the biggest night of her career, the whole world finally watching, and used it to send one message home: Camden Town was still standing.\n\n' +
+      'The Hawley rebuilt. Amy kept coming back until she couldn\'t. And now, behind the pub, there\'s a mural of her, two storeys tall, watching over the street she never really left. Go and see it after the audio ends. People leave flowers. It\'s the one stop where we\'d ask you to take the photo quietly.',
     linkAudioUrl: linkAudio(6, 7),
     audioUrl: stopAudio(6),
   },
@@ -290,7 +285,7 @@ export const LAUNCH_ROUTE: TourStop[] = [
       'The evening before, four leather-jacketed brothers from Queens called the Ramones had played the Roundhouse up the road and reduced it to rubble in under forty minutes. The next night they played here. Smaller room. Same chainsaw. And the queue outside Dingwalls was the most important guest list ever assembled: the Sex Pistols. The Clash. The Damned. Chrissie Hynde. Every band that would define the next five years of music, all unknown, all broke, all here.\n\n' +
       'The British bands waited outside before doors, sitting on the bonnets of parked cars like a gang in a western, trying to look dangerous for the Americans. The Clash, who\'d played their first ever gig the night before, asked the Ramones how on earth they\'d filled two venues. The answer, more or less: we\'re terrible musicians, we play fast, we give the kids a show. Stop rehearsing. Go blow them away.\n\n' +
       'They did. Everyone did. Within six months, every band in London had doubled its tempo, and the brawl that broke out front of here that night, Clash versus Stranglers, made the national papers and put this warehouse on the map for good. Blondie played here early too, just to round out the syllabus.\n\n' +
-      'Your pint is waiting on the terrace over the lock, and your enamel pin is at the bar. Get it on, because you are not done. Camden Town handed you the legends. Chalk Farm Road, just up the water, hands you the strange stuff: a rock bar that came back wearing a crown, the little room every arena act started in, and a bar so small the famous ones use it to hide.\n\n' +
+      'And you are not done. Camden Town handed you the legends. Chalk Farm Road, just up the water, hands you the strange stuff: a rock bar that came back wearing a crown, the little room every arena act started in, and a bar so small the famous ones use it to hide.\n\n' +
       'Follow the red glow.',
     linkAudioUrl: linkAudio(7, 8),
     audioUrl: stopAudio(7),
@@ -319,7 +314,7 @@ export const LAUNCH_ROUTE: TourStop[] = [
       'The walls are the show. Posters on posters, memorabilia stacked like the room is trying to remember every gig Camden ever hosted at once. Animal print where you least expect it. A pool table waiting for your money. And horror B movies playing silently in the corner, all rubber monsters and screaming, because nothing pairs with a cold lager like a man in a latex suit menacing a cardboard spaceship.\n\n' +
       'Then there is Zoltan, the fortune telling machine. Feed it a coin and it will tell you your future, which in this postcode is usually another round and a band you have never heard of becoming your new favourite.\n\n' +
       'Rock bars are supposed to be extinct. Nobody told this one.\n\n' +
-      'Your pint is banked, the table is open, and the monsters are already screaming. Ask Zoltan about the next stop. He knows.',
+      'The table is open, the monsters are already screaming, and Zoltan knows exactly where you are going next. Feed him.',
     linkAudioUrl: linkAudio(8, 9),
     audioUrl: stopAudio(8),
   },
@@ -340,11 +335,10 @@ export const LAUNCH_ROUTE: TourStop[] = [
     image: STOP_IMAGES[1],
     transcript:
       'Every big band has a small room on their CV. This is the one most of them share.\n\n' +
-      'From 1996 this was the Barfly. Two hundred capacity, sticky floor, and the sharpest scouting post in Britain. The names who sweated on that little stage on their way up read like a festival poster: Coldplay. Adele. Muse. Ed Sheeran. The deal was simple. If the industry wanted to know what was next, it stood at the back of this room with a warm beer and found out.\n\n' +
+      'From 1996 this was the Barfly. Two hundred capacity, a floor that held onto your shoes, and the sharpest scouting post in Britain. The names who sweated on that little stage on the way up read like a festival poster: Coldplay. Adele. Muse. Ed Sheeran. If the industry wanted to know what was next, it stood at the back with a warm beer and found out.\n\n' +
       'Then in 2016 the name came off the door, and the building spent eight years answering to Camden Assembly, which never sounded right, and everybody knew it.\n\n' +
-      'On the twenty second of June, 2026, the sign went back up. Frank Turner played the first night of the reborn Barfly, which is about as correct as bookings get, and the new room keeps the old religion while upgrading the tools: a wall of fame with photographs nobody had seen before, blue plaques for the alumni, a proper new rig, and downstairs a vinyl listening bar built around a 1959 jukebox that is older than every record it plays.\n\n' +
-      'Two hundred capacity, same as ever. Statistically, somebody on this stage in the next twelve months will be filling arenas before your tour pin needs polishing. You get to say you saw them here, and this time the wall of fame is ready for them.\n\n' +
-      'Your lager is banked for gig nights, early doors, when the support band is soundchecking and hope is at its loudest.',
+      'On the twenty second of June 2026 the sign went back up. Frank Turner played the first night of the reborn Barfly, which is about as correct as a booking gets. The new room keeps the old religion and upgrades the kit: a wall of fame, blue plaques for the alumni, a proper rig, and downstairs a listening bar built around a 1959 jukebox that is older than every record it plays.\n\n' +
+      'Two hundred capacity, same as ever. Somebody on this stage in the next twelve months will be filling arenas by the time you get round to telling anyone you were here. And this time the wall of fame is ready for them.',
     linkAudioUrl: linkAudio(9, 10),
     audioUrl: stopAudio(9),
   },
@@ -368,7 +362,7 @@ export const LAUNCH_ROUTE: TourStop[] = [
       'Ask Ann Liu Cannon. She was playing this room when Ethan Johns walked in, the producer behind records for Paul McCartney and Laura Marling. He heard her, and the publishing deal with BMG followed. From this floor, no stage worth mentioning, to editorial playlists and American tours. The bar carries the torch for grassroots music and every so often the torch catches.\n\n' +
       'That is the trick of the Spiritual. The legends do not play here. They stand at the back with a drink, watching, because this is where the next ones surface first. Keep an eye on whoever looks too relaxed. That is usually somebody famous doing their listening.\n\n' +
       'The tour ends here, and that is deliberate. You have spent the evening in rooms where it already happened: a witch\'s corner, a boxer\'s ballroom, a lie about jazz, a pool table that ran a decade, a hiding place, the night punk went overground, a palace of monsters, and the room on every CV. Ten stops, one half-mile, all still pouring. This is the last one, and it is the only room where it has not happened yet.\n\n' +
-      'Your last drink is banked. Take it slow, face the stage, and if the person next to you hums along too precisely, buy them one as well. Chances are you own their records. Chances are, in a year, so will everyone else.',
+      'Take it slow and face the stage. If the person next to you hums along too precisely, that is not a coincidence. Chances are you own their records. Chances are, in a year, so will everyone else.',
     linkAudioUrl: null,
     audioUrl: stopAudio(10),
   },

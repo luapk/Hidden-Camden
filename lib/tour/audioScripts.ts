@@ -14,11 +14,11 @@ export const AUDIO_FILES: AudioFile[] = [
   {
     filename: 'intro.mp3',
     label: 'Intro — Camden Town Tube',
-    text: `You're standing on the most musical half-mile on Earth. Camden should have more blue plaques than anywhere in London, but hardly any of them got put up, because the people who made this place famous were usually being barred from it at the time.
+    text: `You're standing on the most musical half-mile on Earth. Camden should have more blue plaques than anywhere in London. It has almost none, because the people who made it famous were usually being barred from the building at the time.
 
-Here's how it works. Ten venues. Each one stays locked until you're physically standing in front of it. When your phone buzzes, a story starts, and a drink goes into your pocket for later. The rewards bank, so you don't have to drink your way round in an hour. People have tried. People have failed. We named a cleaning bill after one of them.
+Here's how it works. Ten venues. Each stays locked until you're physically standing in front of it, at which point your phone buzzes and a story begins. No app has ever cared this much about your exact location, and it means well.
 
-One rule. Keep your eyes up. Everything worth seeing in Camden happens at first-floor level and above, where the developers haven't reached yet.
+One rule. Keep your eyes up. Everything worth seeing in Camden happens at first-floor level and above, which is the only part the developers haven't reached yet.
 
 Your first stop is thirty seconds away. Cross at the lights and aim for the pub that takes up half the block. Don't worry about the witch. She's been dead three hundred and fifty years.
 
@@ -29,15 +29,13 @@ Probably.`,
     label: 'Stop 1 — World\'s End & The Underworld',
     text: `Before the bands. Before the market. Before Camden was even Camden, there was a cottage on this corner, and in it lived a woman called Jinny Bingham.
 
-Seventeenth century. The locals called her Mother Damnable, then later Mother Red Cap, and they gave her a wide berth. Partly manners. Mostly because the men in her life kept dying. One vanished. One went into the oven, according to the kinder versions. And the story goes that on the night Jinny herself died, witnesses saw the devil walk in through her front door.
+Seventeenth century. The locals called her Mother Damnable, then Mother Red Cap, and they kept their distance. Partly manners. Mostly because the men in her life kept dying. One vanished. One went into the oven, according to the kinder versions. And on the night Jinny died, witnesses swore the devil himself walked in through her front door.
 
-Nobody saw him leave.
+Nobody saw him leave. He presumably had a quiet one and slipped out the back.
 
-The pub that grew up on this spot traded as The Mother Red Cap for the next three centuries, a coaching halt at the edge of London, the last drink before the countryside. The world's end. Hence the name on the wall now. These days it's the biggest boozer in Camden, the pre-gig waiting room for every show in NW1, and if the jukebox sounds harder than your average pub, there's a reason.
+The pub that grew up here traded as the Mother Red Cap for three centuries, the last drink before the open countryside. The world's end. Hence the name on the wall. Today it's the biggest boozer in Camden, the pre-gig holding pen for every show in NW1, and if the jukebox sounds harder than your average pub, there's a reason.
 
-That's coming from under your feet. Down the stairs is The Underworld, and for more than thirty years it's been the loudest basement in Britain. Every metal, punk and hardcore band you've ever loved either played that room on the way up or came back to it on the way down, close enough to touch and twice as sweaty. There's a pillar in the middle of the floor, holding up the pub above. Veterans navigate around it by instinct, in the dark, mid-mosh. Tourists find it with their faces.
-
-Your first reward just landed. One pint, on us, any time before five. Jinny's round.`,
+It's coming from under your feet. Down the stairs is the Underworld, and for thirty years it's been the loudest basement in Britain. Every metal, punk and hardcore band you love played that room on the way up or crawled back to it on the way down, close enough to touch and twice as sweaty. There's a pillar in the middle of the floor, holding up the pub above. Veterans navigate it by instinct, in the dark, mid-mosh. Tourists find it with their faces.`,
   },
   {
     filename: 'link-01-02.mp3',
@@ -47,21 +45,19 @@ Your first reward just landed. One pint, on us, any time before five. Jinny's ro
   {
     filename: 'stop-02.mp3',
     label: 'Stop 2 — Electric Ballroom',
-    text: `In 1938, a Kerry-born builder and amateur boxer called Bill Fuller took over a rough little Irish club on this site called the Buffalo. The main entrance was round the back on Kentish Town Road. Business was steady. Space was tight.
+    text: `In 1938, a Kerry-born builder and amateur boxer called Bill Fuller took over a rough little Irish club on this site called the Buffalo. The entrance was round the back on Kentish Town Road. Business was steady. Space was tight.
 
 Then the war came, and the Luftwaffe bombed the terrace next door.
 
-Most people saw tragedy. Bill Fuller saw site clearance. He bought the rubble, knocked through, and built himself a two-thousand-capacity ballroom where Irish London came to dance for the next forty years.
+Most people saw a tragedy. Bill Fuller saw available square footage. He bought the rubble, knocked through, and built a two-thousand-capacity ballroom where Irish London danced for the next forty years.
 
-By 1978, the dancing had changed. The relaunch night starred The Greedies, a supergroup built around Phil Lynott of Thin Lizzy plus half the Sex Pistols. They got the name because they demanded three quarters of the door money and Fuller called them a crowd of greedy bastards. To their credit, they kept it.
+By 1978 the dancing had changed. The relaunch starred the Greedies, a supergroup built around Phil Lynott of Thin Lizzy and half the Sex Pistols. They got the name because they demanded three quarters of the door money and Fuller called them a crowd of greedy bastards. To their credit, they kept it.
 
-Two weeks later, Sid Vicious played a one-off here with a pickup band. The gig was billed as Sid Sods Off, and the door money had a specific purpose: raising the airfare to get Sid and Nancy to New York. Camden crowdfunded the most doomed relocation in rock history, at a fiver a head.
+Two weeks later Sid Vicious played a one-off with a pickup band, billed as Sid Sods Off. The door money had a purpose: the airfare to get Sid and Nancy to New York. Camden crowdfunded the most doomed relocation in rock history, at a fiver a head, and never once asked for a progress report.
 
-Since then: Joy Division. The Clash, who rehearsed here for a week. Madness. The Smiths. Public Enemy. And one night in 2014, with a few hours' notice and rumours flying on Twitter, Prince walked in and played to about seventy people, while a queue of the disbelieving wrapped around the block outside.
+Then: Joy Division. The Clash, who rehearsed here for a week. Madness. The Smiths. Public Enemy. And one night in 2014, on a few hours' notice, Prince walked in and played to about seventy people while a queue of the disbelieving wrapped round the block.
 
-This is a two-thousand-cap room. He used roughly four percent of it. The other ninety-six queued.
-
-Your voucher's banked. It works on club nights, after seven. Wear black. You'll want to blend in.`,
+A two-thousand-capacity room. He used roughly four percent of it. The other ninety-six percent queued.`,
   },
   {
     filename: 'link-02-03.mp3',
@@ -73,15 +69,13 @@ Your voucher's banked. It works on club nights, after seven. Wear black. You'll 
     label: 'Stop 3 — Jazz Café',
     text: `Not everything in Camden is loud.
 
-This corner has been the Jazz Café since 1990, and it runs on a single idea: take the artists who fill arenas, and put them in a room where the back row is closer than the front row anywhere else. Four hundred people. A balcony where you can eat dinner while a legend works below you, close enough to read the setlist, and close enough to feel guilty ordering the calamari mid-ballad.
+This corner has been the Jazz Café since 1990, and it runs on a single idea: take the artists who fill arenas, and put them in a room where the back row is closer than the front row of anywhere else. Four hundred people. A balcony where you can eat dinner while a legend works below you, close enough to read the setlist, and close enough to feel judged for ordering the calamari mid-ballad.
 
-The room's reputation was sealed in 1995, when a young singer from Virginia called D'Angelo played a run of nights here and taped them. That recording got passed between musicians for years like contraband, the sound of neo-soul being born in NW1, and it put a permanent question mark over the idea that the great soul rooms were all in America.
+The reputation was sealed in 1995, when a young singer from Virginia called D'Angelo played a run of nights here and taped them. That recording passed between musicians for years like contraband, the sound of neo-soul being born in NW1, and it quietly ended the idea that all the great soul rooms were in America.
 
-Since then the walls have absorbed everyone. Soul royalty, funk pioneers on farewell laps, rappers doing the one small show of the tour, and now and then a north London girl with a beehive, back when only Camden knew her name.
+Since then the walls have absorbed everyone. Soul royalty. Funk pioneers on farewell laps they have since gone back on. Rappers doing the one small show of the tour. And now and then a north London girl with a beehive, back when only Camden knew her name.
 
-Here's the thing about this room: it's at its best in the first hour, when the lights are low and the band is checking levels and you can still get the rail. Which is exactly when your drink works. Doors hour, seven till eight, a proper gin and tonic at the brass rail while everyone else is still queueing.
-
-Arrive early. The room rewards it. So do we.`,
+The room is at its best in the first hour, lights low, the band still finding the levels, nobody in yet who came to talk over the quiet bits. Get there for doors. The good seats do not care that you own the album.`,
   },
   {
     filename: 'link-03-04.mp3',
@@ -101,7 +95,7 @@ The lying-about-jazz trick worked so well the room never stopped. Blur played in
 
 And then there's Amy. Winehouse loved this pub so much that when the paparazzi made a normal night impossible, she'd come in and get behind the bar, pulling pints for startled customers. Hiding in plain sight, dressed as her own barmaid. In 2007, already conquering the world with Back to Black, she played a secret homecoming gig in that back room. Crammed in hip to hip. Suggs was there. So was Pete Doherty, cap down at the back, which in 2007 Camden barely counted as a sighting. Nobody bothered either of them. That's the whole pub in one image.
 
-Your reward is live. One pint of Guinness, the same black stuff that's been settling on this bar since before Madness talked their way in. And there are four bands on in the back tonight. Statistically, one of them is the next Coldplay. The other three will spend twenty years telling people they knew them first.`,
+There are usually four bands on in the back tonight. Statistically, one of them is the next Coldplay. The other three will spend twenty years telling people they knew them first.`,
   },
   {
     filename: 'link-04-05.mp3',
@@ -119,9 +113,7 @@ Blur drank here. Not occasionally. Residentially. Graham Coxon lived around the 
 
 And because every scene needs a war, this is where Britpop's cold front ran. When Oasis came down from Manchester, this pub is where the two tribes actually had to share a room, and depending on who's telling it, that ended with words, or a squaring-up, or the Gallaghers barred outright. Nobody agrees on the details. Everyone agrees on the venue.
 
-One more regular, years later. A local girl who'd come in, put her money on the table, and quietly run it. Amy was, by all accounts, very good at pool. People only remember the voice. The pool arm deserves a plaque, and like most things round here, it won't get one.
-
-Your reward fits the room: a pint and a free rack. Weekday afternoons, when the table's empty and the light comes in sideways. Bring someone you want to beat.`,
+One more regular, years later. A local girl who'd come in, put her money on the table, and quietly run it. Amy was, by all accounts, very good at pool. People only remember the voice. The pool arm deserves a plaque, and like most things round here, it will not get one.`,
   },
   {
     filename: 'link-05-06.mp3',
@@ -133,17 +125,15 @@ Your reward fits the room: a pint and a free rack. Weekday afternoons, when the 
     label: 'Stop 6 — Hawley Arms',
     text: `Every pub on this tour has famous customers. This one had a family.
 
-Through the 2000s, the Hawley Arms was the indie aristocracy's living room. Kate Moss at the bar. Noel Fielding in the corner. Half the bands you owned on CD, in here on a Tuesday, being left alone. That was the deal at the Hawley. You could be anyone, and they'd treat you like no one, in the nicest possible way.
+Through the 2000s the Hawley Arms was the indie aristocracy's living room, if the aristocracy smoked indoors and never quite got a round in. Kate Moss at the bar. Noel Fielding in the corner. Half the bands you owned on CD, in on a Tuesday, being studiously left alone, which in Camden is the highest compliment going.
 
 Which is why Amy Winehouse loved it.
 
-She didn't come here to be seen. She came here to disappear. And when even sitting at the bar got complicated, she did the most Amy thing imaginable: she got up, walked round, and started serving. The biggest soul voice of her generation, pulling pints for tourists who couldn't believe what they were looking at. The bar wasn't a stage. It was a hiding place where she could be the version of herself she liked best.
+She didn't come here to be seen. She came here to disappear. And when even sitting at the bar got complicated, she did the most Amy thing imaginable: she got up, walked round, and started serving. The biggest soul voice of her generation, pulling pints for tourists too stunned to order. The bar wasn't a stage. It was a hiding place where she could be the version of herself she liked best.
 
-Then, in February 2008, the great Camden fire tore through the market, and the Hawley burned with it. Ten days later, Amy stood up at the Grammys, in the biggest moment of her career, with the whole world finally watching, and used it to send a message home: that Camden Town was still standing. Her pub. On that stage. That night.
+Then, in February 2008, the great Camden fire tore through the market, and the Hawley burned with it. Ten days later Amy stood up at the Grammys, the biggest night of her career, the whole world finally watching, and used it to send one message home: Camden Town was still standing.
 
-The Hawley rebuilt. Amy kept coming back until she couldn't. And now, behind the pub, there's a mural of her, two storeys tall, watching over the street she never really left. Go and see it after the audio ends. People leave flowers. It's the only stop on this tour where we'd ask you to take the photo quietly.
-
-Your pint is banked for a calm weekday afternoon, which is when this pub is most itself. Raise it to the family.`,
+The Hawley rebuilt. Amy kept coming back until she couldn't. And now, behind the pub, there's a mural of her, two storeys tall, watching over the street she never really left. Go and see it after the audio ends. People leave flowers. It's the one stop where we'd ask you to take the photo quietly.`,
   },
   {
     filename: 'link-06-07.mp3',
@@ -163,7 +153,7 @@ The British bands waited outside before doors, sitting on the bonnets of parked 
 
 They did. Everyone did. Within six months, every band in London had doubled its tempo, and the brawl that broke out front of here that night, Clash versus Stranglers, made the national papers and put this warehouse on the map for good. Blondie played here early too, just to round out the syllabus.
 
-Your pint is waiting on the terrace over the lock, and your enamel pin is at the bar. Get it on, because you are not done. Camden Town handed you the legends. Chalk Farm Road, just up the water, hands you the strange stuff: a rock bar that came back wearing a crown, the little room every arena act started in, and a bar so small the famous ones use it to hide.
+And you are not done. Camden Town handed you the legends. Chalk Farm Road, just up the water, hands you the strange stuff: a rock bar that came back wearing a crown, the little room every arena act started in, and a bar so small the famous ones use it to hide.
 
 Follow the red glow.`,
   },
@@ -185,7 +175,7 @@ Then there is Zoltan, the fortune telling machine. Feed it a coin and it will te
 
 Rock bars are supposed to be extinct. Nobody told this one.
 
-Your pint is banked, the table is open, and the monsters are already screaming. Ask Zoltan about the next stop. He knows.`,
+The table is open, the monsters are already screaming, and Zoltan knows exactly where you are going next. Feed him.`,
   },
   {
     filename: 'link-08-09.mp3',
@@ -197,15 +187,13 @@ Your pint is banked, the table is open, and the monsters are already screaming. 
     label: 'Stop 9 — Barfly',
     text: `Every big band has a small room on their CV. This is the one most of them share.
 
-From 1996 this was the Barfly. Two hundred capacity, sticky floor, and the sharpest scouting post in Britain. The names who sweated on that little stage on their way up read like a festival poster: Coldplay. Adele. Muse. Ed Sheeran. The deal was simple. If the industry wanted to know what was next, it stood at the back of this room with a warm beer and found out.
+From 1996 this was the Barfly. Two hundred capacity, a floor that held onto your shoes, and the sharpest scouting post in Britain. The names who sweated on that little stage on the way up read like a festival poster: Coldplay. Adele. Muse. Ed Sheeran. If the industry wanted to know what was next, it stood at the back with a warm beer and found out.
 
 Then in 2016 the name came off the door, and the building spent eight years answering to Camden Assembly, which never sounded right, and everybody knew it.
 
-On the twenty second of June, 2026, the sign went back up. Frank Turner played the first night of the reborn Barfly, which is about as correct as bookings get, and the new room keeps the old religion while upgrading the tools: a wall of fame with photographs nobody had seen before, blue plaques for the alumni, a proper new rig, and downstairs a vinyl listening bar built around a 1959 jukebox that is older than every record it plays.
+On the twenty second of June 2026 the sign went back up. Frank Turner played the first night of the reborn Barfly, which is about as correct as a booking gets. The new room keeps the old religion and upgrades the kit: a wall of fame, blue plaques for the alumni, a proper rig, and downstairs a listening bar built around a 1959 jukebox that is older than every record it plays.
 
-Two hundred capacity, same as ever. Statistically, somebody on this stage in the next twelve months will be filling arenas before your tour pin needs polishing. You get to say you saw them here, and this time the wall of fame is ready for them.
-
-Your lager is banked for gig nights, early doors, when the support band is soundchecking and hope is at its loudest.`,
+Two hundred capacity, same as ever. Somebody on this stage in the next twelve months will be filling arenas by the time you get round to telling anyone you were here. And this time the wall of fame is ready for them.`,
   },
   {
     filename: 'link-09-10.mp3',
@@ -223,7 +211,7 @@ That is the trick of the Spiritual. The legends do not play here. They stand at 
 
 The tour ends here, and that is deliberate. You have spent the evening in rooms where it already happened: a witch's corner, a boxer's ballroom, a lie about jazz, a pool table that ran a decade, a hiding place, the night punk went overground, a palace of monsters, and the room on every CV. Ten stops, one half-mile, all still pouring. This is the last one, and it is the only room where it has not happened yet.
 
-Your last drink is banked. Take it slow, face the stage, and if the person next to you hums along too precisely, buy them one as well. Chances are you own their records. Chances are, in a year, so will everyone else.`,
+Take it slow and face the stage. If the person next to you hums along too precisely, that is not a coincidence. Chances are you own their records. Chances are, in a year, so will everyone else.`,
   },
 
   // ────────────────────────────────────────────────────────────────────────
@@ -414,7 +402,7 @@ Go back for the record you left in the crate. You know the one.`,
 export const AUDIO_TEXT_ES: Record<string, string> = {
   'intro.mp3': `Estás en el medio kilómetro más musical del planeta. Camden debería tener más placas azules que cualquier otro lugar de Londres, pero casi ninguna llegó a colocarse, porque la gente que hizo famoso este sitio solía tener prohibida la entrada en aquella época.
 
-Así funciona esto. Diez locales. Cada uno permanece bloqueado hasta que estás físicamente delante de él. Cuando tu teléfono vibra, empieza una historia, y una bebida va a tu bolsillo para más tarde. Las recompensas se acumulan, así que no tienes que beberte la ruta entera en una hora. Te sorprendería cuánta gente lo ha intentado.
+Así funciona esto. Diez locales. Cada uno permanece bloqueado hasta que estás físicamente delante de él. Cuando tu teléfono vibra, empieza una historia. Ninguna app se ha preocupado nunca tanto por tu ubicación exacta, y lo hace con buena intención.
 
 Una regla. Mantén la mirada en alto. Todo lo que merece la pena ver en Camden ocurre en la primera planta y más arriba, donde los promotores todavía no han llegado.
 
@@ -430,9 +418,7 @@ Nadie lo vio salir.
 
 El pub que creció en este lugar funcionó como The Mother Red Cap durante los tres siglos siguientes, una parada de diligencias al borde de Londres, la última copa antes del campo. El fin del mundo. De ahí el nombre que ves ahora en la pared. Hoy en día es el bar más grande de Camden, la sala de espera previa a los conciertos de cualquier actuación en NW1, y si la máquina de discos suena más dura que la de un pub normal, hay una razón.
 
-Viene de debajo de tus pies. Bajando las escaleras está The Underworld, y durante más de treinta años ha sido el sótano más ruidoso de Gran Bretaña. Cada grupo de metal, punk y hardcore que has querido alguna vez o tocó en esa sala mientras subía, o volvió a ella mientras bajaba, lo bastante cerca como para tocarlo y el doble de sudoroso. Hay una columna en mitad de la pista. Los veteranos la esquivan por instinto, a oscuras, en pleno mosh.
-
-Acaba de llegar tu primera recompensa. Una pinta, invitamos nosotros, en cualquier momento antes de las cinco. Invita Jinny.`,
+Viene de debajo de tus pies. Bajando las escaleras está The Underworld, y durante más de treinta años ha sido el sótano más ruidoso de Gran Bretaña. Cada grupo de metal, punk y hardcore que has querido alguna vez o tocó en esa sala mientras subía, o volvió a ella mientras bajaba, lo bastante cerca como para tocarlo y el doble de sudoroso. Hay una columna en mitad de la pista. Los veteranos la esquivan por instinto, a oscuras, en pleno mosh. Los turistas la encuentran con la cara.`,
 
   'link-01-02.mp3': `Al salir del World's End, gira a la derecha y sube por la High Street con el metro a tu izquierda. Busca el edificio que sobrevivió a la Luftwaffe. Cuarenta segundos, a tu izquierda, pasados los escaparates con forma de botas gigantes y dragones. Mientras caminas: todo lo que estás a punto de oír es verdad, lo cual, para los estándares de Camden, es raro.`,
 
@@ -448,9 +434,7 @@ Dos semanas después, Sid Vicious tocó aquí una única vez con una banda impro
 
 Desde entonces: Joy Division. The Clash, que ensayaron aquí una semana. Madness. The Smiths. Public Enemy. Y una noche de 2014, avisando con pocas horas de antelación y con los rumores volando por Twitter, Prince entró y tocó para unas setenta personas, mientras una cola de incrédulos rodeaba la manzana por fuera.
 
-Esta es una sala con aforo para dos mil. Él usó más o menos el cuatro por ciento.
-
-Tu vale está guardado. Sirve en las noches de club, después de las siete. Vístete de negro. Querrás pasar desapercibido.`,
+Esta es una sala con aforo para dos mil. Él usó más o menos el cuatro por ciento. El otro noventa y seis hizo cola.`,
 
   'link-02-03.mp3': `Vuelve por donde viniste, pasa el metro y tira a la derecha por Parkway. Ahora. En enero de 1979, siete jóvenes entraron en un pub de esta calle y le contaron una mentira al dueño. El dueño les creyó, porque era una mentira respetable, contada con educación. Y esa mentira inventó la música pop británica tal y como la conoces. El pub está doscientos metros más adelante. La historia es...`,
 
@@ -462,9 +446,7 @@ La reputación de la sala quedó sellada en 1995, cuando un joven cantante de Vi
 
 Desde entonces, las paredes lo han absorbido todo. La realeza del soul, pioneros del funk en sus vueltas de despedida, raperos haciendo el único concierto pequeño de la gira, y de vez en cuando una chica del norte de Londres con un peinado de colmena, cuando solo Camden conocía su nombre.
 
-La cosa con esta sala es la siguiente: da lo mejor de sí en la primera hora, cuando las luces están bajas y el grupo está ajustando niveles y todavía puedes pillar sitio en la barandilla. Que es justo cuando funciona tu bebida. La hora de apertura, de siete a ocho, un buen gin-tonic en la barandilla de latón mientras los demás siguen haciendo cola.
-
-Llega pronto. La sala lo recompensa. Nosotros también.`,
+Esta sala da lo mejor de sí en la primera hora, con las luces bajas, el grupo aún ajustando niveles y nadie dentro todavía que haya venido a hablar por encima de las partes tranquilas. Llega a la apertura. A los buenos asientos les da igual que tengas el disco.`,
 
   'link-03-04.mp3': `Recto por Parkway, alejándote del ruido. Pasada la tienda de mascotas que lleva ahí toda la vida, pasadas las placas azules que sí se llegaron a colocar. Te diriges al pub de esquina rojo sangre del número 94, el que está empapelado de carteles de conciertos como si presumiera. Casi todas las mejores salas de Camden esconden lo que son. Esta es la que lo lleva por fuera.`,
 
@@ -478,7 +460,7 @@ El truco de mentir sobre el jazz funcionó tan bien que la sala no paró nunca. 
 
 Y luego está Amy. A Winehouse le gustaba tanto este pub que, cuando los paparazzi hacían imposible una noche normal, entraba y se ponía detrás de la barra, tirando pintas para clientes desconcertados. Escondida a plena vista, disfrazada de su propia camarera. En 2007, cuando ya estaba conquistando el mundo con Back to Black, dio un concierto secreto de vuelta a casa en esa sala de atrás. Apretados cadera con cadera. Suggs estaba allí. También Pete Doherty, con la gorra calada al fondo, lo que en el Camden de 2007 apenas contaba como avistamiento. Nadie molestó a ninguno de los dos. Eso es el pub entero en una sola imagen.
 
-Tu recompensa está activa. Una pinta de Guinness, la misma cerveza negra que se reposa en esta barra desde antes de que Madness se colara con su mentira. Y esta noche tocan cuatro grupos en la parte de atrás. Estadísticamente, uno de ellos es el próximo Coldplay. Los otros tres se pasarán veinte años diciendo que los conocieron primero.`,
+Casi siempre tocan cuatro grupos en la parte de atrás. Estadísticamente, uno de ellos es el próximo Coldplay. Los otros tres se pasarán veinte años diciendo que los conocieron primero.`,
 
   'link-04-05.mp3': `Sal del Castle, cruza, y sube por Arlington Road. Primera a la izquierda por Inverness Street, el viejo mercado de frutas y verduras. Estás a punto de entrar en los años noventa. En concreto, en el pub donde los años noventa se planearon, se tramaron y estuvieron a punto de acabar a puñetazos.`,
 
@@ -490,9 +472,7 @@ Blur bebía aquí. No de vez en cuando. De forma residente. Graham Coxon vivía 
 
 Y como toda escena necesita su guerra, aquí pasaba el frente frío del britpop. Cuando Oasis bajaron desde Manchester, este pub es donde las dos tribus tuvieron que compartir sala de verdad, y según quién lo cuente, aquello acabó en palabras, o en un cara a cara, o con los Gallagher expulsados del todo. Nadie se pone de acuerdo en los detalles. Todos se ponen de acuerdo en el lugar.
 
-Un habitual más, años después. Una chica del barrio que entraba, ponía su dinero en la mesa, y la dominaba sin hacer ruido. Amy, según todos, jugaba muy bien al billar. La gente solo recuerda la voz. El brazo del billar merece su reconocimiento.
-
-Tu recompensa pega con el sitio: una pinta y una partida de billar gratis. Tardes entre semana, cuando la mesa está vacía y la luz entra de lado. Trae a alguien a quien quieras ganar.`,
+Un habitual más, años después. Una chica del barrio que entraba, ponía su dinero en la mesa, y la dominaba sin hacer ruido. Amy, según todos, jugaba muy bien al billar. La gente solo recuerda la voz. El brazo del billar merecería una placa y, como casi todo por aquí, no la tendrá.`,
 
   'link-05-06.mp3': `Baja por Inverness Street hasta la High Street, gira a la izquierda, y prepárate: vas a atravesar el gentío del mercado, bajo el puente del ferrocarril, hacia el canal. En el puente, tira a la izquierda por Castlehaven Road. El siguiente pub es el que Camden estuvo a punto de perder, dos veces. Una por el fuego. Otra por el dolor.`,
 
@@ -506,9 +486,7 @@ No venía aquí para que la vieran. Venía aquí para desaparecer. Y cuando incl
 
 Entonces, en febrero de 2008, el gran incendio de Camden arrasó el mercado, y el Hawley ardió con él. Diez días después, Amy se levantó en los Grammy, en el mayor momento de su carrera, con el mundo entero por fin mirando, y lo aprovechó para mandar un mensaje a casa: que Camden Town seguía en pie. Su pub. En aquel escenario. Aquella noche.
 
-El Hawley se reconstruyó. Amy siguió volviendo hasta que no pudo. Y ahora, detrás del pub, hay un mural de ella, de dos plantas de alto, vigilando la calle que en realidad nunca abandonó. Ve a verlo cuando termine el audio. La gente deja flores. Es la única parada de esta ruta en la que te pediríamos que hagas la foto en silencio.
-
-Tu pinta queda guardada para una tarde tranquila entre semana, que es cuando este pub es más él mismo. Brinda por la familia.`,
+El Hawley se reconstruyó. Amy siguió volviendo hasta que no pudo. Y ahora, detrás del pub, hay un mural de ella, de dos plantas de alto, vigilando la calle que en realidad nunca abandonó. Ve a verlo cuando termine el audio. La gente deja flores. Es la única parada de esta ruta en la que te pediríamos que hagas la foto en silencio.`,
 
   'link-06-07.mp3': `Vuelve al puente y métete en el mercado de verdad. Sigue a la multitud hacia el agua, hasta el East Yard. Busca el viejo almacén con el nombre de un muerto pintado en el ladrillo. La última historia es la más grande. Va sobre la noche en que todo se aceleró.`,
 
@@ -524,7 +502,5 @@ Y lo hicieron. Todos lo hicieron. En seis meses, todos los grupos de Londres hab
 
 Así que esa es tu hora. Una bruja, un boxeador, una mentira sobre el jazz, una mesa de billar, un escondite, y la noche en que el punk salió a la superficie. Todo en medio kilómetro, y todo sigue sirviendo copas.
 
-Tu última pinta te espera en la terraza sobre la esclusa, y tu chapa la puedes reclamar en la barra. Póntela en un sitio donde la gente te pregunte por ella.
-
-Y entonces cuéntales la de la banda de jazz.`,
+Y ahora, cuéntale a alguien la de la banda de jazz.`,
 }
