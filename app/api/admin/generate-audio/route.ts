@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { put, list } from '@vercel/blob'
 import { z } from 'zod'
 import { requireAdmin, isAdminError } from '@/lib/admin/auth'
-import { AUDIO_FILES, AUDIO_TEXT_ES } from '@/lib/tour/audioScripts'
+import { AUDIO_FILES, AUDIO_TEXT_ES, scriptVersion } from '@/lib/tour/audioScripts'
 
 export const maxDuration = 300
 
@@ -54,18 +54,28 @@ export async function GET(req: Request) {
     return NextResponse.json(
       AUDIO_FILES.map((f) => {
         const path = blobPath(lang, f.filename)
+        const blob = blobs.find((b) => b.pathname === path)
         return {
           filename: f.filename,
           label: f.label,
-          exists: blobs.some((b) => b.pathname === path),
-          url: blobs.find((b) => b.pathname === path)?.url ?? null,
+          exists: !!blob,
+          url: blob?.url ?? null,
+          uploadedAt: blob?.uploadedAt ?? null,
+          version: scriptVersion(f.filename),
         }
       }),
     )
   } catch {
     // BLOB_READ_WRITE_TOKEN not configured — return pending state
     return NextResponse.json(
-      AUDIO_FILES.map((f) => ({ filename: f.filename, label: f.label, exists: false, url: null })),
+      AUDIO_FILES.map((f) => ({
+        filename: f.filename,
+        label: f.label,
+        exists: false,
+        url: null,
+        uploadedAt: null,
+        version: scriptVersion(f.filename),
+      })),
     )
   }
 }

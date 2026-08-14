@@ -7,12 +7,22 @@ interface FileStatus {
   label: string
   exists: boolean
   url: string | null
+  uploadedAt?: string | null
+  version?: number
   state?: 'idle' | 'generating' | 'done' | 'error'
   error?: string
   sizeKb?: number
 }
 
 type Lang = 'en' | 'es'
+
+// Blob timestamp -> "14 Aug 2026", or a clear placeholder when never made.
+function fmtGenerated(iso?: string | null): string {
+  if (!iso) return 'not generated'
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return 'not generated'
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+}
 
 export default function GenerateAudioClient() {
   const [files, setFiles] = useState<FileStatus[]>([])
@@ -70,7 +80,7 @@ export default function GenerateAudioClient() {
       setFiles((prev) =>
         prev.map((f) =>
           f.filename === filename
-            ? { ...f, state: 'done', exists: true, url: data.url ?? null, sizeKb: data.sizeKb }
+            ? { ...f, state: 'done', exists: true, url: data.url ?? null, sizeKb: data.sizeKb, uploadedAt: new Date().toISOString() }
             : f,
         ),
       )
@@ -99,6 +109,7 @@ export default function GenerateAudioClient() {
 
   const doneCount = files.filter((f) => f.exists || f.state === 'done').length
   const total = files.length
+  const packVersion = files.reduce((max, f) => Math.max(max, f.version ?? 0), 0)
 
   const langTabs = (
     <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
@@ -145,7 +156,7 @@ export default function GenerateAudioClient() {
           Audio Generation
         </h1>
         <span style={{ fontFamily: 'monospace', fontSize: '0.75rem', color: '#8A8077' }}>
-          {lang === 'es' ? 'ES' : 'EN'} · {doneCount}/{total} files
+          {lang === 'es' ? 'ES' : 'EN'} · {doneCount}/{total} files{packVersion ? ` · scripts v${packVersion}` : ''}
         </span>
       </div>
 
@@ -218,6 +229,16 @@ export default function GenerateAudioClient() {
                 <td style={{ padding: '0.6rem 0.5rem', color: isDone ? '#F0E6D2' : '#8A8077' }}>
                   <div style={{ fontFamily: 'monospace', fontSize: '0.7rem', color: '#C9933C' }}>{f.filename}</div>
                   <div style={{ marginTop: 2 }}>{f.label}</div>
+                  <div style={{ marginTop: 3, fontFamily: 'monospace', fontSize: '0.65rem', color: '#8A8077' }}>
+                    <span
+                      title="Script version"
+                      style={{ color: (f.version ?? 0) >= packVersion && packVersion > 0 ? '#C9933C' : '#5A554E' }}
+                    >
+                      v{f.version ?? '?'}
+                    </span>
+                    <span style={{ color: '#3A3530' }}> · </span>
+                    <span title="Last generated">{fmtGenerated(f.uploadedAt)}</span>
+                  </div>
                   {isError && (
                     <div style={{ color: '#D8432F', fontSize: '0.7rem', marginTop: 2 }}>{f.error}</div>
                   )}

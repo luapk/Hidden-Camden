@@ -10,6 +10,36 @@ export interface AudioFile {
   text: string
 }
 
+/** Current version of the narration pack. Bump when copy changes materially. */
+export const SCRIPT_VERSION = 3
+
+/**
+ * Filenames whose script changed in v3 (the history-tour rewrite: rewards
+ * pulled out of the narration, wit sharpened, Dublin Castle and finale
+ * fixes). Everything else is still v2. The admin audio page reads this to
+ * show which files are ahead of the audio currently in the blob store.
+ */
+const V3_FILENAMES = new Set<string>([
+  'intro.mp3',
+  'stop-01.mp3',
+  'stop-02.mp3',
+  'stop-03.mp3',
+  'stop-04.mp3',
+  'stop-05.mp3',
+  'stop-06.mp3',
+  'stop-07.mp3',
+  'stop-08.mp3',
+  'stop-09.mp3',
+  'stop-10.mp3',
+  'link-03-04.mp3',
+  'culture-intro.mp3',
+])
+
+/** Script version for a given audio filename. */
+export function scriptVersion(filename: string): number {
+  return V3_FILENAMES.has(filename) ? 3 : 2
+}
+
 export const AUDIO_FILES: AudioFile[] = [
   {
     filename: 'intro.mp3',
