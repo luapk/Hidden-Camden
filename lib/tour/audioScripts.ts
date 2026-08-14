@@ -223,9 +223,9 @@ Take it slow and face the stage. If the person next to you hums along too precis
     label: 'Culture · Intro at the tube',
     text: `Same tube, different Camden.
 
-The other tour walks you through the rooms where the music happened. This one walks you through everything around the music: the shops that armed the bands, the streets that hid them, the walls that remember them, and one warehouse full of monsters.
+The other tour walks you through the rooms where the music happened. This one walks you through everything around it: the shops that armed the bands, the streets that hid them, the walls that remember them, and one warehouse full of monsters, which is not a metaphor.
 
-Ten stops. No pint required, though nobody will stop you. Daylight suits this route. So do comfortable shoes and a tenner for the record crates, because you will not get past stop two without wanting something.
+Ten stops. Daylight suits this route, and so do comfortable shoes and a tenner you will not be keeping, because you are not getting past stop two without wanting something off a shelf.
 
 Head down Camden High Street with the station behind you, then take the left into Delancey Street. We start with the tools.`,
   },
