@@ -6,7 +6,6 @@ import {
   LAUNCH_ROUTE,
   type TourStop,
 } from './launchRoute'
-import { CULTURE_INTRO_AUDIO_URL, CULTURE_ROUTE } from './cultureRoute'
 
 /**
  * The tour registry. Two routes share one start point (Camden Town tube),
@@ -48,19 +47,6 @@ export const TOURS: TourDef[] = [
     completeText:
       'A witch, a boxer, a lie about jazz, a pool table, a hiding place, the night punk went overground, a fortune teller, the room on every CV, and the bar where it happens next. Your pin is waiting at Dingwalls. Wear it somewhere people will ask.',
     stops: LAUNCH_ROUTE,
-  },
-  {
-    id: 'culture',
-    name: 'The Culture Cut',
-    shortName: 'Culture Cut',
-    descriptor: 'Family culture walk',
-    family: true,
-    tagline:
-      'The daylight route. Record shops, boots, murals and monsters, no pint required.',
-    introAudioUrl: CULTURE_INTRO_AUDIO_URL,
-    completeText:
-      'The guitars, the boots, the records, the eggs, the robots, the horses, the girl from Jeffrey’s Street and the man who built the monsters. Your pin is waiting at Dingwalls. Go back for the record you left in the crate.',
-    stops: CULTURE_ROUTE,
   },
 ]
 

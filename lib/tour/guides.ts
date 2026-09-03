@@ -14,10 +14,9 @@ import { localizeAudioUrl, type Lang } from './language'
  * default narration for that language plays regardless of the chosen guide.
  */
 
-export type GuideId = 'local' | 'sammie' | 'suggs' | 'yungblud' | 'carl-barat'
+export type GuideId = 'sammie' | 'suggs' | 'yungblud' | 'carl-barat'
 
-/** Which tours a guide narrates. Star guides are a music-venue thing;
- *  the house voice covers everything. */
+/** Which tours a guide narrates. Every current guide is a music-venue guide. */
 export type GuideTour = 'crawl' | 'culture'
 
 export interface TourGuide {
@@ -36,15 +35,6 @@ export interface TourGuide {
 // Portraits are placeholders reused from the app's proven Unsplash set until
 // real press shots are cleared. Swap per-guide when assets land.
 export const GUIDES: TourGuide[] = [
-  {
-    id: 'local',
-    name: 'The Local',
-    tagline: 'The house voice. Dry, North London.',
-    bio: 'Knows every back door and who got thrown out of it. Witches, boxers, and the lie about jazz, told straight.',
-    image: 'https://images.unsplash.com/photo-1543832923-44667a44c804?w=600&q=80',
-    status: 'live',
-    tours: ['crawl', 'culture'],
-  },
   {
     id: 'sammie',
     name: 'DJ Sammie Star',
@@ -83,7 +73,10 @@ export const GUIDES: TourGuide[] = [
   },
 ]
 
-export const DEFAULT_GUIDE_ID: GuideId = 'local'
+// Sammie is the house voice for now: his narration is the default
+// AI-generated audio at /audio/<file>, so resolveAudioUrl returns it
+// unchanged. Star guides yet to be recorded live under /audio/guides/<id>/.
+export const DEFAULT_GUIDE_ID: GuideId = 'sammie'
 
 export function getGuide(id: GuideId): TourGuide {
   return GUIDES.find((g) => g.id === id) ?? GUIDES[0]

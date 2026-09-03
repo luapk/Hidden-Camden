@@ -14,11 +14,9 @@ import { getTour, useActiveTour, type TourId } from '@/lib/tour/tours'
 import { useTourProgress } from '@/lib/tour/useTourProgress'
 
 /**
- * One list, one decision: who walks you round, and which Camden they show
- * you. The venue guides and the family Culture Cut sit side by side as
- * poster cards; picking a card sets both the tour and the voice. Switching
- * routes locks while a walk is in progress, because half-finished streets
- * are chaos.
+ * One list, one decision: who walks you round the music-venues route. The
+ * guides sit as poster cards; picking a card sets the voice. Live guides
+ * are selectable; the rest sit on the bill as coming soon.
  */
 
 interface WalkOption {
@@ -36,7 +34,6 @@ interface WalkOption {
 
 function buildOptions(): WalkOption[] {
   const crawl = getTour('crawl')
-  const culture = getTour('culture')
 
   const crawlGuides = guidesForTour('crawl').map((g) => ({
     key: `crawl:${g.id}`,
@@ -51,22 +48,9 @@ function buildOptions(): WalkOption[] {
     family: false,
   }))
 
-  const cultureOption: WalkOption = {
-    key: 'culture:local',
-    tourId: 'culture',
-    guideId: 'local',
-    headline: culture.name,
-    eyebrow: culture.descriptor,
-    tagline: 'Told by The Local. Ten stops in daylight.',
-    bio: 'Record shops, boots, murals and the man who built the monsters. Rewards without the round, so bring the kids and keep the receipts.',
-    image: 'https://images.unsplash.com/photo-1483412033650-1015ddeb83d1?w=600&q=80',
-    comingSoon: false,
-    family: true,
-  }
-
   const live = crawlGuides.filter((o) => !o.comingSoon)
   const soon = crawlGuides.filter((o) => o.comingSoon)
-  return [...live, cultureOption, ...soon]
+  return [...live, ...soon]
 }
 
 export default function WalkPicker() {
@@ -103,7 +87,7 @@ export default function WalkPicker() {
         const isActive =
           hydrated &&
           option.tourId === activeTourId &&
-          (option.tourId === 'culture' || option.guideId === activeGuideId)
+          option.guideId === activeGuideId
         const isLocked =
           !option.comingSoon && lockedIn && option.tourId !== activeTourId
 

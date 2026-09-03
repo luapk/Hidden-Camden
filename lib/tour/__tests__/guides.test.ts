@@ -37,9 +37,9 @@ describe('resolveAudioUrl', () => {
     expect(resolveAudioUrl(url, 'en', DEFAULT_GUIDE_ID)).toBe(url)
   })
 
-  it('maps a guide onto its audio directory in English', () => {
-    expect(resolveAudioUrl(url, 'en', 'sammie')).toBe(
-      'https://cdn.example.com/audio/guides/sammie/stop-01.mp3',
+  it('maps a non-default guide onto its audio directory in English', () => {
+    expect(resolveAudioUrl(url, 'en', 'suggs')).toBe(
+      'https://cdn.example.com/audio/guides/suggs/stop-01.mp3',
     )
   })
 
