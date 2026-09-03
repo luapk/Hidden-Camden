@@ -344,25 +344,25 @@ export const LAUNCH_ROUTE: TourStop[] = [
   },
   {
     position: 10,
-    name: 'Spiritual Bar',
-    subtitle: 'Where legends come to listen',
-    address: '4-6 Ferdinand St, London NW1 8ER',
-    instagram: '',
-    lat: 51.54275,
-    lng: -0.1503,
-    radiusM: 35,
+    name: 'Roundhouse',
+    subtitle: 'The engine shed',
+    address: 'Chalk Farm Rd, London NW1 8EH',
+    instagram: 'roundhouseldn',
+    lat: 51.54360,
+    lng: -0.15270,
+    radiusM: 45,
     rewardLabel: 'House drink',
-    rewardWindow: 'Tue to Sun, 18:00 to 22:00',
+    rewardWindow: 'Event nights, bar open',
     runtimeS: 120,
     isFree: false,
     accent: STOP_ACCENTS[3],
     image: STOP_IMAGES[3],
     transcript:
-      'Ferdinand Street does not look like a launchpad. One room, run by a record label, live music six nights a week, and a Tuesday open mic that is quietly one of the most dangerous career moves in London. Dangerous because here, people actually listen.\n\n' +
-      'Ask Ann Liu Cannon. She was playing this room when Ethan Johns walked in, the producer behind records for Paul McCartney and Laura Marling. He heard her, and the publishing deal with BMG followed. From this floor, no stage worth mentioning, to editorial playlists and American tours. The bar carries the torch for grassroots music and every so often the torch catches.\n\n' +
-      'That is the trick of the Spiritual. The legends do not play here. They stand at the back with a drink, watching, because this is where the next ones surface first. Keep an eye on whoever looks too relaxed. That is usually somebody famous doing their listening.\n\n' +
-      'The tour ends here, and that is deliberate. You have spent the evening in rooms where it already happened: a witch\'s corner, a boxer\'s ballroom, a lie about jazz, a pool table that ran a decade, a hiding place, the night punk went overground, a palace of monsters, and the room on every CV. Ten stops, one half-mile, all still pouring. This is the last one, and it is the only room where it has not happened yet.\n\n' +
-      'Take it slow and face the stage. If the person next to you hums along too precisely, that is not a coincidence. Chances are you own their records. Chances are, in a year, so will everyone else.',
+      'You saved the biggest for last, and it started life as a garage for trains.\n\n' +
+      'The Roundhouse went up in 1847 as an engine shed, a great brick circle built around a turntable so the railway could spin a locomotive round and send it back the way it came. The trains outgrew it within about a decade, which makes this the most beautiful planning mistake in Camden: a cathedral built by accident, for machines.\n\n' +
+      'Then the counterculture found the empty round room. In October 1966 the launch party for International Times filled it with Pink Floyd, a sound system held together by optimism, and a jelly the size of a small car. After that, everyone came. The Doors played their only British shows here. Hendrix. Bowie. The Stones. And in July 1976, four brothers from Queens called the Ramones flattened the place, then walked down the hill to Dingwalls and did it again the next night. You started this tour standing in that aftershock. You are finishing it at the epicentre.\n\n' +
+      'It went dark in the eighties, the way the great rooms do, and came back in 2006, restored, with a twist: half of what happens here now is a charity handing Camden\'s teenagers the same tools that built everyone on this tour. The round room still turns things around. It just swapped locomotives for fifteen-year-olds with something to prove.\n\n' +
+      'So that is your half-mile. A witch\'s corner, a boxer\'s ballroom, a lie about jazz, a pool table that ran a decade, a hiding place, the night punk went overground, a palace of monsters, the room on every CV, and the engine shed that outlived the trains. Ten stops, one square half-mile, every last one of it still going. Stand in the middle, look up, and take a second. All of it happened within a stone\'s throw of where your feet are. Camden just never bothered to mention it.',
     linkAudioUrl: null,
     audioUrl: stopAudio(10),
   },

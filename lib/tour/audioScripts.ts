@@ -32,6 +32,7 @@ const V3_FILENAMES = new Set<string>([
   'stop-09.mp3',
   'stop-10.mp3',
   'link-03-04.mp3',
+  'link-09-10.mp3',
   'culture-intro.mp3',
 ])
 
@@ -227,21 +228,21 @@ Two hundred capacity, same as ever. Somebody on this stage in the next twelve mo
   },
   {
     filename: 'link-09-10.mp3',
-    label: 'Link 9→10 — to Spiritual Bar',
-    text: `Keep climbing Chalk Farm Road and take the left into Ferdinand Street. It looks like nothing, which by now you know is Camden for something. The last room is the smallest, and it is the one the famous faces visit on their nights off.`,
+    label: 'Link 9→10 — to the Roundhouse',
+    text: `Keep climbing Chalk Farm Road towards the tube, and for once you won't need directions. The last stop is the enormous round brick drum on your right, the one that looks like a Victorian gasworks that ran off to join the circus. It is neither. Head for the doors.`,
   },
   {
     filename: 'stop-10.mp3',
-    label: 'Stop 10 — Spiritual Bar (finale)',
-    text: `Ferdinand Street does not look like a launchpad. One room, run by a record label, live music six nights a week, and a Tuesday open mic that is quietly one of the most dangerous career moves in London. Dangerous because here, people actually listen.
+    label: 'Stop 10 — Roundhouse (finale)',
+    text: `You saved the biggest for last, and it started life as a garage for trains.
 
-Ask Ann Liu Cannon. She was playing this room when Ethan Johns walked in, the producer behind records for Paul McCartney and Laura Marling. He heard her, and the publishing deal with BMG followed. From this floor, no stage worth mentioning, to editorial playlists and American tours. The bar carries the torch for grassroots music and every so often the torch catches.
+The Roundhouse went up in 1847 as an engine shed, a great brick circle built around a turntable so the railway could spin a locomotive round and send it back the way it came. The trains outgrew it within about a decade, which makes this the most beautiful planning mistake in Camden: a cathedral built by accident, for machines.
 
-That is the trick of the Spiritual. The legends do not play here. They stand at the back with a drink, watching, because this is where the next ones surface first. Keep an eye on whoever looks too relaxed. That is usually somebody famous doing their listening.
+Then the counterculture found the empty round room. In October 1966 the launch party for International Times filled it with Pink Floyd, a sound system held together by optimism, and a jelly the size of a small car. After that, everyone came. The Doors played their only British shows here. Hendrix. Bowie. The Stones. And in July 1976, four brothers from Queens called the Ramones flattened the place, then walked down the hill to Dingwalls and did it again the next night. You started this tour standing in that aftershock. You are finishing it at the epicentre.
 
-The tour ends here, and that is deliberate. You have spent the evening in rooms where it already happened: a witch's corner, a boxer's ballroom, a lie about jazz, a pool table that ran a decade, a hiding place, the night punk went overground, a palace of monsters, and the room on every CV. Ten stops, one half-mile, all still pouring. This is the last one, and it is the only room where it has not happened yet.
+It went dark in the eighties, the way the great rooms do, and came back in 2006, restored, with a twist: half of what happens here now is a charity handing Camden's teenagers the same tools that built everyone on this tour. The round room still turns things around. It just swapped locomotives for fifteen-year-olds with something to prove.
 
-Take it slow and face the stage. If the person next to you hums along too precisely, that is not a coincidence. Chances are you own their records. Chances are, in a year, so will everyone else.`,
+So that is your half-mile. A witch's corner, a boxer's ballroom, a lie about jazz, a pool table that ran a decade, a hiding place, the night punk went overground, a palace of monsters, the room on every CV, and the engine shed that outlived the trains. Ten stops, one square half-mile, every last one of it still going. Stand in the middle, look up, and take a second. All of it happened within a stone's throw of where your feet are. Camden just never bothered to mention it.`,
   },
 
   // ────────────────────────────────────────────────────────────────────────
