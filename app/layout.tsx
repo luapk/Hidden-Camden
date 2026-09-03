@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Anton, Courier_Prime, Jost, Space_Grotesk } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import PasswordGate from './PasswordGate'
 import './globals.css'
 
 const anton = Anton({
@@ -46,7 +47,7 @@ export default function RootLayout({
       <body
         className={`${anton.variable} ${courierPrime.variable} ${jost.variable} ${spaceGrotesk.variable}`}
       >
-        {children}
+        <PasswordGate>{children}</PasswordGate>
         <Analytics />
       </body>
     </html>
