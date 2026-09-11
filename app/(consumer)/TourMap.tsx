@@ -9,7 +9,7 @@ import {
   type MapRef,
 } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { Check, Crosshair, FlagCheckered, LockSimple } from '@phosphor-icons/react'
+import { Check, Crosshair, LockSimple } from '@phosphor-icons/react'
 import { START_POINT, type TourStop } from '@/lib/tour/launchRoute'
 import type { GeoPosition } from '@/lib/geo/useGeofence'
 
@@ -24,6 +24,14 @@ export interface TourMapProps {
 
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/dark'
 const ACID = '#CCFF00'
+
+// A few quiet landmarks so the map has orientation points beyond the stops.
+// Non-interactive, muted labels; the acid route and stops stay the heroes.
+const LANDMARKS: { name: string; lat: number; lng: number }[] = [
+  { name: 'Camden Lock', lat: 51.5413, lng: -0.1462 },
+  { name: 'Stables Market', lat: 51.5435, lng: -0.1489 },
+  { name: "Regent's Canal", lat: 51.5401, lng: -0.1385 },
+]
 
 export default function TourMap({
   stops,
@@ -95,14 +103,22 @@ export default function TourMap({
             map.setPaintProperty(
               layer.id,
               'fill-color',
-              isWater ? '#434952' : id.includes('building') ? '#43444b' : '#3d3f45',
+              isWater ? '#7cc0e6' : id.includes('building') ? '#43444b' : '#3d3f45',
             )
           } else if (layer.type === 'line') {
             map.setPaintProperty(
               layer.id,
               'line-color',
-              isWater ? '#434952' : '#6a6c76',
+              isWater ? '#7cc0e6' : '#6a6c76',
             )
+            // The canal reads as a thin ribbon; give waterways a little more body.
+            if (isWater) {
+              try {
+                map.setPaintProperty(layer.id, 'line-width', 3)
+              } catch {
+                // Some water line layers have no width expression; ignore.
+              }
+            }
           } else if (layer.type === 'symbol') {
             map.setPaintProperty(layer.id, 'text-color', '#e2e2e8')
             map.setPaintProperty(layer.id, 'text-halo-color', '#2b2c31')
@@ -136,40 +152,58 @@ export default function TourMap({
         onLoad={handleLoad}
       >
         <Source id="cc-route" type="geojson" data={routeLine}>
-          {/* Glow underlay */}
+          {/* Faint continuous trail so the dotted line still reads as a path */}
           <Layer
             id="cc-route-glow"
             type="line"
             layout={{ 'line-cap': 'round', 'line-join': 'round' }}
             paint={{
               'line-color': ACID,
-              'line-width': 10,
-              'line-opacity': 0.12,
+              'line-width': 6,
+              'line-opacity': 0.1,
             }}
           />
+          {/* Dotted acid route: round caps + a zero-length dash = dots */}
           <Layer
             id="cc-route-line"
             type="line"
             layout={{ 'line-cap': 'round', 'line-join': 'round' }}
             paint={{
               'line-color': ACID,
-              'line-width': 3,
+              'line-width': 4,
+              'line-dasharray': [0, 2],
             }}
           />
         </Source>
 
-        {/* Start: outside Camden Town tube. */}
+        {/* Quiet orientation landmarks (non-interactive). */}
+        {LANDMARKS.map((lm) => (
+          <Marker key={lm.name} longitude={lm.lng} latitude={lm.lat} anchor="center">
+            <div className="pointer-events-none flex select-none flex-col items-center">
+              <span className="h-1.5 w-1.5 rounded-full bg-white/35" />
+              <span className="mt-0.5 whitespace-nowrap font-grotesk text-[8px] uppercase tracking-[0.14em] text-white/45">
+                {lm.name}
+              </span>
+            </div>
+          </Marker>
+        ))}
+
+        {/* Start: Camden Town tube, drawn as an Underground roundel. */}
         <Marker
           longitude={START_POINT.lng}
           latitude={START_POINT.lat}
           anchor="center"
         >
           <div className="flex flex-col items-center">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white/30 bg-black text-label-1">
-              <FlagCheckered size={16} weight="fill" color="#F0E6D2" />
+            <span
+              className="flex h-6 w-6 items-center justify-center rounded-full border-[3px] bg-black"
+              style={{ borderColor: '#D8432F' }}
+              aria-hidden
+            >
+              <span className="h-[7px] w-[7px] rounded-full bg-white" />
             </span>
-            <span className="mt-1 rounded-full bg-black/60 px-2 py-0.5 font-grotesk text-[8px] uppercase tracking-[0.2em] text-label-2 backdrop-blur-sm">
-              Start
+            <span className="mt-1 rounded-full bg-black/70 px-2 py-0.5 font-grotesk text-[8px] font-bold uppercase tracking-[0.16em] text-label-1 backdrop-blur-sm">
+              Camden Town ▸ Start
             </span>
           </div>
         </Marker>
@@ -191,28 +225,37 @@ export default function TourMap({
                 onSelectStop(stop)
               }}
             >
-              <div className="relative flex items-center justify-center">
-                {isNext && <span className="cc-next-dot" />}
-                <button
-                  aria-label={`Stop ${stop.position}: ${stop.name}`}
-                  className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full font-grotesk text-[13px] font-bold ${
-                    banked
-                      ? 'bg-acid text-black shadow-[0_0_24px_rgba(204,255,0,0.35)]'
-                      : unlocked
-                        ? 'border-2 border-acid bg-acid/25 text-acid shadow-[0_0_18px_rgba(204,255,0,0.2)]'
-                        : isNext
-                          ? 'cc-next-ring border-2 border-acid bg-black text-acid shadow-[0_0_24px_rgba(204,255,0,0.25)]'
-                          : 'border-2 border-white/20 bg-black text-label-2'
+              <div className="relative flex flex-col items-center">
+                <div className="relative flex items-center justify-center">
+                  {isNext && <span className="cc-next-dot" />}
+                  <button
+                    aria-label={`Stop ${stop.position}: ${stop.name}`}
+                    className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full font-grotesk text-[13px] font-bold ${
+                      banked
+                        ? 'bg-acid text-black shadow-[0_0_24px_rgba(204,255,0,0.35)]'
+                        : unlocked
+                          ? 'border-2 border-acid bg-acid/25 text-acid shadow-[0_0_18px_rgba(204,255,0,0.2)]'
+                          : isNext
+                            ? 'cc-next-ring border-2 border-acid bg-black text-acid shadow-[0_0_24px_rgba(204,255,0,0.25)]'
+                            : 'border-2 border-white/20 bg-black text-label-2'
+                    }`}
+                  >
+                    {banked ? (
+                      <Check size={15} weight="bold" />
+                    ) : locked ? (
+                      <LockSimple size={13} weight="bold" />
+                    ) : (
+                      stop.position
+                    )}
+                  </button>
+                </div>
+                <span
+                  className={`pointer-events-none mt-1 max-w-[86px] truncate rounded bg-black/65 px-1.5 py-0.5 text-center font-grotesk text-[8px] font-bold uppercase tracking-[0.06em] backdrop-blur-sm ${
+                    banked || unlocked || isNext ? 'text-acid' : 'text-label-2'
                   }`}
                 >
-                  {banked ? (
-                    <Check size={15} weight="bold" />
-                  ) : locked ? (
-                    <LockSimple size={13} weight="bold" />
-                  ) : (
-                    stop.position
-                  )}
-                </button>
+                  {stop.name}
+                </span>
               </div>
             </Marker>
           )
