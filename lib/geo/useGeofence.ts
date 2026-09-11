@@ -164,7 +164,8 @@ export function useGeofence(
 
   // requireApproach: you must be seen outside the fence before the dwell can
   // start, so one overlapping fix can't unlock the next stop the moment the
-  // previous one unlocks. Stops only ever unlock in order, on arrival.
+  // previous one unlocks. Stops unlock on arrival, in whatever order the
+  // walker reaches them.
   const trackerRef = useRef(
     createDwellTracker(dwellMs, { requireApproach: true }),
   )

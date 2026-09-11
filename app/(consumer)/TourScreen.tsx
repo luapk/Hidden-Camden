@@ -37,6 +37,7 @@ import {
 import { arrivalSting, playSting, startSting } from '@/lib/tour/stings'
 import BrandLogo from './BrandLogo'
 import StoryPlayer from './StoryPlayer'
+import WalkPicker from './GuidePicker'
 
 const TourMap = dynamic(() => import('./TourMap'), {
   ssr: false,
@@ -68,8 +69,8 @@ function distanceFigure(m: number): { value: string; unit: string } {
 export default function TourScreen({ stops }: { stops: TourStop[] }) {
   // The crawl's stops arrive from the server (DB-aware, falls back to the
   // static route); other tours are static client data from the registry.
-  // Tour selection happens in Settings, never here: switching mid-walk
-  // would be chaos, so the home screen simply serves whatever is chosen.
+  // Before the walk starts the home screen offers the guide picker inline;
+  // once walking, the map takes over and the guide is changed in Settings.
   const { tourId, tour } = useActiveTour()
   const routeStops = tourId === 'crawl' ? stops : tour.stops
   const progress = useTourProgress(tourId)
@@ -98,9 +99,12 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     [routeStops],
   )
 
-  const nextStop = hydrated && tourStarted
-    ? sorted.find((s) => !unlockedStops.includes(s.position)) ?? null
-    : null
+  // The stop we're guiding the walker to. The tour is not fixed order: this
+  // is the nearest un-unlocked stop to the current fix (falling back to the
+  // lowest-numbered remaining stop before we have a position), so arriving at
+  // any stop unlocks that one. Updated by an effect once the geofence has a
+  // position (declared below the geofence).
+  const [nextStop, setNextStop] = useState<TourStop | null>(null)
 
   const [override, setOverride] = useState<GeoPosition | null>(null)
   const [unlockFlash, setUnlockFlash] = useState<TourStop | null>(null)
@@ -195,6 +199,42 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     8_000,
     override,
   )
+
+  // Choose the target stop: nearest un-unlocked to the current fix (out of
+  // order), or the lowest-numbered remaining stop before we have a position.
+  // Only while the tour is running; the geofence above watches whatever this
+  // sets, and arriving there unlocks it.
+  useEffect(() => {
+    if (!hydrated || !tourStarted) {
+      setNextStop(null)
+      return
+    }
+    const remaining = sorted.filter((s) => !unlockedStops.includes(s.position))
+    if (remaining.length === 0) {
+      setNextStop(null)
+      return
+    }
+    const pos = geo.position
+    let target = remaining[0]
+    if (pos) {
+      let best = Infinity
+      for (const s of remaining) {
+        const d = haversineDistance(
+          pos.lat,
+          pos.lng,
+          s.fenceLat ?? s.lat,
+          s.fenceLng ?? s.lng,
+        )
+        if (d < best) {
+          best = d
+          target = s
+        }
+      }
+    }
+    setNextStop((prev) =>
+      prev?.position === target.position ? prev : target,
+    )
+  }, [hydrated, tourStarted, unlockedStops, sorted, geo.position])
 
   // Distance to start point (Camden Town tube) — used to gate the tour start.
   const distanceToTube = geo.position
@@ -398,43 +438,62 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
       </header>
 
 
-      {/* Map — capped height so shorter phones always see content peeking
-          below it; one-finger drags scroll the page, two fingers pan the map */}
-      <div className="relative mt-4 h-[42vh] max-h-[380px] min-h-[240px] overflow-hidden rounded-2xl border border-white/10">
-        <TourMap
-          stops={sorted}
-          userPosition={geo.position}
-          unlockedStops={unlockedStops}
-          bankedStops={bankedStops}
-          nextPosition={nextStop?.position ?? null}
-          onSelectStop={setSelectedStop}
-        />
-      </div>
-
-      {/* Link audio — auto-plays once the walker leaves a venue */}
-      {miniAudio && (
-        <MiniPlayer
-          key={miniAudio.url}
-          url={miniAudio.url}
-          fallbackUrl={miniAudio.fallbackUrl}
-          label={miniAudio.label}
-          onDismiss={() => setMiniAudio(null)}
-        />
-      )}
-
-      {/* ── Pre-start gate ── */}
+      {/* ── Pre-start: pick a guide, then start. The map stays hidden until
+          the tour begins, so the first decision is who walks you round. ── */}
       {hydrated && !tourStarted && (
-        <StartGate
-          nearTube={nearTube || simEnabled}
-          distanceToTube={distanceToTube}
-          permissionState={geo.permissionState}
-          onStart={beginTour}
-        />
+        <section className="mt-6">
+          <div className="flex items-center gap-1.5 font-grotesk text-[11px] uppercase tracking-[0.25em] text-label-2">
+            <Headphones size={14} weight="bold" />
+            Choose your guide
+          </div>
+          <WalkPicker />
+          <div className="mt-6">
+            <StartGate
+              nearTube={nearTube || simEnabled}
+              distanceToTube={distanceToTube}
+              permissionState={geo.permissionState}
+              onStart={beginTour}
+            />
+          </div>
+          <p className="mt-4 text-center font-grotesk text-[10.5px] uppercase tracking-[0.18em] text-label-3">
+            {sorted.length} stops · a half-mile · about 90 minutes on foot
+          </p>
+          <Link
+            href="/how-it-works"
+            className="mx-auto mt-2 block w-fit font-grotesk text-[10.5px] uppercase tracking-[0.18em] text-acid"
+          >
+            How it works
+          </Link>
+        </section>
       )}
 
-      {/* ── Tour in progress ── */}
+      {/* ── Tour in progress: the map appears, plus directions and stops ── */}
       {hydrated && tourStarted && (
         <>
+          {/* Map — capped height so shorter phones always see content peeking
+              below it; one finger scrolls the page, two fingers pan the map */}
+          <div className="relative mt-4 h-[42vh] max-h-[380px] min-h-[240px] overflow-hidden rounded-2xl border border-white/10">
+            <TourMap
+              stops={sorted}
+              userPosition={geo.position}
+              unlockedStops={unlockedStops}
+              bankedStops={bankedStops}
+              nextPosition={nextStop?.position ?? null}
+              onSelectStop={setSelectedStop}
+            />
+          </div>
+
+          {/* Link audio — auto-plays once the walker leaves a venue */}
+          {miniAudio && (
+            <MiniPlayer
+              key={miniAudio.url}
+              url={miniAudio.url}
+              fallbackUrl={miniAudio.fallbackUrl}
+              label={miniAudio.label}
+              onDismiss={() => setMiniAudio(null)}
+            />
+          )}
+
           {/* Pending-unlock confirm — shown when GPS can't confidently
               distinguish which stop the user is at */}
           <AnimatePresence>
@@ -537,7 +596,8 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         </div>
       )}
 
-      {/* Stop list */}
+      {/* Stop list — only once the walk is underway */}
+      {hydrated && tourStarted && (
       <motion.ul
         className="mt-6"
         initial="hidden"
@@ -566,6 +626,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
           )
         })}
       </motion.ul>
+      )}
 
       {/* TEMP: testing-only tour reset. Remove before launch. */}
       {hydrated && (tourStarted || unlockedStops.length > 0) && (
