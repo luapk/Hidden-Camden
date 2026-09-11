@@ -1,4 +1,5 @@
 import BottomNav from './BottomNav'
+import Onboarding from './Onboarding'
 
 export default function ConsumerLayout({
   children,
@@ -9,6 +10,7 @@ export default function ConsumerLayout({
     <div className="min-h-screen bg-night font-jost text-label-1">
       <div className="mx-auto max-w-md px-4 pb-32 pt-5">{children}</div>
       <BottomNav />
+      <Onboarding />
     </div>
   )
 }
