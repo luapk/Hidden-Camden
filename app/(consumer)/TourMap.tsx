@@ -73,18 +73,39 @@ export default function TourMap({
     })
   }
 
-  // Mute the stock labels and road contrast so the basemap recedes and the
-  // acid route reads as the brightest thing on the canvas.
+  // Lift the stock dark basemap off black into a readable greyscale: a
+  // charcoal ground, distinguishable water, lighter streets and brighter
+  // labels, while our acid route (cc-* layers) stays the brightest thing on
+  // the canvas. Layer ids vary by style version, so match by type + id and
+  // fail silently per layer.
   const handleLoad = useCallback(() => {
     const map = mapRef.current?.getMap()
     if (!map) return
     try {
       const layers = map.getStyle()?.layers ?? []
       for (const layer of layers) {
+        const id = layer.id.toLowerCase()
+        // Never touch our own route/glow layers.
+        if (id.startsWith('cc-')) continue
+        const isWater = id.includes('water')
         try {
-          if (layer.type === 'symbol') {
-            map.setPaintProperty(layer.id, 'text-color', '#9A9AA0')
-            map.setPaintProperty(layer.id, 'text-halo-color', '#0A0A0A')
+          if (layer.type === 'background') {
+            map.setPaintProperty(layer.id, 'background-color', '#3a3b41')
+          } else if (layer.type === 'fill') {
+            map.setPaintProperty(
+              layer.id,
+              'fill-color',
+              isWater ? '#434952' : id.includes('building') ? '#43444b' : '#3d3f45',
+            )
+          } else if (layer.type === 'line') {
+            map.setPaintProperty(
+              layer.id,
+              'line-color',
+              isWater ? '#434952' : '#6a6c76',
+            )
+          } else if (layer.type === 'symbol') {
+            map.setPaintProperty(layer.id, 'text-color', '#e2e2e8')
+            map.setPaintProperty(layer.id, 'text-halo-color', '#2b2c31')
           }
         } catch {
           // Layer ids vary by style version. Skip silently.
