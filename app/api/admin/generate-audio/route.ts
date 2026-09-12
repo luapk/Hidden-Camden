@@ -6,7 +6,11 @@ import { AUDIO_FILES, AUDIO_TEXT_ES, scriptVersion } from '@/lib/tour/audioScrip
 
 export const maxDuration = 300
 
-const MODEL = 'eleven_multilingual_v2'
+// ElevenLabs model. v3 is the newest and most expressive (best quality).
+// Override via ELEVEN_MODEL_ID in the environment, e.g. set it to
+// eleven_multilingual_v2 or eleven_turbo_v2_5 if the account doesn't have
+// v3 access yet.
+const MODEL = process.env.ELEVEN_MODEL_ID ?? 'eleven_v3'
 
 type Lang = 'en' | 'es'
 

@@ -249,21 +249,23 @@ export default function GenerateAudioClient() {
                       {f.sizeKb}KB
                     </span>
                   )}
-                  {!isDone && !isGenerating && (
+                  {!isGenerating && (
                     <button
                       onClick={() => generateOne(f.filename)}
                       disabled={running}
+                      title={isDone ? 'Re-render just this file' : 'Generate this file'}
                       style={{
                         background: 'none',
-                        border: '1px solid #3A3530',
-                        color: '#8A8077',
+                        border: `1px solid ${isDone ? '#3A3530' : '#C9933C'}`,
+                        color: isDone ? '#8A8077' : '#C9933C',
                         padding: '0.2rem 0.5rem',
                         fontFamily: 'monospace',
                         fontSize: '0.65rem',
-                        cursor: 'pointer',
+                        cursor: running ? 'not-allowed' : 'pointer',
+                        marginRight: '0.5rem',
                       }}
                     >
-                      Gen
+                      {isDone ? 'Re-gen' : 'Gen'}
                     </button>
                   )}
                   {isDone && f.url && (
