@@ -10,6 +10,8 @@
  * Override paths via NEXT_PUBLIC_AUDIO_BASE env var (CDN base URL, no trailing slash).
  */
 
+import { scriptVersion } from './audioScripts'
+
 // Public blob store base for the launch-route narration. Used as the
 // default so audio resolves on every deployment without depending on the
 // NEXT_PUBLIC_AUDIO_BASE env var being scoped into each build. The host is
@@ -18,7 +20,16 @@ const DEFAULT_AUDIO_BASE = 'https://2nrkszijjyuoqrsq.public.blob.vercel-storage.
 
 export const AUDIO_BASE = process.env.NEXT_PUBLIC_AUDIO_BASE || DEFAULT_AUDIO_BASE
 
-export const INTRO_AUDIO_URL = `${AUDIO_BASE}/audio/intro.mp3`
+// Cache-bust every recording with its script version. Vercel Blob serves
+// public objects as immutable (cached for up to a year), so a regenerated
+// file overwritten at the same path would keep playing from cache. The ?v
+// query gives each new version a fresh cache key, so a re-render goes live
+// for everyone the moment its version bumps.
+function audioUrl(filename: string): string {
+  return `${AUDIO_BASE}/audio/${filename}?v=${scriptVersion(filename)}`
+}
+
+export const INTRO_AUDIO_URL = audioUrl('intro.mp3')
 
 /**
  * Where the tour begins: outside Camden Town tube. Not a stop (no story, no
@@ -42,11 +53,11 @@ export function directionsHref(name: string, address: string): string {
 }
 
 function stopAudio(n: number): string {
-  return `${AUDIO_BASE}/audio/stop-${String(n).padStart(2, '0')}.mp3`
+  return audioUrl(`stop-${String(n).padStart(2, '0')}.mp3`)
 }
 
 function linkAudio(from: number, to: number): string {
-  return `${AUDIO_BASE}/audio/link-${String(from).padStart(2, '0')}-${String(to).padStart(2, '0')}.mp3`
+  return audioUrl(`link-${String(from).padStart(2, '0')}-${String(to).padStart(2, '0')}.mp3`)
 }
 
 export interface TourStop {
