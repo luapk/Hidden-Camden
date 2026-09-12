@@ -25,7 +25,6 @@ import {
   useGuide,
 } from '@/lib/tour/guides'
 import { useActiveTour } from '@/lib/tour/tours'
-import { bankSting, playSting } from '@/lib/tour/stings'
 import { isPaywalled } from '@/lib/tour/useTourProgress'
 import { VENUE_POSTERS } from '@/lib/tour/venuePosters'
 import Paywall from './Paywall'
@@ -196,12 +195,28 @@ function StoryBody({
     setElapsed(t)
   }
 
-  const bank = () => {
-    // A guitar riff for the bank moment: same shelf as the arrival stings,
-    // never the same riff this stop arrived to.
-    playSting(bankSting(stop.position), 0.6)
+  // Bank once and only once. The reward unlocks automatically: halfway
+  // through the story, or when it finishes, or when the walker closes the
+  // player. No button press. Confirmed visually (card + confetti); no audio
+  // sting, since it would clash with the narration still playing at halfway.
+  const bankFiredRef = useRef(banked)
+  const doBank = (silent = false) => {
+    if (bankFiredRef.current) return
+    bankFiredRef.current = true
+    if (!silent) setJustBanked(true)
     onBank(stop.position)
-    setJustBanked(true)
+  }
+
+  // Bank the reward the moment it unlocks (halfway, finish, or mark-listened).
+  useEffect(() => {
+    if (finished) doBank()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [finished])
+
+  // Clicking away banks the reward too, quietly, since we're leaving.
+  const handleClose = () => {
+    doBank(true)
+    onClose()
   }
 
   const hasAudio = !!audioUrl && audioState !== 'failed'
@@ -222,7 +237,7 @@ function StoryBody({
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black" />
         <span className="absolute inset-x-0 bottom-0 h-px bg-acid" aria-hidden />
         <button
-          onClick={onClose}
+          onClick={handleClose}
           aria-label="Close the story"
           className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/40 text-label-1 backdrop-blur-xl"
         >
@@ -320,7 +335,15 @@ function StoryBody({
           }}
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
-          onTimeUpdate={(e) => setElapsed(e.currentTarget.currentTime)}
+          onTimeUpdate={(e) => {
+            const t = e.currentTarget.currentTime
+            setElapsed(t)
+            // The reward unlocks halfway through the story itself.
+            if (track === 'story' && !finished) {
+              const d = e.currentTarget.duration
+              if (Number.isFinite(d) && d > 0 && t / d >= 0.5) setFinished(true)
+            }
+          }}
           onLoadedMetadata={(e) => {
             if (Number.isFinite(e.currentTarget.duration)) {
               setDuration(e.currentTarget.duration)
@@ -454,7 +477,7 @@ function StoryBody({
                 className="mt-5 bg-acid p-4 text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]"
               >
                 <div className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-black/60">
-                  {banked ? 'Reward banked' : 'Your reward'}
+                  Reward banked
                 </div>
                 <div className="mt-1 flex items-center gap-2">
                   <BeerStein size={22} weight="fill" color="#000000" />
@@ -466,28 +489,19 @@ function StoryBody({
                   {stop.rewardWindow} · keeps for 7 days
                 </div>
 
-                {banked ? (
-                  <div className="mt-3 flex items-center justify-between gap-3">
-                    <span className="flex items-center gap-1.5 font-grotesk text-[12px] text-black">
-                      <CheckCircle size={18} weight="fill" color="#000000" />
-                      Banked. Find it in your wallet.
-                    </span>
-                    <Link
-                      href="/wallet"
-                      className="flex shrink-0 items-center gap-1.5 rounded-full bg-black px-3 py-1.5 font-grotesk text-[11px] uppercase tracking-[0.1em] text-acid"
-                    >
-                      <Wallet size={14} weight="bold" />
-                      Wallet
-                    </Link>
-                  </div>
-                ) : (
-                  <button
-                    onClick={bank}
-                    className="mt-3 w-full bg-black px-4 py-3 font-jost text-[15px] font-bold uppercase tracking-[0.08em] text-acid"
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <span className="flex items-center gap-1.5 font-grotesk text-[12px] text-black">
+                    <CheckCircle size={18} weight="fill" color="#000000" />
+                    Banked. Find it in your wallet.
+                  </span>
+                  <Link
+                    href="/wallet"
+                    className="flex shrink-0 items-center gap-1.5 rounded-full bg-black px-3 py-1.5 font-grotesk text-[11px] uppercase tracking-[0.1em] text-acid"
                   >
-                    Bank reward
-                  </button>
-                )}
+                    <Wallet size={14} weight="bold" />
+                    Wallet
+                  </Link>
+                </div>
               </motion.div>
               {justBanked && <BauhausBurst />}
             </div>
