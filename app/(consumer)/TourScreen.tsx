@@ -788,83 +788,82 @@ function StartGate({
   permissionState: string
   onStart: () => void
 }) {
-  // One live status line, so the user always knows what the app is waiting
-  // for. The button wakes at the tube; until then the panel guides you there.
-  const statusLine = nearTube
-    ? 'Headphones in and press start.'
-    : distanceToTube !== null
-      ? `${Math.round(distanceToTube)}m away. Head for the entrance on Camden High Street.`
-      : permissionState === 'denied'
-        ? 'Location is off. Turn it on so the tour can see you reach the tube.'
-        : 'Finding you. Head for the tube in the meantime.'
+  // Distance, formatted: over a km reads as km, under as metres.
+  const distText =
+    distanceToTube === null
+      ? null
+      : distanceToTube >= 1000
+        ? `${(distanceToTube / 1000).toFixed(1)} km away`
+        : `${Math.round(distanceToTube)} m away`
+  const denied = permissionState === 'denied'
 
+  // The whole panel is acid with black type. Hierarchy, top to bottom:
+  // where to go → how far → get there → start (the goal, live only at the tube).
   return (
     <motion.div
-      className={`mt-5 overflow-hidden rounded-2xl border bg-night-2 ${
-        nearTube
-          ? 'border-acid/70 shadow-[0_0_34px_rgba(204,255,0,0.18)]'
-          : 'border-white/10'
-      }`}
+      className="mt-5 rounded-2xl bg-acid p-5 text-black shadow-[0_0_36px_rgba(204,255,0,0.22)]"
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 120, damping: 22 }}
     >
-      {/* Acid strip: calm ink far from the tube, full acid once you arrive. */}
-      <div
-        className={`flex items-center gap-2 px-4 py-2.5 font-grotesk text-[10px] font-bold uppercase tracking-[0.3em] ${
-          nearTube ? 'bg-acid text-black' : 'bg-night-3 text-label-2'
+      <div className="flex items-center gap-1.5 font-grotesk text-[10px] font-bold uppercase tracking-[0.3em] text-black/55">
+        <FlagCheckered size={12} weight="fill" color="#000000" />
+        {nearTube ? 'Ready to go' : 'Starting point'}
+      </div>
+
+      <h2 className="mt-2 font-jost text-[26px] font-bold uppercase leading-[0.98] tracking-tight text-black">
+        {nearTube ? "You're at the tube." : 'Walk to Camden Town tube.'}
+      </h2>
+
+      {nearTube ? (
+        <p className="mt-2 text-[14px] font-medium text-black/75">
+          Headphones in and press start.
+        </p>
+      ) : denied ? (
+        <p className="mt-2 text-[14px] font-medium text-black/75">
+          Location is off. Turn it on so the app can see you arrive.
+        </p>
+      ) : (
+        <div className="mt-2.5">
+          <div className="font-jost text-[22px] font-bold uppercase leading-none tracking-tight text-black">
+            {distText ?? 'Finding you'}
+          </div>
+          <div className="mt-1 text-[13px] text-black/70">
+            Entrance on Camden High Street, NW1.
+          </div>
+        </div>
+      )}
+
+      {!nearTube && (
+        <a
+          href={directionsHref(START_POINT.name, 'Camden High Street, London NW1 0JH')}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-4 flex items-center justify-center gap-2 rounded-xl bg-black py-3 font-grotesk text-[12px] font-bold uppercase tracking-[0.16em] text-acid"
+        >
+          <NavigationArrow size={14} weight="bold" />
+          Get directions
+        </a>
+      )}
+
+      <button
+        onClick={nearTube ? onStart : undefined}
+        disabled={!nearTube}
+        className={`mt-3 flex w-full items-center justify-center gap-2 rounded-xl py-4 font-jost text-[20px] font-bold uppercase tracking-[0.08em] transition-colors ${
+          nearTube
+            ? 'bg-black text-acid'
+            : 'cursor-not-allowed border-2 border-black/25 text-black/40'
         }`}
       >
-        <FlagCheckered size={13} weight="fill" color={nearTube ? '#000000' : '#CCFF00'} />
-        {nearTube ? 'Ready to start' : 'Start at Camden Town tube'}
-      </div>
+        Start the tour
+        {nearTube && <ArrowRight size={20} weight="bold" />}
+      </button>
 
-      <div className="p-4">
-        <p className="text-[16px] font-bold leading-snug text-label-1">
-          {nearTube ? 'You made it to the tube.' : 'Meet at Camden Town tube.'}
+      {!nearTube && (
+        <p className="mt-2.5 text-center font-grotesk text-[10px] font-bold uppercase tracking-[0.16em] text-black/55">
+          Unlocks when you reach the tube
         </p>
-        <p className="mt-1 font-grotesk text-[11.5px] leading-relaxed text-label-2">
-          {statusLine}
-        </p>
-
-        {!nearTube && (
-          <a
-            href={directionsHref(START_POINT.name, 'Camden High Street, London NW1 0JH')}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-3 flex items-center justify-between rounded-xl border border-white/10 bg-night-3/60 px-3 py-2.5"
-          >
-            <span className="flex items-center gap-2">
-              <MapPin size={14} weight="fill" color="#CCFF00" />
-              <span className="font-grotesk text-[11.5px] text-label-1">
-                Camden Town tube, NW1 0JH
-              </span>
-            </span>
-            <span className="flex items-center gap-1.5 font-grotesk text-[10px] uppercase tracking-[0.15em] text-acid">
-              <NavigationArrow size={12} weight="bold" />
-              Directions
-            </span>
-          </a>
-        )}
-
-        <button
-          onClick={nearTube ? onStart : undefined}
-          disabled={!nearTube}
-          className={`mt-4 flex w-full items-center justify-center gap-2 rounded-xl px-5 py-4 font-jost text-[19px] font-bold uppercase tracking-[0.08em] transition-colors ${
-            nearTube
-              ? 'bg-acid text-black shadow-[0_0_28px_rgba(204,255,0,0.3)]'
-              : 'cursor-not-allowed border border-white/10 bg-night-3 text-label-3'
-          }`}
-        >
-          Start the tour
-          {nearTube && <ArrowRight size={19} weight="bold" />}
-        </button>
-        {!nearTube && (
-          <p className="mt-2 text-center font-grotesk text-[10.5px] leading-relaxed text-label-3">
-            The button wakes up when you reach the tube entrance.
-          </p>
-        )}
-      </div>
+      )}
     </motion.div>
   )
 }
