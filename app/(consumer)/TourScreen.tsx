@@ -98,12 +98,13 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     [routeStops],
   )
 
-  // The stop we're guiding the walker to. The tour is not fixed order: this
-  // is the nearest un-unlocked stop to the current fix (falling back to the
-  // lowest-numbered remaining stop before we have a position), so arriving at
-  // any stop unlocks that one. Updated by an effect once the geofence has a
-  // position (declared below the geofence).
-  const [nextStop, setNextStop] = useState<TourStop | null>(null)
+  // The next stop, in sequence: the first one not yet unlocked. The tour is
+  // walked in order, so this is both the geofence target and the "up next"
+  // card. Null before the tour starts.
+  const nextStop =
+    hydrated && tourStarted
+      ? sorted.find((s) => !unlockedStops.includes(s.position)) ?? null
+      : null
 
   const [override, setOverride] = useState<GeoPosition | null>(null)
   const [unlockFlash, setUnlockFlash] = useState<TourStop | null>(null)
@@ -198,42 +199,6 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     8_000,
     override,
   )
-
-  // Choose the target stop: nearest un-unlocked to the current fix (out of
-  // order), or the lowest-numbered remaining stop before we have a position.
-  // Only while the tour is running; the geofence above watches whatever this
-  // sets, and arriving there unlocks it.
-  useEffect(() => {
-    if (!hydrated || !tourStarted) {
-      setNextStop(null)
-      return
-    }
-    const remaining = sorted.filter((s) => !unlockedStops.includes(s.position))
-    if (remaining.length === 0) {
-      setNextStop(null)
-      return
-    }
-    const pos = geo.position
-    let target = remaining[0]
-    if (pos) {
-      let best = Infinity
-      for (const s of remaining) {
-        const d = haversineDistance(
-          pos.lat,
-          pos.lng,
-          s.fenceLat ?? s.lat,
-          s.fenceLng ?? s.lng,
-        )
-        if (d < best) {
-          best = d
-          target = s
-        }
-      }
-    }
-    setNextStop((prev) =>
-      prev?.position === target.position ? prev : target,
-    )
-  }, [hydrated, tourStarted, unlockedStops, sorted, geo.position])
 
   // Distance to start point (Camden Town tube) — used to gate the tour start.
   const distanceToTube = geo.position
