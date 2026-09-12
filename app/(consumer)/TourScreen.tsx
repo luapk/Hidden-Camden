@@ -37,7 +37,6 @@ import {
 import { arrivalSting, playSting, startSting } from '@/lib/tour/stings'
 import BrandLogo from './BrandLogo'
 import StoryPlayer from './StoryPlayer'
-import WalkPicker from './GuidePicker'
 
 const TourMap = dynamic(() => import('./TourMap'), {
   ssr: false,
@@ -441,20 +440,16 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
       {/* ── Pre-start: pick a guide, then start. The map stays hidden until
           the tour begins, so the first decision is who walks you round. ── */}
       {hydrated && !tourStarted && (
-        <section className="mt-6">
-          <div className="flex items-center gap-1.5 font-grotesk text-[11px] uppercase tracking-[0.25em] text-label-2">
-            <Headphones size={14} weight="bold" />
-            Choose your guide
-          </div>
-          <WalkPicker />
-          <div className="mt-6">
-            <StartGate
-              nearTube={nearTube || simEnabled}
-              distanceToTube={distanceToTube}
-              permissionState={geo.permissionState}
-              onStart={beginTour}
-            />
-          </div>
+        <section>
+          {/* Start is the hero here. The guide is already chosen (shown in the
+              top-right indicator, changed in Settings), so the home leads
+              straight with getting to the tube and pressing go. */}
+          <StartGate
+            nearTube={nearTube || simEnabled}
+            distanceToTube={distanceToTube}
+            permissionState={geo.permissionState}
+            onStart={beginTour}
+          />
           <p className="mt-4 text-center font-grotesk text-[10.5px] uppercase tracking-[0.18em] text-label-3">
             {sorted.length} stops · a half-mile · about 90 minutes on foot
           </p>
@@ -794,106 +789,82 @@ function StartGate({
   onStart: () => void
 }) {
   // One live status line, so the user always knows what the app is waiting
-  // for. The button itself never waits: the gate guides, it does not block.
+  // for. The button wakes at the tube; until then the panel guides you there.
   const statusLine = nearTube
-    ? "That's the spot. Headphones in."
+    ? 'Headphones in and press start.'
     : distanceToTube !== null
-      ? `${Math.round(distanceToTube)}m away. It's the entrance on Camden High Street.`
+      ? `${Math.round(distanceToTube)}m away. Head for the entrance on Camden High Street.`
       : permissionState === 'denied'
         ? 'Location is off. Turn it on so the tour can see you reach the tube.'
-        : 'Getting a GPS fix. Head for the tube in the meantime.'
-
-  const steps: { label: string; done: boolean }[] = [
-    { label: 'Meet at Camden Town tube', done: nearTube },
-    { label: 'Tap start. The intro plays in your ears', done: false },
-    { label: 'Walk. Stories unlock when your feet arrive', done: false },
-  ]
+        : 'Finding you. Head for the tube in the meantime.'
 
   return (
     <motion.div
-      className="mt-4 border border-white/10 bg-night-2 p-4"
-      initial={{ opacity: 0, y: 16 }}
+      className={`mt-5 overflow-hidden rounded-2xl border bg-night-2 ${
+        nearTube
+          ? 'border-acid/70 shadow-[0_0_34px_rgba(204,255,0,0.18)]'
+          : 'border-white/10'
+      }`}
+      initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 120, damping: 22 }}
     >
-      <div className="flex items-center gap-2 font-grotesk text-[10px] uppercase tracking-[0.3em] text-label-2">
-        <FlagCheckered size={13} weight="fill" color="#CCFF00" />
-        Starting point
-      </div>
-
-      <p className="mt-2 text-[15px] font-semibold text-label-1">
-        {nearTube
-          ? 'You are at Camden Town tube.'
-          : 'The tour starts at Camden Town tube.'}
-      </p>
-      <p className="mt-1 font-grotesk text-[11px] leading-relaxed text-label-2">
-        {statusLine}
-      </p>
-
-      {/* How it works, in three lines. Step one ticks itself off live. */}
-      <ol className="mt-4 space-y-2">
-        {steps.map((step, i) => (
-          <li key={step.label} className="flex items-center gap-2.5">
-            {step.done ? (
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-acid">
-                <Check size={11} weight="bold" color="#000000" />
-              </span>
-            ) : (
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white/15 font-grotesk text-[10px] font-bold text-label-3">
-                {i + 1}
-              </span>
-            )}
-            <span
-              className={`font-grotesk text-[12px] ${
-                step.done ? 'text-label-1' : 'text-label-2'
-              }`}
-            >
-              {step.label}
-            </span>
-          </li>
-        ))}
-      </ol>
-
-      {!nearTube && (
-        <a
-          href={directionsHref(START_POINT.name, 'Camden High Street, London NW1 0JH')}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-3 flex items-center justify-between border border-white/10 bg-night-3/60 px-3 py-2.5"
-        >
-          <span className="flex items-center gap-2">
-            <MapPin size={14} weight="fill" color="#CCFF00" />
-            <span className="font-grotesk text-[11.5px] text-label-1">
-              Camden Town tube, NW1 0JH
-            </span>
-          </span>
-          <span className="flex items-center gap-1.5 font-grotesk text-[10px] uppercase tracking-[0.15em] text-acid">
-            <NavigationArrow size={12} weight="bold" />
-            Directions
-          </span>
-        </a>
-      )}
-
-      <GuideNudge />
-
-      {/* The start button only wakes up at the tube: arriving at the
-          entrance is the first beat of the experience, not a suggestion. */}
-      <button
-        onClick={nearTube ? onStart : undefined}
-        disabled={!nearTube}
-        className={`mt-4 w-full px-5 py-4 font-jost text-lg font-bold uppercase tracking-[0.08em] transition-colors ${
-          nearTube
-            ? 'bg-acid text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]'
-            : 'cursor-not-allowed border border-white/10 bg-night-3 text-label-3'
+      {/* Acid strip: calm ink far from the tube, full acid once you arrive. */}
+      <div
+        className={`flex items-center gap-2 px-4 py-2.5 font-grotesk text-[10px] font-bold uppercase tracking-[0.3em] ${
+          nearTube ? 'bg-acid text-black' : 'bg-night-3 text-label-2'
         }`}
       >
-        Start the tour
-      </button>
-      {!nearTube && (
-        <p className="mt-2 font-grotesk text-[10.5px] leading-relaxed text-label-3">
-          The button wakes up when you reach the tube entrance.
+        <FlagCheckered size={13} weight="fill" color={nearTube ? '#000000' : '#CCFF00'} />
+        {nearTube ? 'Ready to start' : 'Start at Camden Town tube'}
+      </div>
+
+      <div className="p-4">
+        <p className="text-[16px] font-bold leading-snug text-label-1">
+          {nearTube ? 'You made it to the tube.' : 'Meet at Camden Town tube.'}
         </p>
-      )}
+        <p className="mt-1 font-grotesk text-[11.5px] leading-relaxed text-label-2">
+          {statusLine}
+        </p>
+
+        {!nearTube && (
+          <a
+            href={directionsHref(START_POINT.name, 'Camden High Street, London NW1 0JH')}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-3 flex items-center justify-between rounded-xl border border-white/10 bg-night-3/60 px-3 py-2.5"
+          >
+            <span className="flex items-center gap-2">
+              <MapPin size={14} weight="fill" color="#CCFF00" />
+              <span className="font-grotesk text-[11.5px] text-label-1">
+                Camden Town tube, NW1 0JH
+              </span>
+            </span>
+            <span className="flex items-center gap-1.5 font-grotesk text-[10px] uppercase tracking-[0.15em] text-acid">
+              <NavigationArrow size={12} weight="bold" />
+              Directions
+            </span>
+          </a>
+        )}
+
+        <button
+          onClick={nearTube ? onStart : undefined}
+          disabled={!nearTube}
+          className={`mt-4 flex w-full items-center justify-center gap-2 rounded-xl px-5 py-4 font-jost text-[19px] font-bold uppercase tracking-[0.08em] transition-colors ${
+            nearTube
+              ? 'bg-acid text-black shadow-[0_0_28px_rgba(204,255,0,0.3)]'
+              : 'cursor-not-allowed border border-white/10 bg-night-3 text-label-3'
+          }`}
+        >
+          Start the tour
+          {nearTube && <ArrowRight size={19} weight="bold" />}
+        </button>
+        {!nearTube && (
+          <p className="mt-2 text-center font-grotesk text-[10.5px] leading-relaxed text-label-3">
+            The button wakes up when you reach the tube entrance.
+          </p>
+        )}
+      </div>
     </motion.div>
   )
 }
@@ -959,44 +930,6 @@ function GuideProgressRing({
  * still with headphones going in — the best moment to choose whose voice
  * they walk with. Shows the current guide and points at Settings to swap.
  */
-function GuideNudge() {
-  const { lang } = useLanguage()
-  const { tourId } = useActiveTour()
-  const { guideId } = useGuide()
-  const guide = getGuide(effectiveGuideId(tourId, guideId))
-
-  if (lang !== 'en') return null
-
-  return (
-    <Link
-      href="/settings#guide"
-      className="mt-3 flex items-center gap-3 border border-white/10 bg-night-3/60 p-2.5"
-    >
-      <span className="relative block h-10 w-10 shrink-0 overflow-hidden rounded-full border border-acid/60">
-        <Image
-          src={guide.image}
-          alt={guide.name}
-          fill
-          sizes="40px"
-          className="object-cover"
-          style={{ filter: 'grayscale(15%) contrast(1.05)' }}
-        />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block font-grotesk text-[9px] uppercase tracking-[0.25em] text-label-3">
-          Walking with
-        </span>
-        <span className="mt-0.5 block truncate font-jost text-[13.5px] font-bold uppercase tracking-tight text-label-1">
-          {guide.name}
-        </span>
-      </span>
-      <span className="shrink-0 font-grotesk text-[10px] uppercase tracking-[0.15em] text-acid">
-        Change →
-      </span>
-    </Link>
-  )
-}
-
 /* ------------------------------------------------------------------ */
 
 function miniClock(s: number): string {
