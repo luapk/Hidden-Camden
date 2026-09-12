@@ -11,34 +11,38 @@ export interface AudioFile {
 }
 
 /** Current version of the narration pack. Bump when copy changes materially. */
-export const SCRIPT_VERSION = 3
+export const SCRIPT_VERSION = 4
 
 /**
- * Filenames whose script changed in v3 (the history-tour rewrite: rewards
- * pulled out of the narration, wit sharpened, Dublin Castle and finale
- * fixes). Everything else is still v2. The admin audio page reads this to
- * show which files are ahead of the audio currently in the blob store.
+ * Per-file script version, so the admin audio page can flag which recordings
+ * are behind the current copy. Files default to 2 (the pre-history-tour
+ * baseline); bump an entry whenever its script changes.
  */
-const V3_FILENAMES = new Set<string>([
-  'intro.mp3',
-  'stop-01.mp3',
-  'stop-02.mp3',
-  'stop-03.mp3',
-  'stop-04.mp3',
-  'stop-05.mp3',
-  'stop-06.mp3',
-  'stop-07.mp3',
-  'stop-08.mp3',
-  'stop-09.mp3',
-  'stop-10.mp3',
-  'link-03-04.mp3',
-  'link-09-10.mp3',
-  'culture-intro.mp3',
-])
+const FILE_VERSIONS: Record<string, number> = {
+  // v4: direction fixes and trims (Sep 2026)
+  'intro.mp3': 4,
+  'stop-01.mp3': 4,
+  'link-01-02.mp3': 4,
+  'stop-02.mp3': 4,
+  'link-02-03.mp3': 4,
+  'stop-04.mp3': 4,
+  'link-04-05.mp3': 4,
+  // v3: the history-tour rewrite (rewards out, wit in, Dublin red, Roundhouse)
+  'stop-03.mp3': 3,
+  'stop-05.mp3': 3,
+  'stop-06.mp3': 3,
+  'stop-07.mp3': 3,
+  'stop-08.mp3': 3,
+  'stop-09.mp3': 3,
+  'stop-10.mp3': 3,
+  'link-03-04.mp3': 3,
+  'link-09-10.mp3': 3,
+  'culture-intro.mp3': 3,
+}
 
 /** Script version for a given audio filename. */
 export function scriptVersion(filename: string): number {
-  return V3_FILENAMES.has(filename) ? 3 : 2
+  return FILE_VERSIONS[filename] ?? 2
 }
 
 export const AUDIO_FILES: AudioFile[] = [
@@ -48,8 +52,6 @@ export const AUDIO_FILES: AudioFile[] = [
     text: `You're standing on the most musical half-mile on Earth. Camden should have more blue plaques than anywhere in London. It has almost none, because the people who made it famous were usually being barred from the building at the time.
 
 Here's how it works. Ten venues. Each stays locked until you're physically standing in front of it, at which point your phone buzzes and a story begins. No app has ever cared this much about your exact location, and it means well.
-
-One rule. Keep your eyes up. Everything worth seeing in Camden happens at first-floor level and above, which is the only part the developers haven't reached yet.
 
 Your first stop is thirty seconds away. Cross at the lights and aim for the pub that takes up half the block. Don't worry about the witch. She's been dead three hundred and fifty years.
 
@@ -66,12 +68,12 @@ Nobody saw him leave. He presumably had a quiet one and slipped out the back.
 
 The pub that grew up here traded as the Mother Red Cap for three centuries, the last drink before the open countryside. The world's end. Hence the name on the wall. Today it's the biggest boozer in Camden, the pre-gig holding pen for every show in NW1, and if the jukebox sounds harder than your average pub, there's a reason.
 
-It's coming from under your feet. Down the stairs is the Underworld, and for thirty years it's been the loudest basement in Britain. Every metal, punk and hardcore band you love played that room on the way up or crawled back to it on the way down, close enough to touch and twice as sweaty. There's a pillar in the middle of the floor, holding up the pub above. Veterans navigate it by instinct, in the dark, mid-mosh. Tourists find it with their faces.`,
+It's coming from under your feet. Down the stairs is the Underworld, and for thirty years it's been the loudest basement in Britain. Every metal, punk and hardcore band you love played that room on the way up, close enough to touch and twice as sweaty. There's a pillar in the middle of the floor, holding up the pub above. If you're in the pit, give it a swerve.`,
   },
   {
     filename: 'link-01-02.mp3',
     label: 'Link 1→2 — to Electric Ballroom',
-    text: `Out of the World's End, turn right, and walk up the High Street with the tube on your right. You're looking for the building that out-lasted the Luftwaffe. Forty seconds, on your left, past the shopfronts shaped like giant boots and dragons. While you walk: everything you're about to hear is true, which by Camden standards is rare.`,
+    text: `Out of the World's End, turn right, and walk up the High Street with the tube on your right. You're looking for the building that out-lasted the Luftwaffe. Forty seconds, on your right, past the music walk of fame stars, yup that's David Bowie, towards the shopfronts shaped like giant boots and dragons.`,
   },
   {
     filename: 'stop-02.mp3',
@@ -84,16 +86,14 @@ Most people saw a tragedy. Bill Fuller saw available square footage. He bought t
 
 By 1978 the dancing had changed. The relaunch starred the Greedies, a supergroup built around Phil Lynott of Thin Lizzy and half the Sex Pistols. They got the name because they demanded three quarters of the door money and Fuller called them a crowd of greedy bastards. To their credit, they kept it.
 
-Two weeks later Sid Vicious played a one-off with a pickup band, billed as Sid Sods Off. The door money had a purpose: the airfare to get Sid and Nancy to New York. Camden crowdfunded the most doomed relocation in rock history, at a fiver a head, and never once asked for a progress report.
+Two weeks later Sid Vicious played a one-off with a pickup band. The door money had a purpose: the airfare to get Sid and Nancy to New York. Camden crowdfunded the most doomed relocation in rock history, at a fiver a head.
 
-Then: Joy Division. The Clash, who rehearsed here for a week. Madness. The Smiths. Public Enemy. And one night in 2014, on a few hours' notice, Prince walked in and played to about seventy people while a queue of the disbelieving wrapped round the block.
-
-A two-thousand-capacity room. He used roughly four percent of it. The other ninety-six percent queued.`,
+Then: Joy Division. The Clash, who rehearsed here for a week. Madness. The Smiths. Public Enemy. And one night in 2014, on a few hours' notice, Prince walked in and played to about seventy people while a queue of the disbelieving wrapped round the block.`,
   },
   {
     filename: 'link-02-03.mp3',
     label: 'Link 2→3 — paywall moment (cuts at "The story is...")',
-    text: `Back the way you came, past the tube, and bear right onto Parkway. Now. In January 1979, seven young men walked into a pub on this road and told the landlord a lie. The landlord believed them, because it was a respectable lie, told politely. And that lie invented British pop music as you know it. The pub is two hundred metres ahead. The story is...`,
+    text: `Back the way you came, past the tube, and bear right up onto Parkway. Look out for a grand old white building on your right.`,
   },
   {
     filename: 'stop-03.mp3',
@@ -124,14 +124,14 @@ Now. January 1979. Seven young men walk in and tell the landlord, Alo Conlon, th
 
 The lying-about-jazz trick worked so well the room never stopped. Blur played in there. Coldplay. Supergrass. The Killers. Muse got signed off the back of one electrifying set. The Libertines did a residency that nobody fully remembers, including the Libertines.
 
-And then there's Amy. Winehouse loved this pub so much that when the paparazzi made a normal night impossible, she'd come in and get behind the bar, pulling pints for startled customers. Hiding in plain sight, dressed as her own barmaid. In 2007, already conquering the world with Back to Black, she played a secret homecoming gig in that back room. Crammed in hip to hip. Suggs was there. So was Pete Doherty, cap down at the back, which in 2007 Camden barely counted as a sighting. Nobody bothered either of them. That's the whole pub in one image.
+And then there's Amy. Winehouse loved this pub so much that when the paparazzi made a normal night impossible, she'd come in and get behind the bar, pulling pints for startled customers. Hiding in plain sight, dressed as her own barmaid. In 2007, already conquering the world with Back to Black, she played a secret homecoming gig in that back room. Crammed in hip to hip. Suggs was there. So was Pete Doherty, cap down at the back, which in 2007 Camden barely counted as a sighting. Nobody bothered either of them.
 
 There are usually four bands on in the back tonight. Statistically, one of them is the next Coldplay. The other three will spend twenty years telling people they knew them first.`,
   },
   {
     filename: 'link-04-05.mp3',
     label: 'Link 4→5 — to Good Mixer',
-    text: `Out of the Castle, cross over, and head up Arlington Road. First left onto Inverness Street, the old fruit and veg market. You're about to walk into the 1990s. Specifically, into the pub where the 1990s were planned, plotted, and very nearly punched.`,
+    text: `Out of the Castle, turn left and back down to Arlington Road on your left. First right onto Inverness Street, the old fruit and veg market. You're about to walk into the 1990s. Specifically, into the pub where the 1990s were planned, plotted, and often punched.`,
   },
   {
     filename: 'stop-05.mp3',
