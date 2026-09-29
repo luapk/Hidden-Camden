@@ -17,14 +17,16 @@ import { START_POINT, LAUNCH_ROUTE } from '@/lib/tour/launchRoute'
  */
 
 const KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-// The whole swoop is one continuous, eased camera path (no per-venue stops).
-const DURATION_MS = 30000
-// Hold on the establishing shot first so the photoreal tiles stream in
-// before the camera starts moving.
+// The whole route is one continuous, eased camera path (no per-venue stops).
+const DURATION_MS = 60000
+// Hold on the opening shot first so the photoreal tiles stream in before the
+// camera starts moving.
 const START_DELAY_MS = 3500
-const CRUISE_RANGE = 300 // camera distance during the low pass, metres
-const END_RANGE = 720 // pulled back at the very start and finish
-const TILT = 62
+const START_RANGE = 90 // street-level framing outside the tube, metres
+const FOLLOW_RANGE = 190 // steady follow distance for the glide, metres
+const TILT = 64 // constant, so vertical movement stays minimal
+const LOOK_AHEAD = 0.02 // how far along the path the camera looks
+const HEADING_LERP = 0.06 // per-frame turn damping, so bends are gentle
 
 type LL = { lat: number; lng: number }
 
@@ -82,10 +84,11 @@ function pathAt(u: number): LL {
   }
 }
 
-// Pull the camera back at the very start and end, low through the middle.
+// Start at street level, rise gently to the steady follow distance over the
+// first stretch, then hold it. Keeps vertical movement to a minimum.
 function rangeAt(u: number): number {
-  const k = Math.max(0, 1 - Math.min(u, 1 - u) / 0.18)
-  return CRUISE_RANGE + (END_RANGE - CRUISE_RANGE) * k
+  const rise = easeInOutCubic(Math.min(1, u / 0.08))
+  return START_RANGE + (FOLLOW_RANGE - START_RANGE) * rise
 }
 
 // Install Google's official inline bootstrap loader once. This is what
@@ -129,6 +132,7 @@ export default function RouteFlythrough() {
   const holderRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<any>(null)
   const rafRef = useRef<number | null>(null)
+  const headingRef = useRef<number | null>(null)
   const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>(
     KEY ? 'loading' : 'error',
   )
@@ -143,16 +147,29 @@ export default function RouteFlythrough() {
     if (!map) return
     if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
     setFlying(true)
+    // Seed the smoothed heading with the path's opening direction.
+    headingRef.current = bearing(pathAt(0), pathAt(LOOK_AHEAD))
     const start = performance.now()
+    let lastFrame = 0
     const frame = (now: number) => {
       const raw = Math.min(1, (now - start) / DURATION_MS)
-      const u = easeInOutCubic(raw)
-      const here = pathAt(u)
-      const ahead = pathAt(Math.min(1, u + 0.008))
-      map.center = { lat: here.lat, lng: here.lng, altitude: 0 }
-      map.heading = bearing(here, ahead)
-      map.tilt = TILT
-      map.range = rangeAt(u)
+      // Throttle camera writes to ~30fps so mobile GPUs aren't overloaded.
+      if (now - lastFrame >= 33 || raw >= 1) {
+        lastFrame = now
+        const u = easeInOutCubic(raw)
+        const here = pathAt(u)
+        const ahead = pathAt(Math.min(1, u + LOOK_AHEAD))
+        // Damp the heading toward the path tangent so bends are gentle.
+        const target = bearing(here, ahead)
+        const cur = headingRef.current ?? target
+        const diff = ((target - cur + 540) % 360) - 180
+        const h = (cur + diff * HEADING_LERP + 360) % 360
+        headingRef.current = h
+        map.center = { lat: here.lat, lng: here.lng, altitude: 0 }
+        map.heading = h
+        map.tilt = TILT
+        map.range = rangeAt(u)
+      }
       if (raw < 1) {
         rafRef.current = requestAnimationFrame(frame)
       } else {
@@ -180,7 +197,7 @@ export default function RouteFlythrough() {
         // Satellite mode: pure photoreal 3D tiles, no basemap road or place
         // labels. Frame on the path's first point so the flight starts with
         // no jump.
-        const startAhead = pathAt(0.008)
+        const startAhead = pathAt(LOOK_AHEAD)
         map = new Map3DElement({
           center: { lat: WAYPOINTS[0].lat, lng: WAYPOINTS[0].lng, altitude: 0 },
           range: rangeAt(0),
@@ -193,12 +210,12 @@ export default function RouteFlythrough() {
         holderRef.current.appendChild(map)
         mapRef.current = map
 
-        // The only labels on the map: a numbered pin per stop (skip the tube).
-        WAYPOINTS.slice(1).forEach((w, i) => {
+        // The only labels on the map: a pin per stop, named (skip the tube).
+        WAYPOINTS.slice(1).forEach((w) => {
           const marker = new Marker3DElement({
             position: { lat: w.lat, lng: w.lng, altitude: 0 },
             altitudeMode: AltitudeMode.CLAMP_TO_GROUND,
-            label: String(i + 1),
+            label: w.name,
           })
           map.append(marker)
         })
