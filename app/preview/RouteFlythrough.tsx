@@ -17,7 +17,14 @@ import { START_POINT, LAUNCH_ROUTE } from '@/lib/tour/launchRoute'
  */
 
 const KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-const SEGMENT_MS = 1200 // per hop; 11 waypoints ≈ 13.2s, plus a short settle
+// The whole swoop is one continuous, eased camera path (no per-venue stops).
+const DURATION_MS = 30000
+// Hold on the establishing shot first so the photoreal tiles stream in
+// before the camera starts moving.
+const START_DELAY_MS = 3500
+const CRUISE_RANGE = 300 // camera distance during the low pass, metres
+const END_RANGE = 720 // pulled back at the very start and finish
+const TILT = 62
 
 type LL = { lat: number; lng: number }
 
@@ -38,6 +45,47 @@ function bearing(a: LL, b: LL): number {
     Math.cos(toRad(a.lat)) * Math.sin(toRad(b.lat)) -
     Math.sin(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.cos(dLon)
   return (toDeg(Math.atan2(y, x)) + 360) % 360
+}
+
+// Smooth acceleration in and deceleration out across the whole flight.
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+}
+
+// 1D Catmull-Rom interpolation.
+function cr(p0: number, p1: number, p2: number, p3: number, t: number): number {
+  const t2 = t * t
+  const t3 = t2 * t
+  return (
+    0.5 *
+    (2 * p1 +
+      (-p0 + p2) * t +
+      (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 +
+      (-p0 + 3 * p1 - 3 * p2 + p3) * t3)
+  )
+}
+
+// A smooth point on the route for progress u in 0..1 (Catmull-Rom through the
+// waypoints, so the corners at each venue round off rather than jerk).
+function pathAt(u: number): LL {
+  const n = WAYPOINTS.length - 1
+  const scaled = Math.max(0, Math.min(1, u)) * n
+  const i = Math.min(Math.floor(scaled), n - 1)
+  const localT = scaled - i
+  const p0 = WAYPOINTS[Math.max(0, i - 1)]
+  const p1 = WAYPOINTS[i]
+  const p2 = WAYPOINTS[i + 1]
+  const p3 = WAYPOINTS[Math.min(n, i + 2)]
+  return {
+    lat: cr(p0.lat, p1.lat, p2.lat, p3.lat, localT),
+    lng: cr(p0.lng, p1.lng, p2.lng, p3.lng, localT),
+  }
+}
+
+// Pull the camera back at the very start and end, low through the middle.
+function rangeAt(u: number): number {
+  const k = Math.max(0, 1 - Math.min(u, 1 - u) / 0.18)
+  return CRUISE_RANGE + (END_RANGE - CRUISE_RANGE) * k
 }
 
 // Install Google's official inline bootstrap loader once. This is what
@@ -80,8 +128,7 @@ function installMapsLoader(key: string): void {
 export default function RouteFlythrough() {
   const holderRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<any>(null)
-  const camsRef = useRef<any[]>([])
-  const stepRef = useRef(0)
+  const rafRef = useRef<number | null>(null)
   const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>(
     KEY ? 'loading' : 'error',
   )
@@ -90,53 +137,63 @@ export default function RouteFlythrough() {
   )
   const [flying, setFlying] = useState(false)
 
+  // One continuous camera path, driven per frame with a global ease-in-out.
   const runFlight = useCallback(() => {
     const map = mapRef.current
-    const cams = camsRef.current
-    if (!map || cams.length === 0) return
-    stepRef.current = 0
+    if (!map) return
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
     setFlying(true)
-    map.flyCameraTo({ endCamera: cams[0], durationMillis: SEGMENT_MS })
+    const start = performance.now()
+    const frame = (now: number) => {
+      const raw = Math.min(1, (now - start) / DURATION_MS)
+      const u = easeInOutCubic(raw)
+      const here = pathAt(u)
+      const ahead = pathAt(Math.min(1, u + 0.008))
+      map.center = { lat: here.lat, lng: here.lng, altitude: 0 }
+      map.heading = bearing(here, ahead)
+      map.tilt = TILT
+      map.range = rangeAt(u)
+      if (raw < 1) {
+        rafRef.current = requestAnimationFrame(frame)
+      } else {
+        rafRef.current = null
+        setFlying(false)
+      }
+    }
+    rafRef.current = requestAnimationFrame(frame)
   }, [])
 
   useEffect(() => {
     if (!KEY) return
     let cancelled = false
     let map: any = null
-    let onEnd: (() => void) | null = null
 
     ;(async () => {
       try {
         installMapsLoader(KEY)
         if (cancelled) return
         const g = (window as any).google
-        const { Map3DElement, Marker3DElement, Polyline3DElement, AltitudeMode } =
+        const { Map3DElement, Marker3DElement, AltitudeMode } =
           await g.maps.importLibrary('maps3d')
         if (cancelled || !holderRef.current) return
 
-        // Establishing shot: high over the start, looking toward stop 1.
+        // Satellite mode: pure photoreal 3D tiles, no basemap road or place
+        // labels. Frame on the path's first point so the flight starts with
+        // no jump.
+        const startAhead = pathAt(0.008)
         map = new Map3DElement({
-          center: { ...WAYPOINTS[0], altitude: 0 },
-          range: 1400,
-          tilt: 40,
-          heading: bearing(WAYPOINTS[0], WAYPOINTS[1]),
-          mode: 'HYBRID',
+          center: { lat: WAYPOINTS[0].lat, lng: WAYPOINTS[0].lng, altitude: 0 },
+          range: rangeAt(0),
+          tilt: TILT,
+          heading: bearing(WAYPOINTS[0], startAhead),
+          mode: 'SATELLITE',
         })
         map.style.width = '100%'
         map.style.height = '100%'
         holderRef.current.appendChild(map)
         mapRef.current = map
 
-        // The route line, clamped to the ground.
-        const line = new Polyline3DElement({
-          altitudeMode: AltitudeMode.CLAMP_TO_GROUND,
-          strokeColor: '#CCFF00',
-          strokeWidth: 8,
-          coordinates: WAYPOINTS.map((w) => ({ lat: w.lat, lng: w.lng })),
-        })
-        map.append(line)
-
-        // A pin per stop (skip the tube), numbered.
+        // The only labels on the map: a numbered pin per stop (skip the tube).
         WAYPOINTS.slice(1).forEach((w, i) => {
           const marker = new Marker3DElement({
             position: { lat: w.lat, lng: w.lng, altitude: 0 },
@@ -146,44 +203,13 @@ export default function RouteFlythrough() {
           map.append(marker)
         })
 
-        // Low, route-following camera at each waypoint, then a settle pull-up.
-        const cams: any[] = WAYPOINTS.map((w, i) => ({
-          center: { lat: w.lat, lng: w.lng, altitude: 0 },
-          range: 230,
-          tilt: 62,
-          heading: bearing(WAYPOINTS[Math.max(0, i - 1)], w),
-        }))
-        cams.push({
-          center: { ...WAYPOINTS[WAYPOINTS.length - 1], altitude: 0 },
-          range: 600,
-          tilt: 45,
-          heading: bearing(
-            WAYPOINTS[WAYPOINTS.length - 2],
-            WAYPOINTS[WAYPOINTS.length - 1],
-          ),
-        })
-        camsRef.current = cams
-
-        // Chain the hops on each animation end.
-        onEnd = () => {
-          stepRef.current += 1
-          if (stepRef.current >= cams.length) {
-            setFlying(false)
-            return
-          }
-          const last = stepRef.current === cams.length - 1
-          map.flyCameraTo({
-            endCamera: cams[stepRef.current],
-            durationMillis: last ? 1400 : SEGMENT_MS,
-          })
-        }
-        map.addEventListener('gmp-animationend', onEnd)
-
-        setStatus('ready')
-        // Kick off after a beat so the tiles start streaming.
+        // Keep the loading cover up while the tiles stream, then reveal the
+        // map and start the flight.
         window.setTimeout(() => {
-          if (!cancelled) runFlight()
-        }, 900)
+          if (cancelled) return
+          setStatus('ready')
+          runFlight()
+        }, START_DELAY_MS)
       } catch (e) {
         if (cancelled) return
         setStatus('error')
@@ -197,7 +223,7 @@ export default function RouteFlythrough() {
 
     return () => {
       cancelled = true
-      if (map && onEnd) map.removeEventListener('gmp-animationend', onEnd)
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
       if (map && map.parentElement) map.parentElement.removeChild(map)
     }
   }, [runFlight])
@@ -235,7 +261,7 @@ export default function RouteFlythrough() {
       )}
 
       {status !== 'ready' && (
-        <div className="absolute inset-0 flex items-center justify-center p-8 text-center">
+        <div className="absolute inset-0 flex items-center justify-center bg-night-1 p-8 text-center">
           <div className="max-w-xs">
             {status === 'loading' && (
               <p className="font-grotesk text-[12px] uppercase tracking-[0.2em] text-label-3">
