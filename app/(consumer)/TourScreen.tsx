@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
+  AirplaneTilt,
   ArrowRight,
   BeerStein,
   Check,
@@ -415,6 +416,13 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
             permissionState={geo.permissionState}
             onStart={beginTour}
           />
+          <Link
+            href="/preview"
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-acid/50 py-3 font-jost text-[14px] font-bold uppercase tracking-[0.08em] text-acid"
+          >
+            <AirplaneTilt size={18} weight="fill" />
+            Preview route
+          </Link>
           <p className="mt-4 text-center font-grotesk text-[10.5px] uppercase tracking-[0.18em] text-label-3">
             {sorted.length} stops · a half-mile · about 90 minutes on foot
           </p>
