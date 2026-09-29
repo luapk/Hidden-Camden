@@ -40,28 +40,41 @@ function bearing(a: LL, b: LL): number {
   return (toDeg(Math.atan2(y, x)) + 360) % 360
 }
 
-// Load the Google Maps JS bootstrap once.
-function loadGoogleMaps(key: string): Promise<void> {
-  const w = window as unknown as { google?: { maps?: { importLibrary?: unknown } } }
-  if (w.google?.maps?.importLibrary) return Promise.resolve()
-  const existing = document.getElementById('gmaps-js')
-  if (existing) {
-    return new Promise((resolve, reject) => {
-      existing.addEventListener('load', () => resolve())
-      existing.addEventListener('error', () => reject(new Error('maps load failed')))
-    })
-  }
-  return new Promise((resolve, reject) => {
-    const s = document.createElement('script')
-    s.id = 'gmaps-js'
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(
-      key,
-    )}&v=alpha&libraries=maps3d,marker&loading=async`
-    s.async = true
-    s.onload = () => resolve()
-    s.onerror = () => reject(new Error('Could not load Google Maps.'))
-    document.head.appendChild(s)
-  })
+// Install Google's official inline bootstrap loader once. This is what
+// defines google.maps.importLibrary (the classic <script> tag does not), and
+// it lazy-loads the requested libraries (here, maps3d) on first import.
+function installMapsLoader(key: string): void {
+  // eslint-disable-next-line
+  const w = window as any
+  if (w.google?.maps?.importLibrary) return
+  ;((g: any) => {
+    let h: any, a: any, k: string
+    const c = 'google'
+    const l = 'importLibrary'
+    const q = '__ib__'
+    const m = document
+    const b = w[c] || (w[c] = {})
+    const d = b.maps || (b.maps = {})
+    const r = new Set<string>()
+    const e = new URLSearchParams()
+    const u = () =>
+      h ||
+      (h = new Promise<void>((f, n) => {
+        a = m.createElement('script')
+        e.set('libraries', Array.from(r).join(','))
+        for (k in g) {
+          e.set(k.replace(/[A-Z]/g, (t) => '_' + t[0].toLowerCase()), g[k])
+        }
+        e.set('callback', c + '.maps.' + q)
+        a.src = 'https://maps.' + c + 'apis.com/maps/api/js?' + e
+        d[q] = f
+        a.onerror = () => (h = n(new Error('Google Maps could not load.')))
+        m.head.append(a)
+      }))
+    if (!d[l]) {
+      d[l] = (f: string, ...n: unknown[]) => r.add(f) && u().then(() => d[l](f, ...n))
+    }
+  })({ key, v: 'alpha' })
 }
 
 export default function RouteFlythrough() {
@@ -94,7 +107,7 @@ export default function RouteFlythrough() {
 
     ;(async () => {
       try {
-        await loadGoogleMaps(KEY)
+        installMapsLoader(KEY)
         if (cancelled) return
         const g = (window as any).google
         const { Map3DElement, Marker3DElement, Polyline3DElement, AltitudeMode } =
