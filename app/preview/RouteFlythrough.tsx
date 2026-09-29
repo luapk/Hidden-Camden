@@ -22,10 +22,12 @@ const DURATION_MS = 60000
 // Hold on the opening shot first so the photoreal tiles stream in before the
 // camera starts moving.
 const START_DELAY_MS = 3500
-const STREET_RANGE = 110 // low, street-level camera held the whole way, metres
-const TILT = 64 // constant, so vertical movement stays minimal
-const LOOK_AHEAD = 0.02 // how far along the path the camera looks
-const HEADING_LERP = 0.06 // per-frame turn damping, so bends are gentle
+// Proven route-flyover framing: an elevated oblique so the streets ahead and
+// the surrounding context stay visible, with a FIXED heading so the camera
+// never rotates. Rotation-to-face-travel is what makes a low chase-cam
+// disorientating; here the route simply tracks beneath a steady angle.
+const OVERVIEW_RANGE = 450 // camera distance, metres (elevated oblique)
+const TILT = 52 // constant oblique angle
 
 type LL = { lat: number; lng: number }
 
@@ -47,6 +49,10 @@ function bearing(a: LL, b: LL): number {
     Math.sin(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.cos(dLon)
   return (toDeg(Math.atan2(y, x)) + 360) % 360
 }
+
+// One fixed viewing direction (the overall tube → Roundhouse bearing) so the
+// camera tracks the route without ever spinning.
+const FIXED_HEADING = bearing(WAYPOINTS[0], WAYPOINTS[WAYPOINTS.length - 1])
 
 // Smooth acceleration in and deceleration out across the whole flight.
 function easeInOutCubic(t: number): number {
@@ -124,7 +130,6 @@ export default function RouteFlythrough() {
   const holderRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<any>(null)
   const rafRef = useRef<number | null>(null)
-  const headingRef = useRef<number | null>(null)
   const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>(
     KEY ? 'loading' : 'error',
   )
@@ -139,8 +144,6 @@ export default function RouteFlythrough() {
     if (!map) return
     if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
     setFlying(true)
-    // Seed the smoothed heading with the path's opening direction.
-    headingRef.current = bearing(pathAt(0), pathAt(LOOK_AHEAD))
     const start = performance.now()
     let lastFrame = 0
     const frame = (now: number) => {
@@ -150,17 +153,11 @@ export default function RouteFlythrough() {
         lastFrame = now
         const u = easeInOutCubic(raw)
         const here = pathAt(u)
-        const ahead = pathAt(Math.min(1, u + LOOK_AHEAD))
-        // Damp the heading toward the path tangent so bends are gentle.
-        const target = bearing(here, ahead)
-        const cur = headingRef.current ?? target
-        const diff = ((target - cur + 540) % 360) - 180
-        const h = (cur + diff * HEADING_LERP + 360) % 360
-        headingRef.current = h
+        // Track the point beneath a fixed angle: no rotation, no zoom.
         map.center = { lat: here.lat, lng: here.lng, altitude: 0 }
-        map.heading = h
+        map.heading = FIXED_HEADING
         map.tilt = TILT
-        map.range = STREET_RANGE
+        map.range = OVERVIEW_RANGE
       }
       if (raw < 1) {
         rafRef.current = requestAnimationFrame(frame)
@@ -189,12 +186,11 @@ export default function RouteFlythrough() {
         // Satellite mode: pure photoreal 3D tiles, no basemap road or place
         // labels. Frame on the path's first point so the flight starts with
         // no jump.
-        const startAhead = pathAt(LOOK_AHEAD)
         map = new Map3DElement({
           center: { lat: WAYPOINTS[0].lat, lng: WAYPOINTS[0].lng, altitude: 0 },
-          range: STREET_RANGE,
+          range: OVERVIEW_RANGE,
           tilt: TILT,
-          heading: bearing(WAYPOINTS[0], startAhead),
+          heading: FIXED_HEADING,
           mode: 'SATELLITE',
         })
         map.style.width = '100%'
