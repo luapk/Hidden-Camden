@@ -22,8 +22,7 @@ const DURATION_MS = 60000
 // Hold on the opening shot first so the photoreal tiles stream in before the
 // camera starts moving.
 const START_DELAY_MS = 3500
-const START_RANGE = 90 // street-level framing outside the tube, metres
-const FOLLOW_RANGE = 190 // steady follow distance for the glide, metres
+const STREET_RANGE = 110 // low, street-level camera held the whole way, metres
 const TILT = 64 // constant, so vertical movement stays minimal
 const LOOK_AHEAD = 0.02 // how far along the path the camera looks
 const HEADING_LERP = 0.06 // per-frame turn damping, so bends are gentle
@@ -82,13 +81,6 @@ function pathAt(u: number): LL {
     lat: cr(p0.lat, p1.lat, p2.lat, p3.lat, localT),
     lng: cr(p0.lng, p1.lng, p2.lng, p3.lng, localT),
   }
-}
-
-// Start at street level, rise gently to the steady follow distance over the
-// first stretch, then hold it. Keeps vertical movement to a minimum.
-function rangeAt(u: number): number {
-  const rise = easeInOutCubic(Math.min(1, u / 0.08))
-  return START_RANGE + (FOLLOW_RANGE - START_RANGE) * rise
 }
 
 // Install Google's official inline bootstrap loader once. This is what
@@ -168,7 +160,7 @@ export default function RouteFlythrough() {
         map.center = { lat: here.lat, lng: here.lng, altitude: 0 }
         map.heading = h
         map.tilt = TILT
-        map.range = rangeAt(u)
+        map.range = STREET_RANGE
       }
       if (raw < 1) {
         rafRef.current = requestAnimationFrame(frame)
@@ -200,7 +192,7 @@ export default function RouteFlythrough() {
         const startAhead = pathAt(LOOK_AHEAD)
         map = new Map3DElement({
           center: { lat: WAYPOINTS[0].lat, lng: WAYPOINTS[0].lng, altitude: 0 },
-          range: rangeAt(0),
+          range: STREET_RANGE,
           tilt: TILT,
           heading: bearing(WAYPOINTS[0], startAhead),
           mode: 'SATELLITE',
