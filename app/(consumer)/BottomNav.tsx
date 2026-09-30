@@ -22,8 +22,8 @@ const ITEMS: NavItem[] = [
   { href: '/', label: 'Tour', icon: MapPin },
   { href: '/wallet', label: 'Wallet', icon: Wallet },
   { href: '/rewards', label: 'Rewards', icon: BeerStein },
-  { href: '/how-it-works', label: 'Guide', icon: BookOpen },
-  { href: '/settings', label: 'Settings', icon: GearSix },
+  { href: '/how-it-works', label: 'How', icon: BookOpen },
+  { href: '/settings', label: 'Guides', icon: GearSix },
 ]
 
 export default function BottomNav() {
