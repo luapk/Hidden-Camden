@@ -11,7 +11,7 @@ export interface AudioFile {
 }
 
 /** Current version of the narration pack. Bump when copy changes materially. */
-export const SCRIPT_VERSION = 5
+export const SCRIPT_VERSION = 6
 
 /**
  * Per-file script version, so the admin audio page can flag which recordings
@@ -19,12 +19,13 @@ export const SCRIPT_VERSION = 5
  * baseline); bump an entry whenever its script changes.
  */
 const FILE_VERSIONS: Record<string, number> = {
+  // v6: celebratory intro opening (troubadours, troublemakers, rough-cut gems)
+  'intro.mp3': 6,
   // v5: NW1 mispronunciation fix (stops 1 & 3) + positive Libertines line (4)
   'stop-01.mp3': 5,
   'stop-03.mp3': 5,
   'stop-04.mp3': 5,
   // v4: direction fixes and trims (Sep 2026)
-  'intro.mp3': 4,
   'link-01-02.mp3': 4,
   'stop-02.mp3': 4,
   'link-02-03.mp3': 4,
@@ -50,7 +51,7 @@ export const AUDIO_FILES: AudioFile[] = [
   {
     filename: 'intro.mp3',
     label: 'Intro — Camden Town Tube',
-    text: `You're standing on the most musical half-mile on Earth. Camden should have more blue plaques than anywhere in London. It has almost none, because the people who made it famous were usually being barred from the building at the time.
+    text: `You're standing on the most musical half-mile on Earth. The old stomping ground of troubadours, troublemakers and rough-cut gems, where the next big sound was always being worked out in a back room. Musical alchemy in the air. Camden calls it Tuesday.
 
 Here's how it works. Ten venues. Each stays locked until you're physically standing in front of it, at which point your phone buzzes and a story begins. No app has ever cared this much about your exact location, and it means well.
 
@@ -432,7 +433,7 @@ Go back for the record you left in the crate. You know the one.`,
  * No em dashes, per the copy rules.
  */
 export const AUDIO_TEXT_ES: Record<string, string> = {
-  'intro.mp3': `Estás en el medio kilómetro más musical del planeta. Camden debería tener más placas azules que cualquier otro lugar de Londres, pero casi ninguna llegó a colocarse, porque la gente que hizo famoso este sitio solía tener prohibida la entrada en aquella época.
+  'intro.mp3': `Estás en el medio kilómetro más musical del planeta. El viejo territorio de trovadores, alborotadores y joyas sin pulir, donde el próximo gran sonido siempre se estaba cocinando en una trastienda. Alquimia musical en el aire. En Camden lo llaman un martes cualquiera.
 
 Así funciona esto. Diez locales. Cada uno permanece bloqueado hasta que estás físicamente delante de él. Cuando tu teléfono vibra, empieza una historia. Ninguna app se ha preocupado nunca tanto por tu ubicación exacta, y lo hace con buena intención.
 
