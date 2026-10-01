@@ -37,7 +37,7 @@
   .logo { width:clamp(188px,25vw,330px); height:auto; color:var(--acid); display:block; filter:drop-shadow(0 6px 38px rgba(204,255,0,0.20)); margin-bottom:clamp(16px,2.4vw,28px); }
   h1 { font-family:'Anton',sans-serif; font-weight:400; text-transform:uppercase; line-height:0.9; letter-spacing:0.005em; color:#fff; font-size:clamp(30px,5.9vw,72px); text-shadow:0 4px 30px rgba(0,0,0,0.6); }
   .lede { margin-top:clamp(14px,2vw,22px); max-width:46ch; font-size:clamp(15px,1.75vw,19px); line-height:1.55; color:#d8d8d2; font-weight:500; }
-  .lede .made { color:var(--acid); text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:3px; }
+  .lede .made { color:var(--acid); }
   footer { margin-top:clamp(22px,3.6vw,40px); padding-top:15px; border-top:1px solid rgba(255,255,255,0.12); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px 18px; font-family:'Space Grotesk',monospace; font-weight:500; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--smoke); }
   footer a { color:var(--paper); text-decoration:none; }
   footer a:hover { color:var(--acid); }
@@ -60,7 +60,7 @@
   }
   @keyframes softUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
   @keyframes ruleIn{from{opacity:0;transform:scaleX(0);}to{opacity:1;transform:scaleX(1);}}
-  @keyframes letterIn{0%{opacity:0;transform:translateY(0.5em);filter:blur(6px);}100%{opacity:1;transform:none;filter:none;}}
+  @keyframes letterIn{0%{opacity:0;transform:translateY(0.5em);}100%{opacity:1;transform:none;}}
   @keyframes stampIn{0%{opacity:0;transform:rotate(-34deg) scale(.3);}60%{opacity:1;transform:rotate(-7deg) scale(1.08);}100%{opacity:1;transform:rotate(-11deg) scale(1);}}
 
   @media (max-width:640px) { .stamp { top:clamp(128px,31vw,210px); width:clamp(98px,27vw,128px); } }
