@@ -6,6 +6,8 @@ import type { VenuePoster } from '@/lib/tour/venuePosters'
 interface CardState {
   imageUrl: string | null
   loaded: boolean
+  /** True for owned/licensed poster art (render full-strength, no placeholder badge). */
+  licensed: boolean
 }
 
 export default function PosterCarousel({
@@ -16,15 +18,25 @@ export default function PosterCarousel({
   accent: string
 }) {
   const [cards, setCards] = useState<CardState[]>(
-    () => posters.map(() => ({ imageUrl: null, loaded: false })),
+    () =>
+      posters.map((p) =>
+        p.imageUrl
+          ? { imageUrl: p.imageUrl, loaded: true, licensed: true }
+          : { imageUrl: null, loaded: false, licensed: false },
+      ),
   )
   const fetchedRef = useRef(false)
+
+  // Any card without an owned image still leans on a Wikipedia placeholder.
+  const hasPlaceholders = posters.some((p) => !p.imageUrl)
 
   useEffect(() => {
     if (fetchedRef.current) return
     fetchedRef.current = true
 
     posters.forEach((poster, i) => {
+      // Owned poster art is already set in initial state; don't fetch.
+      if (poster.imageUrl) return
       const title = encodeURIComponent(poster.wikiTitle.replace(/ /g, '_'))
       fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${title}`, {
         headers: { 'Api-User-Agent': 'HiddenCamdenApp/1.0' },
@@ -33,14 +45,18 @@ export default function PosterCarousel({
         .then((data: { thumbnail?: { source?: string } }) => {
           setCards((prev) => {
             const next = [...prev]
-            next[i] = { imageUrl: data.thumbnail?.source ?? null, loaded: true }
+            next[i] = {
+              imageUrl: data.thumbnail?.source ?? null,
+              loaded: true,
+              licensed: false,
+            }
             return next
           })
         })
         .catch(() => {
           setCards((prev) => {
             const next = [...prev]
-            next[i] = { imageUrl: null, loaded: true }
+            next[i] = { imageUrl: null, loaded: true, licensed: false }
             return next
           })
         })
@@ -54,12 +70,14 @@ export default function PosterCarousel({
         <span className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-label-2">
           Who played here
         </span>
-        <span
-          className="rounded border px-1.5 py-0.5 font-grotesk text-[9px] uppercase tracking-[0.12em]"
-          style={{ borderColor: accent + '40', color: accent + 'AA' }}
-        >
-          Placeholder
-        </span>
+        {hasPlaceholders && (
+          <span
+            className="rounded border px-1.5 py-0.5 font-grotesk text-[9px] uppercase tracking-[0.12em]"
+            style={{ borderColor: accent + '40', color: accent + 'AA' }}
+          >
+            Placeholder
+          </span>
+        )}
       </div>
 
       {/* Scroll track */}
@@ -73,7 +91,7 @@ export default function PosterCarousel({
             <PosterCard
               key={i}
               poster={poster}
-              card={card ?? { imageUrl: null, loaded: false }}
+              card={card ?? { imageUrl: null, loaded: false, licensed: false }}
               accent={accent}
             />
           )
@@ -81,9 +99,11 @@ export default function PosterCarousel({
       </div>
 
       {/* Credit */}
-      <p className="mt-1 font-grotesk text-[9px] leading-relaxed text-label-3">
-        Images sourced from Wikipedia (CC licence) — to be replaced with licensed poster art.
-      </p>
+      {hasPlaceholders && (
+        <p className="mt-1 font-grotesk text-[9px] leading-relaxed text-label-3">
+          Placeholder images sourced from Wikipedia (CC licence), to be replaced with licensed poster art.
+        </p>
+      )}
     </div>
   )
 }
@@ -108,14 +128,19 @@ function PosterCard({
         backgroundColor: '#1A1A1E',
       }}
     >
-      {/* Wikipedia thumbnail */}
+      {/* Poster image: owned art renders full-strength; placeholders are
+          desaturated so they read as stand-ins. */}
       {card.imageUrl && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={card.imageUrl}
           alt={poster.artist}
           className="absolute inset-0 h-full w-full object-cover"
-          style={{ filter: 'grayscale(50%) contrast(1.15) brightness(0.85)' }}
+          style={{
+            filter: card.licensed
+              ? 'none'
+              : 'grayscale(50%) contrast(1.15) brightness(0.85)',
+          }}
         />
       )}
 
@@ -124,12 +149,14 @@ function PosterCard({
         <div className="absolute inset-0 animate-pulse bg-white/5" />
       )}
 
-      {/* Gradient overlay — heavier at the bottom for legibility */}
+      {/* Gradient overlay — heavier at the bottom for legibility. Owned art
+          gets a lighter top so the poster itself stays visible. */}
       <div
         className="absolute inset-0"
         style={{
-          background:
-            'linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.45) 40%, rgba(0,0,0,0.88) 100%)',
+          background: card.licensed
+            ? 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 45%, rgba(0,0,0,0.85) 100%)'
+            : 'linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.45) 40%, rgba(0,0,0,0.88) 100%)',
         }}
       />
 

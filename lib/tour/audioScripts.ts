@@ -11,7 +11,7 @@ export interface AudioFile {
 }
 
 /** Current version of the narration pack. Bump when copy changes materially. */
-export const SCRIPT_VERSION = 4
+export const SCRIPT_VERSION = 5
 
 /**
  * Per-file script version, so the admin audio page can flag which recordings
@@ -19,16 +19,17 @@ export const SCRIPT_VERSION = 4
  * baseline); bump an entry whenever its script changes.
  */
 const FILE_VERSIONS: Record<string, number> = {
+  // v5: NW1 mispronunciation fix (stops 1 & 3) + positive Libertines line (4)
+  'stop-01.mp3': 5,
+  'stop-03.mp3': 5,
+  'stop-04.mp3': 5,
   // v4: direction fixes and trims (Sep 2026)
   'intro.mp3': 4,
-  'stop-01.mp3': 4,
   'link-01-02.mp3': 4,
   'stop-02.mp3': 4,
   'link-02-03.mp3': 4,
-  'stop-04.mp3': 4,
   'link-04-05.mp3': 4,
   // v3: the history-tour rewrite (rewards out, wit in, Dublin red, Roundhouse)
-  'stop-03.mp3': 3,
   'stop-05.mp3': 3,
   'stop-06.mp3': 3,
   'stop-07.mp3': 3,
@@ -66,7 +67,7 @@ Seventeenth century. The locals called her Mother Damnable, then Mother Red Cap,
 
 Nobody saw him leave. He presumably had a quiet one and slipped out the back.
 
-The pub that grew up here traded as the Mother Red Cap for three centuries, the last drink before the open countryside. The world's end. Hence the name on the wall. Today it's the biggest boozer in Camden, the pre-gig holding pen for every show in NW1, and if the jukebox sounds harder than your average pub, there's a reason.
+The pub that grew up here traded as the Mother Red Cap for three centuries, the last drink before the open countryside. The world's end. Hence the name on the wall. Today it's the biggest boozer in Camden, the pre-gig holding pen for every show round here, and if the jukebox sounds harder than your average pub, there's a reason.
 
 It's coming from under your feet. Down the stairs is the Underworld, and for thirty years it's been the loudest basement in Britain. Every metal, punk and hardcore band you love played that room on the way up, close enough to touch and twice as sweaty. There's a pillar in the middle of the floor, holding up the pub above. If you're in the pit, give it a swerve.`,
   },
@@ -102,7 +103,7 @@ Then: Joy Division. The Clash, who rehearsed here for a week. Madness. The Smith
 
 This corner has been the Jazz Café since 1990, and it runs on a single idea: take the artists who fill arenas, and put them in a room where the back row is closer than the front row of anywhere else. Four hundred people. A balcony where you can eat dinner while a legend works below you, close enough to read the setlist, and close enough to feel judged for ordering the calamari mid-ballad.
 
-The reputation was sealed in 1995, when a young singer from Virginia called D'Angelo played a run of nights here and taped them. That recording passed between musicians for years like contraband, the sound of neo-soul being born in NW1, and it quietly ended the idea that all the great soul rooms were in America.
+The reputation was sealed in 1995, when a young singer from Virginia called D'Angelo played a run of nights here and taped them. That recording passed between musicians for years like contraband, the sound of neo-soul being born in north London, and it quietly ended the idea that all the great soul rooms were in America.
 
 Since then the walls have absorbed everyone. Soul royalty. Funk pioneers on farewell laps they have since gone back on. Rappers doing the one small show of the tour. And now and then a north London girl with a beehive, back when only Camden knew her name.
 
@@ -122,7 +123,7 @@ It opened in 1856 to stop navvies killing each other. Camden was crawling with m
 
 Now. January 1979. Seven young men walk in and tell the landlord, Alo Conlon, that they're a jazz band. Alo thinks: jazz, lovely, respectable. Friday night comes, and a wall of skinheads turns up at the door. The band was Madness. Alo gave them a year-long residency anyway, and the back room behind you became the launchpad for One Step Beyond. They shot the video for My Girl in here. That's Alo at the start of it, wearing the face of a man who has worked out he was lied to and decided he can live with it.
 
-The lying-about-jazz trick worked so well the room never stopped. Blur played in there. Coldplay. Supergrass. The Killers. Muse got signed off the back of one electrifying set. The Libertines did a residency that nobody fully remembers, including the Libertines.
+The lying-about-jazz trick worked so well the room never stopped. Blur played in there. Coldplay. Supergrass. The Killers. Muse got signed off the back of one electrifying set. The Libertines held a residency here that passed straight into legend.
 
 And then there's Amy. Winehouse loved this pub so much that when the paparazzi made a normal night impossible, she'd come in and get behind the bar, pulling pints for startled customers. Hiding in plain sight, dressed as her own barmaid. In 2007, already conquering the world with Back to Black, she played a secret homecoming gig in that back room. Crammed in hip to hip. Suggs was there. So was Pete Doherty, cap down at the back, which in 2007 Camden barely counted as a sighting. Nobody bothered either of them.
 
@@ -447,7 +448,7 @@ Siglo diecisiete. Los vecinos la llamaban Mother Damnable, y más tarde Mother R
 
 Nadie lo vio salir.
 
-El pub que creció en este lugar funcionó como The Mother Red Cap durante los tres siglos siguientes, una parada de diligencias al borde de Londres, la última copa antes del campo. El fin del mundo. De ahí el nombre que ves ahora en la pared. Hoy en día es el bar más grande de Camden, la sala de espera previa a los conciertos de cualquier actuación en NW1, y si la máquina de discos suena más dura que la de un pub normal, hay una razón.
+El pub que creció en este lugar funcionó como The Mother Red Cap durante los tres siglos siguientes, una parada de diligencias al borde de Londres, la última copa antes del campo. El fin del mundo. De ahí el nombre que ves ahora en la pared. Hoy en día es el bar más grande de Camden, la sala de espera previa a los conciertos de cualquier actuación del barrio, y si la máquina de discos suena más dura que la de un pub normal, hay una razón.
 
 Viene de debajo de tus pies. Bajando las escaleras está The Underworld, y durante más de treinta años ha sido el sótano más ruidoso de Gran Bretaña. Cada grupo de metal, punk y hardcore que has querido alguna vez o tocó en esa sala mientras subía, o volvió a ella mientras bajaba, lo bastante cerca como para tocarlo y el doble de sudoroso. Hay una columna en mitad de la pista. Los veteranos la esquivan por instinto, a oscuras, en pleno mosh. Los turistas la encuentran con la cara.`,
 
@@ -473,7 +474,7 @@ Esta es una sala con aforo para dos mil. Él usó más o menos el cuatro por cie
 
 Esta esquina es el Jazz Café desde 1990, y se rige por una sola idea: coger a los artistas que llenan estadios, y ponerlos en una sala donde la última fila está más cerca que la primera fila de cualquier otro sitio. Cuatrocientas personas. Un palco donde puedes cenar mientras una leyenda trabaja debajo de ti, lo bastante cerca como para leer el repertorio.
 
-La reputación de la sala quedó sellada en 1995, cuando un joven cantante de Virginia llamado D'Angelo tocó aquí varias noches seguidas y las grabó. Esa grabación pasó de músico en músico durante años como si fuera contrabando, el sonido del neo-soul naciendo en NW1, y dejó un signo de interrogación permanente sobre la idea de que las grandes salas de soul estaban todas en América.
+La reputación de la sala quedó sellada en 1995, cuando un joven cantante de Virginia llamado D'Angelo tocó aquí varias noches seguidas y las grabó. Esa grabación pasó de músico en músico durante años como si fuera contrabando, el sonido del neo-soul naciendo en el norte de Londres, y dejó un signo de interrogación permanente sobre la idea de que las grandes salas de soul estaban todas en América.
 
 Desde entonces, las paredes lo han absorbido todo. La realeza del soul, pioneros del funk en sus vueltas de despedida, raperos haciendo el único concierto pequeño de la gira, y de vez en cuando una chica del norte de Londres con un peinado de colmena, cuando solo Camden conocía su nombre.
 
@@ -487,7 +488,7 @@ Abrió en 1856 para evitar que los peones se mataran entre ellos. Camden estaba 
 
 Ahora. Enero de 1979. Siete jóvenes entran y le dicen al dueño, Alo Conlon, que son una banda de jazz. Alo piensa: jazz, encantador, respetable. Llega el viernes por la noche, y un muro de skinheads aparece en su puerta. La banda era Madness. El público fue estupendo. Alo les dio una residencia de un año, y la sala de atrás, detrás de ti, se convirtió en la plataforma de lanzamiento de One Step Beyond. Rodaron aquí el vídeo de My Girl. Ese que sale al principio es Alo.
 
-El truco de mentir sobre el jazz funcionó tan bien que la sala no paró nunca. Blur tocó ahí. Coldplay. Supergrass. The Killers. A Muse los ficharon a raíz de un concierto electrizante. Los Libertines hicieron una residencia que nadie recuerda del todo, incluidos los propios Libertines.
+El truco de mentir sobre el jazz funcionó tan bien que la sala no paró nunca. Blur tocó ahí. Coldplay. Supergrass. The Killers. A Muse los ficharon a raíz de un concierto electrizante. Los Libertines hicieron aquí una residencia que pasó directamente a la leyenda.
 
 Y luego está Amy. A Winehouse le gustaba tanto este pub que, cuando los paparazzi hacían imposible una noche normal, entraba y se ponía detrás de la barra, tirando pintas para clientes desconcertados. Escondida a plena vista, disfrazada de su propia camarera. En 2007, cuando ya estaba conquistando el mundo con Back to Black, dio un concierto secreto de vuelta a casa en esa sala de atrás. Apretados cadera con cadera. Suggs estaba allí. También Pete Doherty, con la gorra calada al fondo, lo que en el Camden de 2007 apenas contaba como avistamiento. Nadie molestó a ninguno de los dos. Eso es el pub entero en una sola imagen.
 

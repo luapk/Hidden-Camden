@@ -11,9 +11,14 @@ export interface VenuePoster {
   note: string
   /** Wikipedia article title — fetched at runtime for thumbnail. */
   wikiTitle: string
+  /**
+   * A licensed/owned poster scan served from /public. When set, the card uses
+   * this directly and skips the Wikipedia placeholder fetch.
+   */
+  imageUrl?: string
 }
 
-/** Keyed by TourStop.position (1–7). */
+/** Keyed by TourStop.position (1–10). */
 export const VENUE_POSTERS: Record<number, VenuePoster[]> = {
   1: [
     // The World's End / The Underworld
@@ -250,6 +255,41 @@ export const VENUE_POSTERS: Record<number, VenuePoster[]> = {
       year: '1998',
       note: 'Either/Or UK tour',
       wikiTitle: 'Elliott_Smith',
+    },
+  ],
+
+  10: [
+    // The Roundhouse
+    {
+      artist: 'Led Zeppelin',
+      year: '1968',
+      note: 'Billed as the Yardbirds, soon to be Led Zeppelin, with John Lee Hooker',
+      wikiTitle: 'Led_Zeppelin',
+      imageUrl: '/posters/roundhouse-1968.jpg',
+    },
+    {
+      artist: 'The Doors',
+      year: '1968',
+      note: 'Sep 6 and 7 — only UK shows',
+      wikiTitle: 'The_Doors',
+    },
+    {
+      artist: 'Pink Floyd',
+      year: '1966',
+      note: 'Launch night of the UFO scene',
+      wikiTitle: 'Pink_Floyd',
+    },
+    {
+      artist: 'Jimi Hendrix',
+      year: '1967',
+      note: 'Feb 22 — Experience in full flight',
+      wikiTitle: 'Jimi_Hendrix',
+    },
+    {
+      artist: 'The Ramones',
+      year: '1977',
+      note: 'Jul 4 — Independence Day riot',
+      wikiTitle: 'Ramones',
     },
   ],
 }
