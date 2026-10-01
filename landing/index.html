@@ -37,8 +37,8 @@
   .topbar span{display:inline-flex;align-items:center;gap:0.5em;}
   footer .floc{display:inline-flex;align-items:center;gap:0.5em;}
   .ic{width:1.35em;height:1.35em;flex:none;}
-  .partner{font-family:'Space Grotesk',monospace;font-weight:600;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper);background:none;border:0;padding:0;cursor:pointer;transition:color .2s ease;}
-  .partner:hover{color:var(--acid);}
+  .partner{margin-left:auto;font-family:'Space Grotesk',monospace;font-weight:600;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper);background:none;border:1px solid rgba(255,255,255,0.35);border-radius:999px;padding:9px 20px;cursor:pointer;transition:background .2s ease,color .2s ease,border-color .2s ease;}
+  .partner:hover{color:var(--black);background:var(--acid);border-color:var(--acid);}
   .portal{position:fixed;inset:0;z-index:60;background:var(--acid);color:var(--black);display:flex;opacity:0;pointer-events:none;transition:opacity .34s ease;}
   .portal.open{opacity:1;pointer-events:auto;}
   .portal .pclose{position:absolute;top:clamp(18px,4vw,34px);right:var(--gutter);width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:2px solid var(--black);border-radius:50%;background:none;color:var(--black);cursor:pointer;}
@@ -105,7 +105,7 @@
         <p class="lede">A rock &rsquo;n&rsquo; stroll audio tour through Camden&rsquo;s music venues, <span class="made">told by the legends who wrote its story.</span> Walk the route, stories unlock the moment your feet arrive, and a real reward banks to your phone for later.</p>
         <span class="stamp stamp--flow" role="img" aria-label="Coming soon"></span>
       </main>
-      <footer><span class="floc"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>Camden Town &middot; London NW1</span><button id="partnerBtn" class="partner" type="button">Partner login</button></footer>
+      <footer><button id="partnerBtn" class="partner" type="button">Partner login</button></footer>
     </div>
   </section>
 
