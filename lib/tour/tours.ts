@@ -42,7 +42,7 @@ export const TOURS: TourDef[] = [
     descriptor: 'Music venues',
     family: false,
     tagline:
-      'Your personal walking tour from a real Camden legend, with rewards waiting to be unlocked.',
+      'Your personal walking tour from real Camden legends, with rewards waiting to be unlocked.',
     introAudioUrl: INTRO_AUDIO_URL,
     completeText:
       'A witch, a boxer, a lie about jazz, a pool table, a hiding place, the night punk went overground, a fortune teller, the room on every CV, and the bar where it happens next. Your pin is waiting at Dingwalls. Wear it somewhere people will ask.',
