@@ -36,6 +36,7 @@ import {
 } from '@/lib/tour/guides'
 import { arrivalSting, playSting, startSting } from '@/lib/tour/stings'
 import BrandLogo from './BrandLogo'
+import LanguageToggle from './LanguageToggle'
 import StoryPlayer from './StoryPlayer'
 
 const TourMap = dynamic(() => import('./TourMap'), {
@@ -393,6 +394,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
             </span>
           </Link>
         </div>
+        <LanguageToggle className="mt-3" />
         <p className="mt-3 text-[13px] leading-relaxed text-label-2">
           <span className="font-grotesk text-[10px] uppercase tracking-[0.25em] text-acid">
             {tour.name}

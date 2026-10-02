@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { ArrowRight } from '@phosphor-icons/react'
 import BrandLogo from './BrandLogo'
 import WalkPicker from './GuidePicker'
+import LanguageToggle from './LanguageToggle'
 
 /**
  * First-run flow, shown once per browser (localStorage flag):
@@ -71,12 +72,17 @@ export default function Onboarding() {
         ) : (
           <div className="flex flex-1 flex-col">
             <div className="pt-6">
-              <div className="font-grotesk text-[10px] font-bold uppercase tracking-[0.3em] text-acid">
-                Your voice
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="font-grotesk text-[10px] font-bold uppercase tracking-[0.3em] text-acid">
+                    Your voice
+                  </div>
+                  <h2 className="mt-2 font-jost text-[30px] font-bold uppercase leading-[0.98] tracking-tight text-label-1">
+                    Choose your guide
+                  </h2>
+                </div>
+                <LanguageToggle className="mt-0.5 shrink-0" />
               </div>
-              <h2 className="mt-2 font-jost text-[30px] font-bold uppercase leading-[0.98] tracking-tight text-label-1">
-                Choose your guide
-              </h2>
               <p className="mt-2 text-[13.5px] leading-relaxed text-label-2">
                 Pick the voice that walks you round. You can change it any time.
               </p>
