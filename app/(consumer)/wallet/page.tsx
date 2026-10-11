@@ -1,23 +1,26 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { BeerStein, Wallet as WalletIcon } from '@phosphor-icons/react'
+import { CheckCircle, LockSimple } from '@phosphor-icons/react'
 import { LAUNCH_ROUTE, type TourStop } from '@/lib/tour/launchRoute'
-import { CULTURE_ROUTE } from '@/lib/tour/cultureRoute'
 import { useTourProgress } from '@/lib/tour/useTourProgress'
-import BrandLogo from '../BrandLogo'
+import {
+  DRINK_EXPIRY_DAYS,
+  WOLFIES,
+  drinkMilestones,
+  type DrinkMilestone,
+} from '@/lib/tour/drinks'
 
-interface BankedEntry {
-  stop: TourStop
-  tourLabel: string
-  redeemHref: string
-}
-
+/**
+ * The wallet: two Wolfie's, earned as you walk. Drink one after the third
+ * story, drink two at the finale. Earned drinks open the redeem ticket;
+ * the rest show how far away they are.
+ */
 export default function WalletPage() {
-  const crawl = useTourProgress('crawl')
-  const culture = useTourProgress('culture')
+  const progress = useTourProgress('crawl')
   const [stops, setStops] = useState<TourStop[] | null>(null)
 
   useEffect(() => {
@@ -35,125 +38,163 @@ export default function WalletPage() {
     }
   }, [])
 
-  // Drinks from the Crawl and rewards from the Culture Cut live side by
-  // side; a small tag on the ticket says which walk earned it.
-  const banked: BankedEntry[] = [
-    ...(stops ?? [])
-      .filter((s) => crawl.bankedStops.includes(s.position))
-      .map((stop) => ({
-        stop,
-        tourLabel: 'Music venues',
-        redeemHref: `/redeem/demo-${stop.position}`,
-      })),
-    ...CULTURE_ROUTE.filter((s) => culture.bankedStops.includes(s.position)).map(
-      (stop) => ({
-        stop,
-        tourLabel: 'Culture Cut',
-        redeemHref: `/redeem/demo-culture-${stop.position}`,
-      }),
-    ),
-  ]
-
-  const loading = !crawl.hydrated || !culture.hydrated || stops === null
+  const loading = !progress.hydrated || stops === null
+  const sorted = [...(stops ?? [])].sort((a, b) => a.position - b.position)
+  const positions = sorted.map((s) => s.position)
+  const drinks = drinkMilestones(positions)
+  const earnedCount = drinks.filter((d) => progress.bankedStops.includes(d.stop)).length
 
   return (
     <main>
       <header>
         <div className="font-grotesk text-[10px] uppercase tracking-[0.35em] text-acid">
-          Your round
+          Two on us
         </div>
         <h1 className="mt-2 font-jost text-4xl font-bold uppercase leading-[0.95] tracking-tight text-label-1">
           Wallet
         </h1>
-        <p className="mt-2 text-[13px] text-label-2">
-          Drinks land here as you unlock venues. They keep for 7 days.
+        <p className="mt-2 text-[13px] leading-relaxed text-label-2">
+          Two free Wolfie&apos;s, earned as you walk. Each keeps for{' '}
+          {DRINK_EXPIRY_DAYS} days.
         </p>
       </header>
 
+      {/* The drink */}
+      <div className="mt-5 flex items-center gap-4 border border-white/10 bg-night-2 p-4">
+        <Image
+          src={WOLFIES.logoWhite}
+          alt={WOLFIES.name}
+          width={96}
+          height={Math.round(96 / WOLFIES.logoAspect)}
+          className="h-auto w-[96px] shrink-0"
+        />
+        <p className="text-[12px] leading-snug text-label-2">
+          {WOLFIES.blurb} {WOLFIES.serve}
+        </p>
+      </div>
+
       {loading ? (
-        <div className="mt-8 space-y-3">
+        <div className="mt-4 space-y-3">
           {[0, 1].map((i) => (
             <div key={i} className="h-28 animate-pulse bg-white/5" />
           ))}
         </div>
-      ) : banked.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 120, damping: 22 }}
-          className="mt-14 flex flex-col items-center text-center"
-        >
-          <span className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-acid">
-            <WalletIcon size={44} weight="fill" color="#CCFF00" />
-          </span>
-          <p className="mt-6 max-w-[260px] text-[15px] leading-relaxed text-label-2">
-            Nothing banked yet. The first pint is a ten minute walk away.
-          </p>
-          <Link
-            href="/"
-            className="mt-6 bg-acid px-6 py-3 font-jost text-[14px] font-bold uppercase tracking-[0.08em] text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]"
-          >
-            Start the tour
-          </Link>
-        </motion.div>
       ) : (
         <motion.ul
-          className="mt-6 space-y-3"
+          className="mt-4 space-y-3"
           initial="hidden"
           animate="show"
           variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
         >
-          {banked.map(({ stop, tourLabel, redeemHref }) => (
-            <motion.li
-              key={`${tourLabel}-${stop.position}`}
-              variants={{
-                hidden: { opacity: 0, y: 18 },
-                show: { opacity: 1, y: 0 },
-              }}
-              transition={{ type: 'spring', stiffness: 120, damping: 22 }}
-            >
-              <div className="relative flex overflow-hidden border border-white/10 bg-night-2">
-                {/* Lime ticket rule */}
-                <span className="w-[3px] shrink-0 bg-acid" aria-hidden />
-                <div className="relative min-w-0 flex-1 p-4">
-                  {/* Brand watermark */}
-                  <BrandLogo
-                    className="pointer-events-none absolute right-3 top-3 h-auto w-12 opacity-45"
-                  />
-                  <div className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-label-2">
-                    Banked · {tourLabel} · Stop{' '}
-                    <span style={{ color: stop.accent }}>{stop.position}</span>
-                  </div>
-                  <div className="mt-1.5 flex items-center gap-2">
-                    <BeerStein size={22} weight="fill" color="#CCFF00" />
-                    <span className="font-jost text-xl font-bold uppercase leading-tight tracking-tight text-label-1">
-                      {stop.rewardLabel}
-                    </span>
-                  </div>
-                  <div className="mt-1 font-grotesk text-[11px] text-label-2">
-                    {stop.name} · {stop.rewardWindow}
-                  </div>
-                  <Link
-                    href={redeemHref}
-                    className="mt-3 inline-block font-jost text-[14px] font-bold uppercase tracking-[0.1em] text-acid underline-offset-4 hover:underline"
-                  >
-                    Redeem at the counter
-                  </Link>
-                </div>
-                {/* Perforation dot column */}
-                <div
-                  className="flex shrink-0 flex-col items-center justify-center gap-2 border-l border-dashed border-white/10 px-2.5"
-                  aria-hidden
-                >
-                  {[0, 1, 2, 3, 4].map((d) => (
-                    <span key={d} className="h-1 w-1 rounded-full bg-white/10" />
-                  ))}
-                </div>
-              </div>
-            </motion.li>
+          {drinks.map((drink) => (
+            <DrinkSlot
+              key={drink.id}
+              drink={drink}
+              stop={sorted.find((s) => s.position === drink.stop) ?? null}
+              earned={progress.bankedStops.includes(drink.stop)}
+              stopsAway={
+                positions.filter(
+                  (p) => p <= drink.stop && !progress.bankedStops.includes(p),
+                ).length
+              }
+            />
           ))}
         </motion.ul>
       )}
+
+      {!loading && earnedCount === 0 && !progress.tourStarted && (
+        <Link
+          href="/"
+          className="mx-auto mt-6 block w-fit bg-acid px-6 py-3 font-jost text-[14px] font-bold uppercase tracking-[0.08em] text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]"
+        >
+          Start the tour
+        </Link>
+      )}
+
+      <p className="mt-6 border border-white/10 bg-night-3/80 px-4 py-3 font-grotesk text-[11px] leading-relaxed text-label-2">
+        Show your phone at the bar, staff tear, you drink. Codes are cheap,
+        drinks are precious. A dead code never eats a drink.
+      </p>
     </main>
+  )
+}
+
+function DrinkSlot({
+  drink,
+  stop,
+  earned,
+  stopsAway,
+}: {
+  drink: DrinkMilestone
+  stop: TourStop | null
+  earned: boolean
+  stopsAway: number
+}) {
+  const ordinal = drink.id === 1 ? 'First' : 'Second'
+  const where = stop ? `${stop.name}, stop ${stop.position}` : `stop ${drink.stop}`
+
+  return (
+    <motion.li
+      variants={{ hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0 } }}
+      transition={{ type: 'spring', stiffness: 120, damping: 22 }}
+    >
+      {earned ? (
+        <div className="relative flex overflow-hidden bg-acid text-black shadow-[0_0_24px_rgba(204,255,0,0.2)]">
+          <div className="relative min-w-0 flex-1 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-1.5 font-grotesk text-[10px] font-bold uppercase tracking-[0.3em] text-black/60">
+                <CheckCircle size={13} weight="fill" color="#000000" />
+                {ordinal} drink · earned
+              </div>
+              <Image
+                src={WOLFIES.logoBlack}
+                alt={WOLFIES.name}
+                width={72}
+                height={Math.round(72 / WOLFIES.logoAspect)}
+                className="h-auto w-[72px] shrink-0"
+              />
+            </div>
+            <div className="mt-1 font-jost text-[22px] font-bold uppercase leading-tight tracking-tight">
+              A Wolfie&apos;s, on us
+            </div>
+            <div className="mt-0.5 font-grotesk text-[11px] text-black/60">
+              Earned at {where}
+            </div>
+            <Link
+              href={`/redeem/demo-drink-${drink.id}`}
+              className="mt-3 inline-block rounded-full bg-black px-4 py-2 font-jost text-[13px] font-bold uppercase tracking-[0.1em] text-acid"
+            >
+              Redeem at the bar
+            </Link>
+          </div>
+          {/* Perforation dot column */}
+          <div
+            className="flex shrink-0 flex-col items-center justify-center gap-2 border-l border-dashed border-black/20 px-2.5"
+            aria-hidden
+          >
+            {[0, 1, 2, 3, 4].map((d) => (
+              <span key={d} className="h-1 w-1 rounded-full bg-black/20" />
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center gap-4 border border-white/10 bg-night-2 p-4">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/15">
+            <LockSimple size={18} weight="bold" color="rgba(255,255,255,0.45)" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-label-3">
+              {ordinal} drink
+            </div>
+            <div className="mt-0.5 font-jost text-[17px] font-bold uppercase leading-tight tracking-tight text-label-1">
+              {stopsAway} {stopsAway === 1 ? 'stop' : 'stops'} to go
+            </div>
+            <div className="mt-0.5 truncate font-grotesk text-[11px] text-label-2">
+              Lands with the story at {where}
+            </div>
+          </div>
+        </div>
+      )}
+    </motion.li>
   )
 }

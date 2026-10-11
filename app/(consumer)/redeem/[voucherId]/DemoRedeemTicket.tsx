@@ -1,6 +1,8 @@
 'use client'
 
 import { useCallback, useState } from 'react'
+import Image from 'next/image'
+import { WOLFIES } from '@/lib/tour/drinks'
 import BrandLogo from '../../BrandLogo'
 import CountdownBar from './CountdownBar'
 
@@ -39,13 +41,14 @@ type Phase =
   | { name: 'torn'; tornAt: number }
 
 export default function DemoRedeemTicket({
-  venueName,
+  issuer,
   skuLabel,
-  rewardWindow,
+  note,
 }: {
-  venueName: string
+  issuer: string
   skuLabel: string
-  rewardWindow: string
+  /** Short line under the drink, e.g. the serve. */
+  note: string
 }) {
   const [phase, setPhase] = useState<Phase>({ name: 'idle' })
 
@@ -70,13 +73,17 @@ export default function DemoRedeemTicket({
       {/* Letterhead: the brand poster over the paper */}
       <div className="mb-4 flex items-center justify-between border-b border-[#b9a883]/50 pb-3">
         <BrandLogo className="h-auto w-[100px]" />
-        <span className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#6b5c44]">
-          Drink voucher
-        </span>
+        <Image
+          src={WOLFIES.logoBlack}
+          alt={WOLFIES.name}
+          width={76}
+          height={Math.round(76 / WOLFIES.logoAspect)}
+          className="h-auto w-[76px]"
+        />
       </div>
 
       <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-[#a3431f]">
-        {venueName}
+        {issuer}
       </div>
       <div className="mt-1 font-display text-2xl uppercase leading-tight tracking-tight">
         {skuLabel}
@@ -87,10 +94,10 @@ export default function DemoRedeemTicket({
       {phase.name === 'idle' && (
         <div className="py-2 text-center">
           <p className="font-mono text-[11px] text-[#6b5c44]">
-            Valid {rewardWindow}. Tap when you are at the bar.
+            {note} Tap when you are at the bar.
           </p>
           <div className="mt-1.5 rounded bg-brass/10 px-3 py-1 font-mono text-[9px] uppercase tracking-[0.2em] text-brass">
-            Demo mode — no real redemption
+            Demo mode. No real redemption
           </div>
           <button
             onClick={showAtBar}
@@ -117,7 +124,7 @@ export default function DemoRedeemTicket({
             Staff: tear here
           </button>
           <p className="mt-2 text-center font-mono text-[10px] text-[#6b5c44]">
-            Staff only. One tap pours the pint.
+            Staff only. One tap pours the drink.
           </p>
         </div>
       )}
@@ -142,7 +149,7 @@ export default function DemoRedeemTicket({
             Poured
           </span>
           <div className="mt-3 font-mono text-[11px] text-[#6b5c44]">
-            Torn at {formatHHMM(phase.tornAt)} · {venueName}
+            Torn at {formatHHMM(phase.tornAt)} · {WOLFIES.name}
           </div>
           <p className="mt-3 text-sm text-[#6b5c44]">Enjoy. The next story is waiting.</p>
         </div>

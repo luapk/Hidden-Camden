@@ -50,7 +50,7 @@ describe('CULTURE_ROUTE', () => {
     for (const stop of CULTURE_ROUTE) {
       expect(stop.radiusM, `${stop.name} radiusM`).toBeGreaterThanOrEqual(25)
       expect(stop.radiusM, `${stop.name} radiusM`).toBeLessThanOrEqual(60)
-      expect(stop.rewardLabel.length, `${stop.name} rewardLabel`).toBeGreaterThan(0)
+      expect(stop.rewardLabel?.length ?? 0, `${stop.name} rewardLabel`).toBeGreaterThan(0)
     }
   })
 

@@ -5,12 +5,15 @@
  * empty. The DB loader in getTourStops.ts maps live route data onto the
  * same TourStop shape, so client components never care about the source.
  *
- * Audio: drop MP3 files into public/audio/ and they resolve automatically.
- * Expected filenames: stop-01.mp3 … stop-07.mp3, link-01-02.mp3 … link-06-07.mp3
- * Override paths via NEXT_PUBLIC_AUDIO_BASE env var (CDN base URL, no trailing slash).
+ * Audio: narration lives in the blob store under audio/. Filenames are
+ * stop-NN.mp3 / link-AA-BB.mp3 for stops 1-9 and the Roundhouse (stop-10.mp3,
+ * kept from before the Marathon slotted in). The Marathon and its links use
+ * named files so no existing recording is ever played at the wrong venue.
+ * Override the host via NEXT_PUBLIC_AUDIO_BASE (no trailing slash).
  */
 
-import { scriptVersion } from './audioScripts'
+import { scriptText, scriptVersion } from './audioScripts'
+import type { GuideId } from './guides'
 
 // Public blob store base for the launch-route narration. Used as the
 // default so audio resolves on every deployment without depending on the
@@ -30,6 +33,9 @@ function audioUrl(filename: string): string {
 }
 
 export const INTRO_AUDIO_URL = audioUrl('intro.mp3')
+
+// Single-sourced from the script pack: the Camden Cat's own telling.
+const MARATHON_TRANSCRIPT = scriptText('stop-marathon.mp3')
 
 /**
  * Where the tour begins: outside Camden Town tube. Not a stop (no story, no
@@ -77,8 +83,12 @@ export interface TourStop {
   fenceLat?: number
   fenceLng?: number
   radiusM: number
-  rewardLabel: string
-  rewardWindow: string
+  /** Legacy per-venue reward (DB path and the parked culture route only).
+   *  The tour's drinks are progress-based: see drinks.ts. */
+  rewardLabel?: string
+  rewardWindow?: string
+  /** Guest guide who tells this stop. Omitted: the host narrates. */
+  voice?: GuideId
   runtimeS: number
   isFree: boolean
   /** Hex accent colour. One per stop, cycled from STOP_ACCENTS. */
@@ -124,8 +134,6 @@ export const LAUNCH_ROUTE: TourStop[] = [
     fenceLat: 51.53926,
     fenceLng: -0.14208,
     radiusM: 35,
-    rewardLabel: 'House pint',
-    rewardWindow: '12:00 to 17:00, daily',
     runtimeS: 120,
     isFree: true,
     accent: STOP_ACCENTS[0],
@@ -150,8 +158,6 @@ export const LAUNCH_ROUTE: TourStop[] = [
     fenceLat: 51.53961,
     fenceLng: -0.14333,
     radiusM: 35,
-    rewardLabel: 'Club night drink voucher',
-    rewardWindow: 'Thu to Sat, after 19:00',
     runtimeS: 135,
     isFree: true,
     accent: STOP_ACCENTS[1],
@@ -177,10 +183,8 @@ export const LAUNCH_ROUTE: TourStop[] = [
     fenceLat: 51.53881,
     fenceLng: -0.14310,
     radiusM: 50,
-    rewardLabel: 'Tanqueray and tonic',
-    rewardWindow: '19:00 to 20:00, doors hour',
     runtimeS: 105,
-    isFree: false,
+    isFree: true,
     accent: STOP_ACCENTS[2],
     image: STOP_IMAGES[2],
     transcript:
@@ -195,6 +199,7 @@ export const LAUNCH_ROUTE: TourStop[] = [
   {
     position: 4,
     name: 'The Dublin Castle',
+    voice: 'suggs',
     subtitle: 'The lie about jazz',
     address: '94 Parkway, London NW1 7AN',
     instagram: 'thedublincastle',
@@ -203,10 +208,8 @@ export const LAUNCH_ROUTE: TourStop[] = [
     fenceLat: 51.53737,
     fenceLng: -0.14545,
     radiusM: 50,
-    rewardLabel: 'Pint of Guinness',
-    rewardWindow: '12:00 to 18:00, daily',
     runtimeS: 140,
-    isFree: false,
+    isFree: true,
     accent: STOP_ACCENTS[3],
     image: STOP_IMAGES[3],
     transcript:
@@ -230,10 +233,8 @@ export const LAUNCH_ROUTE: TourStop[] = [
     fenceLat: 51.53946,
     fenceLng: -0.14464,
     radiusM: 60,
-    rewardLabel: 'Pint plus a free rack of pool',
-    rewardWindow: 'Mon to Thu, 12:00 to 17:00',
     runtimeS: 120,
-    isFree: false,
+    isFree: true,
     accent: STOP_ACCENTS[4],
     image: STOP_IMAGES[4],
     transcript:
@@ -248,6 +249,7 @@ export const LAUNCH_ROUTE: TourStop[] = [
   {
     position: 6,
     name: 'The Hawley Arms',
+    voice: 'yungblud',
     subtitle: 'The hiding place',
     address: '2 Castlehaven Rd, London NW1 8QU',
     instagram: 'thehawleyarms',
@@ -256,10 +258,8 @@ export const LAUNCH_ROUTE: TourStop[] = [
     fenceLat: 51.54198,
     fenceLng: -0.14530,
     radiusM: 38,
-    rewardLabel: 'House pint',
-    rewardWindow: 'Mon to Thu, 12:00 to 17:00',
     runtimeS: 135,
-    isFree: false,
+    isFree: true,
     accent: STOP_ACCENTS[5],
     image: STOP_IMAGES[5],
     transcript:
@@ -283,10 +283,8 @@ export const LAUNCH_ROUTE: TourStop[] = [
     fenceLat: 51.54128,
     fenceLng: -0.14564,
     radiusM: 38,
-    rewardLabel: 'Terrace pint plus enamel pin',
-    rewardWindow: 'Before 18:00, daily',
     runtimeS: 135,
-    isFree: false,
+    isFree: true,
     accent: STOP_ACCENTS[0],
     image: STOP_IMAGES[6],
     transcript:
@@ -312,10 +310,8 @@ export const LAUNCH_ROUTE: TourStop[] = [
     lat: 51.54195,
     lng: -0.1484,
     radiusM: 30,
-    rewardLabel: 'House pint',
-    rewardWindow: '16:00 to 21:00, daily',
     runtimeS: 120,
-    isFree: false,
+    isFree: true,
     accent: STOP_ACCENTS[1],
     image: STOP_IMAGES[5],
     transcript:
@@ -331,16 +327,15 @@ export const LAUNCH_ROUTE: TourStop[] = [
   {
     position: 9,
     name: 'Barfly',
+    voice: 'carl-barat',
     subtitle: 'The room on every CV',
     address: '49 Chalk Farm Rd, London NW1 8AN',
     instagram: '',
     lat: 51.54235,
     lng: -0.1489,
     radiusM: 30,
-    rewardLabel: 'House lager',
-    rewardWindow: 'Gig nights, before 20:00',
     runtimeS: 130,
-    isFree: false,
+    isFree: true,
     accent: STOP_ACCENTS[2],
     image: STOP_IMAGES[1],
     transcript:
@@ -349,22 +344,41 @@ export const LAUNCH_ROUTE: TourStop[] = [
       'Then in 2016 the name came off the door, and the building spent eight years answering to Camden Assembly, which never sounded right, and everybody knew it.\n\n' +
       'On the twenty second of June 2026 the sign went back up. Frank Turner played the first night of the reborn Barfly, which is about as correct as a booking gets. The new room keeps the old religion and upgrades the kit: a wall of fame, blue plaques for the alumni, a proper rig, and downstairs a listening bar built around a 1959 jukebox that is older than every record it plays.\n\n' +
       'Two hundred capacity, same as ever. Somebody on this stage in the next twelve months will be filling arenas by the time you get round to telling anyone you were here. And this time the wall of fame is ready for them.',
-    linkAudioUrl: linkAudio(9, 10),
+    linkAudioUrl: audioUrl('link-09-marathon.mp3'),
     audioUrl: stopAudio(9),
   },
   {
     position: 10,
+    name: 'The Marathon',
+    voice: 'camden-cat',
+    subtitle: 'The back room',
+    address: '87 Chalk Farm Rd, London NW1 8AR',
+    instagram: '',
+    // Desk estimate from the NW1 8AR postcode centroid. The Roundhouse is
+    // only about 60m on, so calibrate both fences on site.
+    lat: 51.54378,
+    lng: -0.15190,
+    radiusM: 25,
+    runtimeS: 140,
+    isFree: true,
+    accent: STOP_ACCENTS[4],
+    image: STOP_IMAGES[0],
+    transcript: MARATHON_TRANSCRIPT,
+    linkAudioUrl: audioUrl('link-marathon-roundhouse.mp3'),
+    audioUrl: audioUrl('stop-marathon.mp3'),
+  },
+  {
+    position: 11,
     name: 'Roundhouse',
+    voice: 'little-simz',
     subtitle: 'The engine shed',
     address: 'Chalk Farm Rd, London NW1 8EH',
     instagram: 'roundhouseldn',
     lat: 51.54360,
     lng: -0.15270,
     radiusM: 45,
-    rewardLabel: 'House drink',
-    rewardWindow: 'Event nights, bar open',
     runtimeS: 120,
-    isFree: false,
+    isFree: true,
     accent: STOP_ACCENTS[3],
     image: STOP_IMAGES[3],
     transcript:
@@ -372,8 +386,9 @@ export const LAUNCH_ROUTE: TourStop[] = [
       'The Roundhouse went up in 1847 as an engine shed, a great brick circle built around a turntable so the railway could spin a locomotive round and send it back the way it came. The trains outgrew it within about a decade, which makes this the most beautiful planning mistake in Camden: a cathedral built by accident, for machines.\n\n' +
       'Then the counterculture found the empty round room. In October 1966 the launch party for International Times filled it with Pink Floyd, a sound system held together by optimism, and a jelly the size of a small car. After that, everyone came. The Doors played their only British shows here. Hendrix. Bowie. The Stones. And in July 1976, four brothers from Queens called the Ramones flattened the place, then walked down the hill to Dingwalls and did it again the next night. You started this tour standing in that aftershock. You are finishing it at the epicentre.\n\n' +
       'It went dark in the eighties, the way the great rooms do, and came back in 2006, restored, with a twist: half of what happens here now is a charity handing Camden\'s teenagers the same tools that built everyone on this tour. The round room still turns things around. It just swapped locomotives for fifteen-year-olds with something to prove.\n\n' +
-      'So that is your half-mile. A witch\'s corner, a boxer\'s ballroom, a lie about jazz, a pool table that ran a decade, a hiding place, the night punk went overground, a palace of monsters, the room on every CV, and the engine shed that outlived the trains. Ten stops, one square half-mile, every last one of it still going. Stand in the middle, look up, and take a second. All of it happened within a stone\'s throw of where your feet are. Camden just never bothered to mention it.',
+      'So that is your half-mile. A witch\'s corner, a boxer\'s ballroom, a lie about jazz, a pool table that ran a decade, a hiding place, the night punk went overground, a palace of monsters, the room on every CV, a kebab shop\'s back room, and the engine shed that outlived the trains. Eleven stops, one square half-mile, every last one of it still going. Stand in the middle, look up, and take a second. All of it happened within a stone\'s throw of where your feet are. Camden just never bothered to mention it.',
     linkAudioUrl: null,
+    // Recorded as stop-10.mp3 before the Marathon slotted in at 10.
     audioUrl: stopAudio(10),
   },
 ]

@@ -22,7 +22,7 @@ const STEPS: Step[] = [
   {
     n: 1,
     title: 'Walk',
-    copy: 'Follow the route from Camden Town tube. One half-mile, seven rooms, about an hour.',
+    copy: 'Follow the route from Camden Town tube. One half-mile, eleven rooms, about an hour and a half.',
     icon: MapPin,
   },
   {
@@ -34,13 +34,13 @@ const STEPS: Step[] = [
   {
     n: 3,
     title: 'Listen',
-    copy: 'Two minutes of the stuff that actually happened there. A witch, a boxer, a lie about jazz.',
+    copy: 'Two minutes of the stuff that actually happened there, from your host DJ Sammie Star and a cast of Camden legends on the stops they made famous.',
     icon: Headphones,
   },
   {
     n: 4,
     title: 'Drink',
-    copy: 'Each story banks a free drink. Show your phone, staff tear, you drink. Rewards keep for 7 days.',
+    copy: "Two Wolfie's on us: one after the third story, one at the Roundhouse finale. Show your phone, staff tear, you drink. They keep for 7 days.",
     icon: BeerStein,
   },
 ]

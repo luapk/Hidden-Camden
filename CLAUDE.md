@@ -2,7 +2,7 @@
 
 ## What this project is
 
-Hidden Camden is a geofenced audio tour app for Camden's music venues. Users walk a fixed route from Camden Town tube; each venue stop unlocks only when they physically arrive (40m geofence, 8s dwell). Unlocking plays a ~2:15 audio story and banks a drink voucher, redeemable later inside a venue-controlled window. Sponsors (Diageo brands) fund the drinks per verified redemption; venues pay nothing for stock and control when vouchers can be redeemed. Revenue: £4.99 tour purchase (stops 1–2 free, paywall fires mid-walk to stop 3), sponsor activation fees per redemption, venue analytics SaaS, gig ticket commission.
+Hidden Camden is a geofenced audio tour app for Camden's music venues. Users walk a fixed 11-stop route from Camden Town tube; each venue stop unlocks only when they physically arrive (geofence + dwell) and plays a ~2 minute audio story. The tour is free end to end (no paywall). Stories are told by a cast: DJ Sammie Star (AI voice) hosts and narrates every walk between stops, and guest guides each take the stop tied to them (Suggs: Dublin Castle, Yungblud: Hawley Arms, Carl Barât: Barfly, the Camden Cat: the Marathon, Little Simz: Roundhouse). Guests not yet recorded are covered by the host. Rewards are not tied to venues: the walk earns two free Wolfie's (Rod Stewart's blended Scotch; serve and mixers part of the sponsor deal), the first after stop 3's story and the second at the Roundhouse finale.
 
 The consumer app concept, scripts, and a UX simulator already exist. **This codebase's current priorities are two backend-and-admin features:**
 
@@ -71,6 +71,13 @@ staff_users   id, venue_id, email, role (manager|bar)
 ```
 
 Rules enforced at the DB level where possible: unique partial index on `vouchers (user_id, reward_id) WHERE status = 'banked' OR status = 'redeemed'` (one voucher per user per reward), and `redemptions.voucher_id` unique once `torn_at` is set.
+
+## Consumer model (current, Oct 2026)
+
+- Drinks: `lib/tour/drinks.ts` (milestones: stop 3 + finale). Earning is client-side (`useTourProgress` banks a stop when its story is heard); the wallet issues demo tickets (`/redeem/demo-drink-1|2`). The DB voucher pipeline below still models per-venue rewards and needs reworking for Wolfie's before real redemptions/billing go live.
+- Cast: `lib/tour/guides.ts` (host + guests, `TourStop.voice` on `launchRoute.ts`). Guest audio lives at `audio/guides/<id>/<file>`; flip a guest to `status: 'live'` once recorded. Header portrait follows the current stop's owner.
+- Culture Cut (`cultureRoute.ts`) is parked: code kept, not registered or offered anywhere.
+- The backend spec below is the original per-venue design; the paywall parts no longer apply to the consumer app.
 
 ## Feature 1: Voucher tear
 
@@ -162,4 +169,4 @@ AUDIO_STORAGE_URL=           # blob store base for stop audio
 
 ## Out of scope right now (don't build, don't scaffold)
 
-Native app shells, background geofencing, PRS-cleared audio pipeline, sponsor self-serve portal, gig ticketing integration, payments (paywall purchase is stubbed behind a feature flag).
+Native app shells, background geofencing, PRS-cleared audio pipeline, sponsor self-serve portal, gig ticketing integration, payments (the consumer paywall has been removed; the tour is free).

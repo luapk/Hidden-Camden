@@ -8,9 +8,10 @@ import {
 } from './launchRoute'
 
 /**
- * The tour registry. Two routes share one start point (Camden Town tube),
- * one paywall model (stops 1 and 2 free) and one app; what changes is the
- * stops, the narration and the voice of the thing.
+ * The tour registry. One tour is live: the music venues walk, free end to
+ * end, told by a host and a cast of guest guides. The Culture Cut
+ * (cultureRoute.ts) is parked: its code stays, but it is not registered
+ * here, so nothing in the app offers it.
  */
 
 export type TourId = 'crawl' | 'culture'
@@ -42,10 +43,10 @@ export const TOURS: TourDef[] = [
     descriptor: 'Music venues',
     family: false,
     tagline:
-      'Your personal walking tour from real Camden legends, with rewards waiting to be unlocked.',
+      "Your personal walking tour from real Camden legends, with two Wolfie's on us along the way.",
     introAudioUrl: INTRO_AUDIO_URL,
     completeText:
-      'A witch, a boxer, a lie about jazz, a pool table, a hiding place, the night punk went overground, a fortune teller, the room on every CV, and the bar where it happens next. Your pin is waiting at Dingwalls. Wear it somewhere people will ask.',
+      "A witch, a boxer, a lie about jazz, a pool table, a hiding place, the night punk went overground, a fortune teller, the room on every CV, a kebab shop's back room, and the engine shed that outlived the trains. Your second Wolfie's is in the wallet. Raise it to the round room.",
     stops: LAUNCH_ROUTE,
   },
 ]
@@ -75,7 +76,7 @@ function read(): TourId {
 
 /**
  * Reads and writes the chosen tour, localStorage-backed and synced across
- * components in the same tab. Same pattern as useLanguage and useGuide.
+ * components in the same tab. Same pattern as useLanguage.
  */
 export function useActiveTour(): {
   tourId: TourId

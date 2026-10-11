@@ -4,10 +4,9 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
-  BeerStein,
   BookOpen,
-  GearSix,
   MapPin,
+  UsersThree,
   Wallet,
   type Icon,
 } from '@phosphor-icons/react'
@@ -21,9 +20,8 @@ interface NavItem {
 const ITEMS: NavItem[] = [
   { href: '/', label: 'Tour', icon: MapPin },
   { href: '/wallet', label: 'Wallet', icon: Wallet },
-  { href: '/rewards', label: 'Rewards', icon: BeerStein },
   { href: '/how-it-works', label: 'How', icon: BookOpen },
-  { href: '/settings', label: 'Guides', icon: GearSix },
+  { href: '/settings', label: 'Guides', icon: UsersThree },
 ]
 
 export default function BottomNav() {

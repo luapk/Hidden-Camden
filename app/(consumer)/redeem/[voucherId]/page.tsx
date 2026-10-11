@@ -1,8 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { vouchers, type Reward, type Venue, type Voucher } from '@/lib/db/schema'
-import { LAUNCH_ROUTE } from '@/lib/tour/launchRoute'
-import { CULTURE_ROUTE } from '@/lib/tour/cultureRoute'
+import { WOLFIES } from '@/lib/tour/drinks'
 import BrandLogo from '../../BrandLogo'
 import RedeemTicket from './RedeemTicket'
 import DemoRedeemTicket from './DemoRedeemTicket'
@@ -16,20 +15,18 @@ export default async function RedeemPage({
 }: {
   params: { voucherId: string }
 }) {
-  // Demo vouchers ("demo-1" for the crawl, "demo-culture-1" for the Culture
-  // Cut) are served client-side without a DB lookup.
-  const demoMatch = params.voucherId.match(/^demo-(culture-)?(\d+)$/)
+  // Demo Wolfie's tickets ("demo-drink-1", "demo-drink-2") are served
+  // client-side without a DB lookup. The wallet issues these.
+  const demoMatch = params.voucherId.match(/^demo-drink-([12])$/)
   if (demoMatch) {
-    const route = demoMatch[1] ? CULTURE_ROUTE : LAUNCH_ROUTE
-    const position = parseInt(demoMatch[2], 10)
-    const stop = route.find((s) => s.position === position) ?? route[0]
+    const ordinal = demoMatch[1] === '1' ? 'First' : 'Second'
     return (
       <main className="pt-4">
         <div className="rounded-3xl bg-ink p-4 shadow-[0_12px_40px_rgba(22,18,16,0.35)]">
           <DemoRedeemTicket
-            venueName={stop.name}
-            skuLabel={stop.rewardLabel}
-            rewardWindow={stop.rewardWindow}
+            issuer={`${ordinal} drink · on Hidden Camden`}
+            skuLabel="A Wolfie's, your way"
+            note={WOLFIES.serve}
           />
         </div>
       </main>

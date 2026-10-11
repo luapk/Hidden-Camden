@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { CaretDown, Globe, PersonSimpleWalk } from '@phosphor-icons/react'
+import { CaretDown, Globe, UsersThree } from '@phosphor-icons/react'
 import { LANGUAGES, useLanguage } from '@/lib/tour/language'
-import WalkPicker from '../GuidePicker'
+import GuideCast from '../GuideCast'
 
 const FAQS: { q: string; a: string }[] = [
   {
@@ -12,24 +12,28 @@ const FAQS: { q: string; a: string }[] = [
     a: 'Stories unlock when you physically arrive at each venue, so the app watches your position while the tour screen is open. We check distance, nothing else, and nothing runs in the background.',
   },
   {
-    q: 'What if my code expires at the bar?',
-    a: 'Nothing is lost. Codes live for 60 seconds, your drink does not. Reopen the voucher and get a fresh code. Codes are cheap, vouchers are precious.',
+    q: 'How do the free drinks work?',
+    a: "Two Wolfie's are on us. The first lands when you hear the third story, the second at the Roundhouse finale. Both wait in your wallet.",
   },
   {
-    q: 'How long do banked drinks last?',
-    a: 'Seven days from the moment you bank them. The tour stays an hour, the pints stay yours for the week.',
+    q: 'What is Wolfie\'s?',
+    a: "Rod Stewart's rock 'n' roll blended Scotch. Have it neat, on the rocks, or long with a mixer. Your call.",
+  },
+  {
+    q: 'What if my code expires at the bar?',
+    a: 'Nothing is lost. Codes live for 60 seconds, your drink does not. Reopen the voucher and get a fresh code.',
+  },
+  {
+    q: 'How long do the drinks last?',
+    a: 'Seven days from the moment you earn them. The tour takes an evening, the drinks stay yours for the week.',
   },
   {
     q: 'What happens if I lose signal?',
-    a: 'Stories you have unlocked stay unlocked, and banked drinks stay banked on your phone. Redeeming needs a connection, so step towards a window before you wave the bar over.',
+    a: 'Stories you have unlocked stay unlocked, and earned drinks stay in your wallet on your phone. Redeeming needs a connection, so step towards a window before you wave the bar over.',
   },
   {
     q: 'Is the tour accessible without audio?',
-    a: 'Yes. Every stop has a full transcript, and you can mark a story as listened to bank the reward. The route is step-free apart from the market cobbles.',
-  },
-  {
-    q: 'Can I get a refund?',
-    a: 'If the tour did not work for you, write to support within 14 days of purchase and we will sort it. Tell us what went wrong so we can fix it for the next walker.',
+    a: 'Yes. Every stop has a full transcript, and you can mark a story as listened to move on. The route is step-free apart from the market cobbles.',
   },
 ]
 
@@ -41,23 +45,23 @@ export default function SettingsPage() {
     <main>
       <header>
         <div className="font-grotesk text-[10px] uppercase tracking-[0.35em] text-acid">
-          Settings
+          Guides
         </div>
         <h1 className="mt-2 font-jost text-4xl font-bold uppercase leading-[0.95] tracking-tight text-label-1">
-          Your tour, your way
+          Meet your guides
         </h1>
       </header>
 
-      {/* ── One list, one decision: the walk and the voice ── */}
-      <section id="guide" className="mt-6 scroll-mt-6">
+      {/* ── The cast: one host, guests on the stops tied to them ── */}
+      <section id="guides" className="mt-6 scroll-mt-6">
         <div className="flex items-center gap-1.5 font-grotesk text-[11px] uppercase tracking-[0.25em] text-label-2">
-          <PersonSimpleWalk size={14} weight="bold" />
-          Choose your walk
+          <UsersThree size={14} weight="bold" />
+          One walk, a cast of Camden voices
         </div>
-        <WalkPicker />
+        <GuideCast />
         <p className="mt-2.5 font-grotesk text-[10.5px] text-label-3">
-          Guides narrate in English. One walk at a time: switching routes
-          mid-tour asks first, and your banked stops always keep.
+          Guests narrate in English. Until a guest&apos;s story lands, your host
+          tells it.
         </p>
       </section>
 

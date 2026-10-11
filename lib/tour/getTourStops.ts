@@ -43,6 +43,8 @@ export async function getTourStops(): Promise<TourStop[]> {
         lat: stop.venue.lat,
         lng: stop.venue.lng,
         radiusM: stop.venue.geofence_radius_m,
+        // The cast is keyed by venue, not array index.
+        voice: LAUNCH_ROUTE.find((s) => s.name === stop.venue.name)?.voice,
         rewardLabel: stop.reward.sku_label,
         rewardWindow: `${stop.reward.window_start} to ${stop.reward.window_end}`,
         runtimeS: stop.runtime_s ?? fallback?.runtimeS ?? 135,

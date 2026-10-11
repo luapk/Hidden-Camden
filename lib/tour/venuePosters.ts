@@ -18,7 +18,7 @@ export interface VenuePoster {
   imageUrl?: string
 }
 
-/** Keyed by TourStop.position (1–10). */
+/** Keyed by TourStop.position (1–11; the Marathon at 10 has none yet). */
 export const VENUE_POSTERS: Record<number, VenuePoster[]> = {
   1: [
     // The World's End / The Underworld
@@ -258,7 +258,7 @@ export const VENUE_POSTERS: Record<number, VenuePoster[]> = {
     },
   ],
 
-  10: [
+  11: [
     // The Roundhouse
     {
       artist: 'Led Zeppelin',

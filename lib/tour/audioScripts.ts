@@ -11,7 +11,7 @@ export interface AudioFile {
 }
 
 /** Current version of the narration pack. Bump when copy changes materially. */
-export const SCRIPT_VERSION = 6
+export const SCRIPT_VERSION = 7
 
 /**
  * Per-file script version, so the admin audio page can flag which recordings
@@ -19,8 +19,14 @@ export const SCRIPT_VERSION = 6
  * baseline); bump an entry whenever its script changes.
  */
 const FILE_VERSIONS: Record<string, number> = {
+  // v7: the cast + the Marathon. Intro now eleven venues, two Wolfie's and a
+  // cast of voices; Roundhouse recap takes in the Marathon; new Marathon files.
+  'intro.mp3': 7,
+  'stop-10.mp3': 7,
+  'stop-marathon.mp3': 7,
+  'link-09-marathon.mp3': 7,
+  'link-marathon-roundhouse.mp3': 7,
   // v6: celebratory intro opening (troubadours, troublemakers, rough-cut gems)
-  'intro.mp3': 6,
   // v5: NW1 mispronunciation fix (stops 1 & 3) + positive Libertines line (4)
   'stop-01.mp3': 5,
   'stop-03.mp3': 5,
@@ -36,10 +42,13 @@ const FILE_VERSIONS: Record<string, number> = {
   'stop-07.mp3': 3,
   'stop-08.mp3': 3,
   'stop-09.mp3': 3,
-  'stop-10.mp3': 3,
   'link-03-04.mp3': 3,
-  'link-09-10.mp3': 3,
   'culture-intro.mp3': 3,
+}
+
+/** Narration text for a given audio filename (empty when unknown). */
+export function scriptText(filename: string): string {
+  return AUDIO_FILES.find((f) => f.filename === filename)?.text ?? ''
 }
 
 /** Script version for a given audio filename. */
@@ -53,7 +62,9 @@ export const AUDIO_FILES: AudioFile[] = [
     label: 'Intro — Camden Town Tube',
     text: `You're standing on the most musical half-mile on Earth. The old stomping ground of troubadours, troublemakers and rough-cut gems, where the next big sound was always being worked out in a back room. Musical alchemy in the air. Camden calls it Tuesday.
 
-Here's how it works. Ten venues. Each stays locked until you're physically standing in front of it, at which point your phone buzzes and a story begins. No app has ever cared this much about your exact location, and it means well.
+Here's how it works. Eleven venues. Each stays locked until you're physically standing in front of it, at which point your phone buzzes and a story begins. I'm your host, and at some stops I'll hand you over to the people who made them famous. No app has ever cared this much about your exact location, and it means well.
+
+Hear three stories and the first Wolfie's is on us. Make it to the Roundhouse and so is the second.
 
 Your first stop is thirty seconds away. Cross at the lights and aim for the pub that takes up half the block. Don't worry about the witch. She's been dead three hundred and fifty years.
 
@@ -94,7 +105,7 @@ Then: Joy Division. The Clash, who rehearsed here for a week. Madness. The Smith
   },
   {
     filename: 'link-02-03.mp3',
-    label: 'Link 2→3 — paywall moment (cuts at "The story is...")',
+    label: 'Link 2→3 — to Jazz Café',
     text: `Back the way you came, past the tube, and bear right up onto Parkway. Look out for a grand old white building on your right.`,
   },
   {
@@ -175,7 +186,7 @@ The Hawley rebuilt. Amy kept coming back until she couldn't. And now, behind the
   },
   {
     filename: 'stop-07.mp3',
-    label: 'Stop 7 — Dingwalls (finale)',
+    label: 'Stop 7 — Dingwalls',
     text: `The name on this building belongs to T.E. Dingwall, a packing-case maker who stencilled his name on his warehouse and went out of business long before any of this. The name outlived the man, the trade, and very nearly the century. In 1973 the building reopened as a dance hall, kept the dead man's sign for the look of it, and accidentally made him immortal.
 
 But this stop is really about one night. The fifth of July, 1976.
@@ -229,13 +240,37 @@ On the twenty second of June 2026 the sign went back up. Frank Turner played the
 Two hundred capacity, same as ever. Somebody on this stage in the next twelve months will be filling arenas by the time you get round to telling anyone you were here. And this time the wall of fame is ready for them.`,
   },
   {
-    filename: 'link-09-10.mp3',
-    label: 'Link 9→10 — to the Roundhouse',
-    text: `Keep climbing Chalk Farm Road towards the tube, and for once you won't need directions. The last stop is the enormous round brick drum on your right, the one that looks like a Victorian gasworks that ran off to join the circus. It is neither. Head for the doors.`,
+    filename: 'link-09-marathon.mp3',
+    label: 'Link 9→10 — to the Marathon',
+    text: `Keep climbing Chalk Farm Road towards the tube. Before the big round building, look for a kebab shop at number eighty seven. Yes, a kebab shop. Trust me. This next stop belongs to a man who knows it better than anyone, and I'm handing you over.`,
+  },
+  {
+    filename: 'stop-marathon.mp3',
+    label: 'Stop 10 — The Marathon (the Camden Cat)',
+    text: `Bonsoir. You're standing outside a kebab shop. Don't look so disappointed. For more than ten years this was the best late-night room in London, and I was the house band.
+
+My name is Daniel. Camden calls me the Cat. I came from Marseille by way of San Francisco, where I started a band called the Kingsnakes with two of the Flamin' Groovies, and we toured with the men who invented this music. Chuck Berry. Jerry Lee Lewis. Bo Diddley. When that was over, I came to London with a guitar and no plan, and Camden gave me one.
+
+Here's how the Marathon worked. Out front, kebabs. Through the back, a little bar that could serve until three in the morning, as long as you bought food. So everybody bought chips. From midnight into the small hours, six nights a week, I played rock 'n' roll and blues in that back room to whoever came through the door.
+
+And who came through the door. Paul Weller. Jarvis Cocker. The Gallaghers, not always on the same night. Amy Winehouse, many times, because where else do you go in Camden at one in the morning when you're not finished? One night Jack White walked in, and we played the old sixties blues together. The papers wrote about it. I still don't quite believe it.
+
+Nobody came here to be seen. They came here to disappear. The famous ones could be nobody for a few hours, eating a kebab, singing along with a Frenchman.
+
+In 2011 they took the late licence away, and the music stopped. The kebabs never did. Go in, order something, and look at the back room. That's where it all happened.
+
+And I'm still around. Ride the Northern Line long enough and you'll find me in a carriage playing Ring of Fire. Give me a nod.
+
+Now, the big one. A few more steps up the hill to the building shaped like a train turntable. Tell them the Cat sent you.`,
+  },
+  {
+    filename: 'link-marathon-roundhouse.mp3',
+    label: 'Link 10→11 — to the Roundhouse',
+    text: `Back with me. Keep climbing Chalk Farm Road, and for once you won't need directions. The last stop is the enormous round brick drum on your right, the one that looks like a Victorian gasworks that ran off to join the circus. It is neither. Head for the doors.`,
   },
   {
     filename: 'stop-10.mp3',
-    label: 'Stop 10 — Roundhouse (finale)',
+    label: 'Stop 11 — Roundhouse (finale)',
     text: `You saved the biggest for last, and it started life as a garage for trains.
 
 The Roundhouse went up in 1847 as an engine shed, a great brick circle built around a turntable so the railway could spin a locomotive round and send it back the way it came. The trains outgrew it within about a decade, which makes this the most beautiful planning mistake in Camden: a cathedral built by accident, for machines.
@@ -244,7 +279,7 @@ Then the counterculture found the empty round room. In October 1966 the launch p
 
 It went dark in the eighties, the way the great rooms do, and came back in 2006, restored, with a twist: half of what happens here now is a charity handing Camden's teenagers the same tools that built everyone on this tour. The round room still turns things around. It just swapped locomotives for fifteen-year-olds with something to prove.
 
-So that is your half-mile. A witch's corner, a boxer's ballroom, a lie about jazz, a pool table that ran a decade, a hiding place, the night punk went overground, a palace of monsters, the room on every CV, and the engine shed that outlived the trains. Ten stops, one square half-mile, every last one of it still going. Stand in the middle, look up, and take a second. All of it happened within a stone's throw of where your feet are. Camden just never bothered to mention it.`,
+So that is your half-mile. A witch's corner, a boxer's ballroom, a lie about jazz, a pool table that ran a decade, a hiding place, the night punk went overground, a palace of monsters, the room on every CV, a kebab shop's back room, and the engine shed that outlived the trains. Eleven stops, one square half-mile, every last one of it still going. Stand in the middle, look up, and take a second. All of it happened within a stone's throw of where your feet are. Camden just never bothered to mention it.`,
   },
 
   // ────────────────────────────────────────────────────────────────────────
@@ -435,7 +470,7 @@ Go back for the record you left in the crate. You know the one.`,
 export const AUDIO_TEXT_ES: Record<string, string> = {
   'intro.mp3': `Estás en el medio kilómetro más musical del planeta. El viejo territorio de trovadores, alborotadores y joyas sin pulir, donde el próximo gran sonido siempre se estaba cocinando en una trastienda. Alquimia musical en el aire. En Camden lo llaman un martes cualquiera.
 
-Así funciona esto. Diez locales. Cada uno permanece bloqueado hasta que estás físicamente delante de él. Cuando tu teléfono vibra, empieza una historia. Ninguna app se ha preocupado nunca tanto por tu ubicación exacta, y lo hace con buena intención.
+Así funciona esto. Once locales. Cada uno permanece bloqueado hasta que estás físicamente delante de él. Cuando tu teléfono vibra, empieza una historia. Ninguna app se ha preocupado nunca tanto por tu ubicación exacta, y lo hace con buena intención.
 
 Una regla. Mantén la mirada en alto. Todo lo que merece la pena ver en Camden ocurre en la primera planta y más arriba, donde los promotores todavía no han llegado.
 

@@ -5,15 +5,14 @@ import Map, { Marker, type MapLayerMouseEvent, type MapRef } from 'react-map-gl/
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { haversineDistance } from '@/lib/geo'
 import { LAUNCH_ROUTE, type TourStop } from '@/lib/tour/launchRoute'
-import { CULTURE_ROUTE } from '@/lib/tour/cultureRoute'
 
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/dark'
 
 // Each route calibrates into its own bucket; the crawl keeps the legacy keys.
-type RouteId = 'crawl' | 'culture'
+// The Culture Cut (cultureRoute.ts) is parked: code kept, not offered here.
+type RouteId = 'crawl'
 const ROUTES: Record<RouteId, { label: string; file: string; stops: TourStop[] }> = {
   crawl: { label: 'Music venues', file: 'launchRoute.ts', stops: LAUNCH_ROUTE },
-  culture: { label: 'Culture Cut', file: 'cultureRoute.ts', stops: CULTURE_ROUTE },
 }
 const fenceKeyFor = (r: RouteId) => (r === 'crawl' ? 'cc-calib' : `cc-calib-${r}`)
 const pinKeyFor = (r: RouteId) => (r === 'crawl' ? 'cc-calib-pins' : `cc-calib-pins-${r}`)

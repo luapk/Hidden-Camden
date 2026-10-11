@@ -5,7 +5,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  BeerStein,
   CaretDown,
   CheckCircle,
   InstagramLogo,
@@ -18,16 +17,14 @@ import {
 import { directionsHref, type TourStop } from '@/lib/tour/launchRoute'
 import { localizeAudioUrl, useLanguage } from '@/lib/tour/language'
 import {
-  DEFAULT_GUIDE_ID,
-  effectiveGuideId,
-  getGuide,
+  HOST_ID,
+  assignedGuide,
+  host,
+  narratorFor,
   resolveAudioUrl,
-  useGuide,
 } from '@/lib/tour/guides'
-import { useActiveTour } from '@/lib/tour/tours'
-import { isPaywalled } from '@/lib/tour/useTourProgress'
+import { DRINK_EXPIRY_DAYS, WOLFIES, type DrinkMilestone } from '@/lib/tour/drinks'
 import { VENUE_POSTERS } from '@/lib/tour/venuePosters'
-import Paywall from './Paywall'
 import PosterCarousel from './PosterCarousel'
 
 function clock(s: number): string {
@@ -39,29 +36,31 @@ function clock(s: number): string {
 
 type AudioState = 'none' | 'loading' | 'ready' | 'failed'
 
+/** What hearing this stop means for the drinks. */
+export interface StopDrinkInfo {
+  /** The drink this stop earns, if it is a milestone. */
+  earns: DrinkMilestone | null
+  /** Stops still to hear (counting this one as heard) before the next drink. */
+  untilNext: { id: DrinkMilestone['id']; stopsAway: number } | null
+}
+
 export default function StoryPlayer({
   stop,
-  paid,
   banked,
   onBank,
-  onMarkPaid,
   onClose,
-  bypassPaywall = false,
   autoPlay = false,
   nextStopName = null,
+  drinkInfo,
 }: {
   stop: TourStop
-  paid: boolean
   banked: boolean
   onBank: (position: number) => void
-  onMarkPaid: () => void
   onClose: () => void
-  bypassPaywall?: boolean
   autoPlay?: boolean
   nextStopName?: string | null
+  drinkInfo: StopDrinkInfo
 }) {
-  const gated = isPaywalled(stop.position, paid) && !bypassPaywall
-
   return (
     <motion.div
       className="fixed inset-0 z-50 mx-auto max-w-md overflow-y-auto bg-night text-label-1"
@@ -70,20 +69,17 @@ export default function StoryPlayer({
       exit={{ y: '100%' }}
       transition={{ type: 'spring', stiffness: 220, damping: 30 }}
       role="dialog"
-      aria-label={gated ? 'Continue tour' : `Story: ${stop.name}`}
+      aria-label={`Story: ${stop.name}`}
     >
-      {gated ? (
-        <Paywall onUnlock={onMarkPaid} onClose={onClose} />
-      ) : (
-        <StoryBody
-          stop={stop}
-          banked={banked}
-          onBank={onBank}
-          onClose={onClose}
-          autoPlay={autoPlay}
-          nextStopName={nextStopName}
-        />
-      )}
+      <StoryBody
+        stop={stop}
+        banked={banked}
+        onBank={onBank}
+        onClose={onClose}
+        autoPlay={autoPlay}
+        nextStopName={nextStopName}
+        drinkInfo={drinkInfo}
+      />
     </motion.div>
   )
 }
@@ -97,6 +93,7 @@ function StoryBody({
   onClose,
   autoPlay = false,
   nextStopName = null,
+  drinkInfo,
 }: {
   stop: TourStop
   banked: boolean
@@ -104,36 +101,34 @@ function StoryBody({
   onClose: () => void
   autoPlay?: boolean
   nextStopName?: string | null
+  drinkInfo: StopDrinkInfo
 }) {
   const { lang } = useLanguage()
-  const { tourId } = useActiveTour()
-  const { guideId: chosenGuideId } = useGuide()
-  // Star guides only narrate the tours they cover; otherwise the house voice.
-  const guideId = effectiveGuideId(tourId, chosenGuideId)
-  const guide = getGuide(guideId)
-  const guideUrl = resolveAudioUrl(stop.audioUrl, lang, guideId)
+  // Each stop belongs to one voice: its guest once they have recorded it,
+  // the host until then (and always outside English).
+  const owner = assignedGuide(stop)
+  const narrator = narratorFor(stop, lang)
+  const guestPending =
+    lang === 'en' && owner.role === 'guest' && owner.status !== 'live'
+  const guideUrl = resolveAudioUrl(stop.audioUrl, lang, narrator.id)
   const houseUrl = localizeAudioUrl(stop.audioUrl, lang)
-  // A guide whose file for this stop is not recorded yet falls back to the
-  // house narration rather than a dead player.
+  // A guest whose file for this stop is missing falls back to the host's
+  // narration rather than a dead player.
   const [guideAudioFailed, setGuideAudioFailed] = useState(false)
-  const guideActive =
-    lang === 'en' && guideId !== DEFAULT_GUIDE_ID && !guideAudioFailed
+  const told = guideAudioFailed ? host() : narrator
 
   // The walk to the next stop plays as the story's outro, in this same
-  // player, while headphones are still on. Only on the first full listen
-  // (not on replays of an already banked stop), and never if the story is
-  // closed early. Nothing chases the walker around afterwards.
-  const guideLinkUrl = resolveAudioUrl(stop.linkAudioUrl, lang, guideId)
-  const houseLinkUrl = localizeAudioUrl(stop.linkAudioUrl, lang)
+  // player, while headphones are still on. The walks are always the host's.
+  // Only on the first full listen (not on replays of an already banked
+  // stop), and never if the story is closed early.
+  const linkUrl = localizeAudioUrl(stop.linkAudioUrl, lang)
   const [track, setTrack] = useState<'story' | 'link'>('story')
-  const [linkFallbackTried, setLinkFallbackTried] = useState(false)
   const [linkDead, setLinkDead] = useState(false)
   const firstListenRef = useRef(!banked)
-  const canRollIntoLink =
-    firstListenRef.current && !!guideLinkUrl && !!nextStopName
+  const canRollIntoLink = firstListenRef.current && !!linkUrl && !!nextStopName
 
   const storySrc = guideAudioFailed ? houseUrl : guideUrl
-  const linkSrc = linkFallbackTried ? houseLinkUrl : guideLinkUrl
+  const linkSrc = linkUrl
   const audioUrl = track === 'story' ? storySrc : linkSrc
   const audioRef = useRef<HTMLAudioElement>(null)
   const [audioState, setAudioState] = useState<AudioState>(
@@ -169,7 +164,7 @@ function StoryBody({
     if (track !== 'link') return
     setElapsed(0)
     audioRef.current?.play().catch(() => {})
-  }, [track, linkFallbackTried])
+  }, [track])
 
   const togglePlay = () => {
     const el = audioRef.current
@@ -195,10 +190,10 @@ function StoryBody({
     setElapsed(t)
   }
 
-  // Bank once and only once. The reward unlocks automatically: halfway
-  // through the story, or when it finishes, or when the walker closes the
-  // player. No button press. Confirmed visually (card + confetti); no audio
-  // sting, since it would clash with the narration still playing at halfway.
+  // Bank once and only once: halfway through the story, or when it
+  // finishes, or when the walker closes the player. No button press. A
+  // milestone stop earns a Wolfie's, confirmed visually (card + confetti);
+  // no audio sting, since it would clash with the narration at halfway.
   const bankFiredRef = useRef(banked)
   const doBank = (silent = false) => {
     if (bankFiredRef.current) return
@@ -207,13 +202,13 @@ function StoryBody({
     onBank(stop.position)
   }
 
-  // Bank the reward the moment it unlocks (halfway, finish, or mark-listened).
+  // Bank the stop the moment it is heard (halfway, finish, or mark-listened).
   useEffect(() => {
     if (finished) doBank()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finished])
 
-  // Clicking away banks the reward too, quietly, since we're leaving.
+  // Clicking away banks the stop too, quietly, since we're leaving.
   const handleClose = () => {
     doBank(true)
     onClose()
@@ -254,11 +249,9 @@ function StoryBody({
           <div className="font-grotesk text-[11px] uppercase tracking-[0.35em] text-acid">
             Stop {stop.position} · Unlocked
           </div>
-          {guideActive && (
-            <div className="mt-1 font-grotesk text-[10px] uppercase tracking-[0.25em] text-label-2">
-              Told by <span className="text-acid">{guide.name}</span>
-            </div>
-          )}
+          <div className="mt-1 font-grotesk text-[10px] uppercase tracking-[0.25em] text-label-2">
+            Told by <span className="text-acid">{told.name}</span>
+          </div>
           <h2 className="mt-1.5 font-jost text-3xl font-bold uppercase leading-[1.02] tracking-tight text-label-1">
             {stop.name}
           </h2>
@@ -316,14 +309,10 @@ function StoryBody({
           onCanPlay={() => setAudioState('ready')}
           onError={() => {
             if (track === 'link') {
-              // Missing guide link file → try the house cut once, then give
-              // up quietly. Link failures never mark the story as failed.
-              if (!linkFallbackTried && guideLinkUrl !== houseLinkUrl) {
-                setLinkFallbackTried(true)
-              } else {
-                setLinkDead(true)
-                setTrack('story')
-              }
+              // A missing walk file gives up quietly. Link failures never
+              // mark the story as failed.
+              setLinkDead(true)
+              setTrack('story')
               return
             }
             if (!guideAudioFailed && guideUrl !== houseUrl) {
@@ -338,7 +327,7 @@ function StoryBody({
           onTimeUpdate={(e) => {
             const t = e.currentTarget.currentTime
             setElapsed(t)
-            // The reward unlocks halfway through the story itself.
+            // The stop banks halfway through the story itself.
             if (track === 'story' && !finished) {
               const d = e.currentTarget.duration
               if (Number.isFinite(d) && d > 0 && t / d >= 0.5) setFinished(true)
@@ -396,10 +385,10 @@ function StoryBody({
       )}
 
       <div className="px-5">
-        {/* Guide file missing → house narration note */}
-        {guideAudioFailed && lang === 'en' && guideId !== DEFAULT_GUIDE_ID && (
+        {/* A guest's stop the host is covering until they record it */}
+        {(guestPending || (guideAudioFailed && narrator.id !== HOST_ID)) && (
           <p className="mt-4 border border-white/10 bg-night-2 px-3 py-2 font-grotesk text-[11px] text-label-2">
-            {guide.name}&apos;s take on this stop lands soon. The house voice has it covered.
+            {owner.name} takes this stop soon. Your host has it covered for now.
           </p>
         )}
 
@@ -466,33 +455,41 @@ function StoryBody({
           />
         )}
 
-        {/* The bank moment */}
+        {/* The bank moment: a Wolfie's at the milestones, a tally otherwise */}
         <AnimatePresence>
-          {finished && (
-            <div key="bank-card" className="relative">
+          {finished && drinkInfo.earns && (
+            <div key="drink-card" className="relative">
               <motion.div
                 initial={{ opacity: 0, y: 24, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ type: 'spring', stiffness: 140, damping: 18 }}
                 className="mt-5 bg-acid p-4 text-black shadow-[0_0_24px_rgba(204,255,0,0.25)]"
               >
-                <div className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-black/60">
-                  Reward banked
+                <div className="flex items-start justify-between gap-3">
+                  <div className="font-grotesk text-[10px] font-bold uppercase tracking-[0.3em] text-black/60">
+                    Drink {drinkInfo.earns.id} of 2 · On us
+                  </div>
+                  <Image
+                    src={WOLFIES.logoBlack}
+                    alt={WOLFIES.name}
+                    width={76}
+                    height={Math.round(76 / WOLFIES.logoAspect)}
+                    className="-mt-1 h-auto w-[76px] shrink-0"
+                  />
                 </div>
-                <div className="mt-1 flex items-center gap-2">
-                  <BeerStein size={22} weight="fill" color="#000000" />
-                  <span className="font-jost text-xl font-bold uppercase leading-tight tracking-tight">
-                    {stop.rewardLabel}
-                  </span>
+                <div className="mt-1 font-jost text-[26px] font-bold uppercase leading-[0.95] tracking-tight">
+                  A Wolfie&apos;s, on us
                 </div>
+                <p className="mt-2 text-[12.5px] leading-snug text-black/75">
+                  {WOLFIES.blurb} {WOLFIES.serve}
+                </p>
                 <div className="mt-1 font-grotesk text-[11px] text-black/60">
-                  {stop.rewardWindow} · keeps for 7 days
+                  Keeps for {DRINK_EXPIRY_DAYS} days
                 </div>
-
                 <div className="mt-3 flex items-center justify-between gap-3">
                   <span className="flex items-center gap-1.5 font-grotesk text-[12px] text-black">
                     <CheckCircle size={18} weight="fill" color="#000000" />
-                    Banked. Find it in your wallet.
+                    It&apos;s in your wallet.
                   </span>
                   <Link
                     href="/wallet"
@@ -505,6 +502,29 @@ function StoryBody({
               </motion.div>
               {justBanked && <BauhausBurst />}
             </div>
+          )}
+          {finished && !drinkInfo.earns && (
+            <motion.div
+              key="stop-done"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 140, damping: 20 }}
+              className="mt-5 flex items-center gap-3 border border-acid/40 bg-night-2 p-4"
+            >
+              <CheckCircle size={22} weight="fill" color="#CCFF00" />
+              <div className="min-w-0">
+                <div className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-acid">
+                  Stop {stop.position} done
+                </div>
+                <div className="mt-0.5 text-[13px] text-label-1">
+                  {drinkInfo.untilNext
+                    ? `${drinkInfo.untilNext.stopsAway} more ${
+                        drinkInfo.untilNext.stopsAway === 1 ? 'stop' : 'stops'
+                      } to your ${drinkInfo.untilNext.id === 1 ? 'first' : 'second'} Wolfie's.`
+                    : "Both Wolfie's are in your wallet."}
+                </div>
+              </div>
+            </motion.div>
           )}
         </AnimatePresence>
       </div>

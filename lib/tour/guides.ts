@@ -1,163 +1,125 @@
-'use client'
-
-import { useCallback, useEffect, useState } from 'react'
 import { localizeAudioUrl, type Lang } from './language'
 
 /**
- * Tour guides — alternative narrators for the English tour.
+ * The cast. One tour, many voices: a host who walks the whole half-mile and
+ * narrates the walks in between, plus guest guides who each take the stop
+ * they are tied to. Nobody is chosen; the cast is introduced up front and
+ * each stop is told by its owner.
  *
- * Every guide walks the same route and the same stops; only the voice over
- * changes. Guide audio lives under /audio/guides/<id>/ mirroring the default
- * filenames, so `stop-01.mp3` becomes `guides/sammie/stop-01.mp3`.
- *
- * Guides narrate in English only. When the tour language is not English the
- * default narration for that language plays regardless of the chosen guide.
+ * Guest audio lives under /audio/guides/<id>/ mirroring the default
+ * filenames. Until a guest's recording exists (status 'coming-soon'), the
+ * host narrates their stop. Guests record English only; any other language
+ * plays the host's localized narration.
  */
 
-export type GuideId = 'sammie' | 'suggs' | 'yungblud' | 'carl-barat'
-
-/** Which tours a guide narrates. Every current guide is a music-venue guide. */
-export type GuideTour = 'crawl' | 'culture'
+export type GuideId =
+  | 'sammie'
+  | 'suggs'
+  | 'yungblud'
+  | 'carl-barat'
+  | 'camden-cat'
+  | 'little-simz'
 
 export interface TourGuide {
   id: GuideId
   name: string
-  /** One-liner shown under the name in the picker. */
+  /** One-liner under the name on the cast list. */
   tagline: string
-  /** Short bio hinting at what this guide's telling of the route reveals. */
+  /** Short line on what they bring to the walk. */
   bio: string
-  /** Portrait. Placeholder shots for guides not yet recorded. */
-  image: string
+  /** Portrait, or null until a cleared press shot lands (monogram shown). */
+  image: string | null
+  /** 'live' once their recordings exist; until then the host covers them. */
   status: 'live' | 'coming-soon'
-  tours: GuideTour[]
+  role: 'host' | 'guest'
 }
 
-// Portraits are placeholders reused from the app's proven Unsplash set until
-// real press shots are cleared. Swap per-guide when assets land.
 export const GUIDES: TourGuide[] = [
   {
     id: 'sammie',
     name: 'DJ Sammie Star',
-    tagline: 'Spins at the Dublin Castle and the Good Mixer on weekends.',
-    bio: 'He has worked these rooms for a decade. Expect the bar stools that matter, the booth gossip, and what really happens after the shutters drop.',
+    tagline: 'Your host. Spins at the Dublin Castle and the Good Mixer.',
+    bio: 'Walks you the whole half-mile and fills in the gaps between the legends: the bar stools that matter, the booth gossip, and what happens after the shutters drop.',
     image: '/guides/sammie.png',
     status: 'live',
-    tours: ['crawl'],
+    role: 'host',
   },
   {
     id: 'suggs',
     name: 'Suggs',
-    tagline: 'Madness frontman. Camden royalty.',
-    bio: 'The streets that built Madness, told by the man who walked them first. Ska, sharp suits, and the ballroom that nearly swallowed the band.',
-    image: 'https://images.unsplash.com/photo-1563089145-599997674d42?w=600&q=80',
+    tagline: 'Madness. Camden royalty.',
+    bio: 'Takes the Dublin Castle, the pub where Madness cut their teeth.',
+    image: null,
     status: 'coming-soon',
-    tours: ['crawl'],
+    role: 'guest',
   },
   {
     id: 'yungblud',
     name: 'Yungblud',
-    tagline: 'Loud, restless, Underworld approved.',
-    bio: 'The new noise and where it hides. Sweat on the Underworld ceiling, eyeliner in the Ballroom toilets, and why Camden still bites.',
-    image: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=600&q=80',
+    tagline: 'The new noise.',
+    bio: 'Takes the Hawley Arms, the pub that never learned to whisper.',
+    image: null,
     status: 'coming-soon',
-    tours: ['crawl'],
+    role: 'guest',
   },
   {
     id: 'carl-barat',
     name: 'Carl Barât',
-    tagline: 'The Libertines. Knows the Dublin Castle stage by heart.',
-    bio: 'Lock-ins, guerrilla gigs and the Good Old Days. He played half these rooms and got carried out of the rest.',
-    image: 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=600&q=80',
+    tagline: 'The Libertines.',
+    bio: 'Takes the Barfly, the little room every band passes through on the way up.',
+    image: null,
     status: 'coming-soon',
-    tours: ['crawl'],
+    role: 'guest',
+  },
+  {
+    id: 'camden-cat',
+    name: 'The Camden Cat',
+    tagline: 'Bluesman. Northern Line legend.',
+    bio: "Takes the Marathon, where he played the back room till the small hours for more than a decade.",
+    image: null,
+    status: 'coming-soon',
+    role: 'guest',
+  },
+  {
+    id: 'little-simz',
+    name: 'Little Simz',
+    tagline: 'North London, all the way.',
+    bio: 'Takes the Roundhouse and brings the walk home.',
+    image: null,
+    status: 'coming-soon',
+    role: 'guest',
   },
 ]
 
-// Sammie is the house voice for now: his narration is the default
-// AI-generated audio at /audio/<file>, so resolveAudioUrl returns it
-// unchanged. Star guides yet to be recorded live under /audio/guides/<id>/.
-export const DEFAULT_GUIDE_ID: GuideId = 'sammie'
+/** The host: narrates every link, plus any stop without a live guest. */
+export const HOST_ID: GuideId = 'sammie'
 
 export function getGuide(id: GuideId): TourGuide {
   return GUIDES.find((g) => g.id === id) ?? GUIDES[0]
 }
 
-/** The roster for one tour's picker. */
-export function guidesForTour(tourId: GuideTour): TourGuide[] {
-  return GUIDES.filter((g) => g.tours.includes(tourId))
+export function host(): TourGuide {
+  return getGuide(HOST_ID)
+}
+
+/** Who owns a stop on the bill (the host when no guest is assigned). */
+export function assignedGuide(stop: { voice?: GuideId }): TourGuide {
+  return getGuide(stop.voice ?? HOST_ID)
 }
 
 /**
- * The guide who actually narrates a given tour. A chosen star guide only
- * applies to tours they cover; everywhere else the house voice steps in.
- * The stored choice is untouched, so Sammie resumes when you return to
- * the venues route.
+ * Who you actually hear at a stop: its guest once their English recording
+ * is live, otherwise the host.
  */
-export function effectiveGuideId(tourId: GuideTour, guideId: GuideId): GuideId {
-  return getGuide(guideId).tours.includes(tourId) ? guideId : DEFAULT_GUIDE_ID
-}
-
-const KEY = 'cc-guide'
-const EVENT = 'cc-guide-change'
-
-function isSelectable(id: string | null): id is GuideId {
-  return GUIDES.some((g) => g.id === id && g.status === 'live')
-}
-
-function read(): GuideId {
-  if (typeof window === 'undefined') return DEFAULT_GUIDE_ID
-  try {
-    const stored = localStorage.getItem(KEY)
-    return isSelectable(stored) ? stored : DEFAULT_GUIDE_ID
-  } catch {
-    return DEFAULT_GUIDE_ID
-  }
+export function narratorFor(stop: { voice?: GuideId }, lang: Lang): TourGuide {
+  const owner = assignedGuide(stop)
+  return lang === 'en' && owner.status === 'live' ? owner : host()
 }
 
 /**
- * Reads and writes the chosen tour guide, kept in localStorage and synced
- * across components in the same tab via a custom event (and across tabs via
- * the native storage event). Same pattern as useLanguage.
- */
-export function useGuide(): {
-  guideId: GuideId
-  guide: TourGuide
-  setGuide: (id: GuideId) => void
-  hydrated: boolean
-} {
-  const [guideId, setGuideId] = useState<GuideId>(DEFAULT_GUIDE_ID)
-  const [hydrated, setHydrated] = useState(false)
-
-  useEffect(() => {
-    setGuideId(read())
-    setHydrated(true)
-    const onChange = () => setGuideId(read())
-    window.addEventListener(EVENT, onChange)
-    window.addEventListener('storage', onChange)
-    return () => {
-      window.removeEventListener(EVENT, onChange)
-      window.removeEventListener('storage', onChange)
-    }
-  }, [])
-
-  const setGuide = useCallback((id: GuideId) => {
-    if (!isSelectable(id)) return
-    try {
-      localStorage.setItem(KEY, id)
-    } catch {
-      /* ignore */
-    }
-    setGuideId(id)
-    window.dispatchEvent(new Event(EVENT))
-  }, [])
-
-  return { guideId, guide: getGuide(guideId), setGuide, hydrated }
-}
-
-/**
- * Maps a default-narration audio URL onto the chosen guide's version.
- * Guides record English only: any other language falls through to
- * localizeAudioUrl unchanged, whatever guide is selected.
+ * Maps a host-narration audio URL onto a given narrator's recording.
+ * Guests record English only: other languages fall through to the host's
+ * localized file, whoever owns the stop.
  */
 export function resolveAudioUrl(
   url: string | null,
@@ -166,6 +128,15 @@ export function resolveAudioUrl(
 ): string | null {
   if (!url) return null
   if (lang !== 'en') return localizeAudioUrl(url, lang)
-  if (guideId === DEFAULT_GUIDE_ID) return url
+  if (guideId === HOST_ID) return url
   return url.replace('/audio/', `/audio/guides/${guideId}/`)
+}
+
+/** Two-letter monogram for guests without a portrait yet. */
+export function monogram(name: string): string {
+  const words = name.replace(/^the\s+/i, '').split(/\s+/).filter(Boolean)
+  return words
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? '')
+    .join('')
 }

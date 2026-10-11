@@ -11,7 +11,6 @@ function storageKeyFor(tourId: string): string {
 export interface TourProgress {
   unlockedStops: number[]
   bankedStops: number[]
-  paid: boolean
   currentStop: number
   /** True once the user has been within 50m of Camden Town tube. */
   tourStarted: boolean
@@ -20,16 +19,8 @@ export interface TourProgress {
 const DEFAULT_PROGRESS: TourProgress = {
   unlockedStops: [],
   bankedStops: [],
-  paid: false,
   currentStop: 1,
   tourStarted: false,
-}
-
-/** Stops 1 and 2 are free; the paywall gates stop 3 onwards. */
-export const FREE_STOPS = 2
-
-export function isPaywalled(position: number, paid: boolean): boolean {
-  return position > FREE_STOPS && !paid
 }
 
 function load(storageKey: string): TourProgress {
@@ -42,7 +33,6 @@ function load(storageKey: string): TourProgress {
         ? parsed.unlockedStops
         : [],
       bankedStops: Array.isArray(parsed.bankedStops) ? parsed.bankedStops : [],
-      paid: parsed.paid === true,
       currentStop:
         typeof parsed.currentStop === 'number' ? parsed.currentStop : 1,
       tourStarted: parsed.tourStarted === true,
@@ -57,14 +47,14 @@ export interface UseTourProgress extends TourProgress {
   hydrated: boolean
   unlockStop: (n: number) => void
   bankStop: (n: number) => void
-  markPaid: () => void
   startTour: () => void
   reset: () => void
 }
 
 /**
  * localStorage-backed tour progress, one bucket per tour.
- * Paywall rule: stops 1 and 2 are free; unlocking stop 3+ requires paid.
+ * The whole tour is open: no paywall. A stop is 'banked' once its story has
+ * been heard (halfway, finished, or closed); drinks are earned off that.
  */
 export function useTourProgress(tourId: string = 'crawl'): UseTourProgress {
   const storageKey = storageKeyFor(tourId)
@@ -120,8 +110,6 @@ export function useTourProgress(tourId: string = 'crawl'): UseTourProgress {
     [save],
   )
 
-  const markPaid = useCallback(() => save((p) => ({ ...p, paid: true })), [save])
-
   const startTour = useCallback(
     () => save((p) => ({ ...p, tourStarted: true })),
     [save],
@@ -129,5 +117,5 @@ export function useTourProgress(tourId: string = 'crawl'): UseTourProgress {
 
   const reset = useCallback(() => save(() => DEFAULT_PROGRESS), [save])
 
-  return { ...progress, hydrated, unlockStop, bankStop, markPaid, startTour, reset }
+  return { ...progress, hydrated, unlockStop, bankStop, startTour, reset }
 }

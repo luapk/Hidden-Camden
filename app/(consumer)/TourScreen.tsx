@@ -19,7 +19,7 @@ import {
 } from '@phosphor-icons/react'
 import { haversineDistance } from '@/lib/geo'
 import { useGeofence, type GeoPosition } from '@/lib/geo/useGeofence'
-import { isPaywalled, useTourProgress } from '@/lib/tour/useTourProgress'
+import { useTourProgress } from '@/lib/tour/useTourProgress'
 import {
   START_POINT,
   directionsHref,
@@ -28,16 +28,12 @@ import {
 import { useActiveTour } from '@/lib/tour/tours'
 import Link from 'next/link'
 import { localizeAudioUrl, useLanguage } from '@/lib/tour/language'
-import {
-  effectiveGuideId,
-  getGuide,
-  resolveAudioUrl,
-  useGuide,
-} from '@/lib/tour/guides'
+import { assignedGuide, host, monogram, type TourGuide } from '@/lib/tour/guides'
+import { drinkForStop, nextDrink, type DrinkMilestone } from '@/lib/tour/drinks'
 import { arrivalSting, playSting, startSting } from '@/lib/tour/stings'
 import BrandLogo from './BrandLogo'
 import LanguageToggle from './LanguageToggle'
-import StoryPlayer from './StoryPlayer'
+import StoryPlayer, { type StopDrinkInfo } from './StoryPlayer'
 
 const TourMap = dynamic(() => import('./TourMap'), {
   ssr: false,
@@ -77,27 +73,33 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   const {
     unlockedStops,
     bankedStops,
-    paid,
     hydrated,
     tourStarted,
     unlockStop,
     bankStop,
-    markPaid,
     startTour,
     reset,
   } = progress
 
   const { lang } = useLanguage()
-  const { guideId } = useGuide()
-  // Star guides only cover the venues route; everywhere else the house
-  // voice narrates, without touching the stored choice.
-  const effGuideId = effectiveGuideId(tourId, guideId)
-  const guide = getGuide(effGuideId)
 
   const sorted = useMemo(
     () => [...routeStops].sort((a, b) => a.position - b.position),
     [routeStops],
   )
+  const positions = useMemo(() => sorted.map((s) => s.position), [sorted])
+
+  /** Drink outlook for a stop's story, counting that stop as heard. */
+  const drinkInfoFor = (stop: TourStop): StopDrinkInfo => {
+    const heard = bankedStops.includes(stop.position)
+      ? bankedStops
+      : [...bankedStops, stop.position]
+    const next = nextDrink(heard, positions)
+    return {
+      earns: drinkForStop(stop.position, positions),
+      untilNext: next ? { id: next.drink.id, stopsAway: next.stopsAway } : null,
+    }
+  }
 
   // The next stop, in sequence: the first one not yet unlocked. The tour is
   // walked in order, so this is both the geofence target and the "up next"
@@ -151,12 +153,10 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     if (startCountdown <= 0) {
       setStartCountdown(null)
       startTour()
+      // The intro is the host's.
       setMiniAudio({
-        url:
-          resolveAudioUrl(tour.introAudioUrl, lang, effGuideId) ??
-          tour.introAudioUrl,
-        fallbackUrl:
-          localizeAudioUrl(tour.introAudioUrl, lang) ?? tour.introAudioUrl,
+        url: localizeAudioUrl(tour.introAudioUrl, lang) ?? tour.introAudioUrl,
+        fallbackUrl: tour.introAudioUrl,
         label: 'Introduction',
       })
       return
@@ -166,7 +166,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
       1_000,
     )
     return () => window.clearTimeout(id)
-  }, [startCountdown, startTour, lang, effGuideId, tour.introAudioUrl])
+  }, [startCountdown, startTour, lang, tour.introAudioUrl])
 
   // Switching tours mid-flight: clear every transient piece of UI so the
   // new route starts clean. Stored progress per tour is untouched.
@@ -249,7 +249,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       // Keyed, not bare: a guessable ?sim would let anyone walk the tour
-      // (and skip the paywall) from their sofa.
+      // (and bank the drinks) from their sofa.
       setSearchSim(
         new URLSearchParams(window.location.search).get('sim') === 'backstage',
       )
@@ -258,7 +258,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
 
   // Sim mode is a demo affordance: the keyed ?sim=backstage param or the
   // env flag. Never auto-enabled by a denied location permission — that
-  // would hand a free walkthrough (and paywall bypass) to anyone who taps
+  // would hand a free walkthrough (and the drinks) to anyone who taps
   // "Don't allow".
   const simEnabled =
     searchSim || process.env.NEXT_PUBLIC_GEO_SIM === 'true'
@@ -267,11 +267,6 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     (stop: TourStop) => {
       setMiniAudio(null)
       setPendingUnlock(null)
-      // Sim mode is for testing: walk through every stop, no paywall.
-      if (isPaywalled(stop.position, paid) && !simEnabled) {
-        setActiveStory(stop)
-        return
-      }
       setUnlockFlash(stop)
       playReward(stop.position)
       unlockStop(stop.position)
@@ -281,7 +276,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         setActiveStory(stop)
       }, 1500)
     },
-    [paid, unlockStop, playReward, simEnabled],
+    [unlockStop, playReward],
   )
 
   // Geofence dwell completed: auto-unlock if confident, else ask for confirm.
@@ -292,7 +287,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     // only honoured with the walker actually at the fence. A latch that
     // somehow outlives its stop can never unlock a venue from streets away.
     if (geo.distanceM === null || geo.distanceM > nextStop.radiusM + 30) return
-    const key = `${tourId}:${nextStop.position}:${paid}`
+    const key = `${tourId}:${nextStop.position}`
     if (handledRef.current === key) return
     handledRef.current = key
     if (isConfidentUnlock(nextStop)) {
@@ -300,7 +295,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     } else {
       setPendingUnlock(nextStop)
     }
-  }, [geo.triggered, geo.distanceM, nextStop, paid, arrive, isConfidentUnlock, tourId])
+  }, [geo.triggered, geo.distanceM, nextStop, arrive, isConfidentUnlock, tourId])
 
   const simulateArrival = () => {
     if (!tourStarted) {
@@ -343,9 +338,10 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
   const prevStop = nextStop
     ? sorted.find((s) => s.position === nextStop.position - 1) ?? null
     : null
+  // The walks between stops are always the host's.
   const directionsUrl =
     prevStop && unlockedStops.includes(prevStop.position)
-      ? resolveAudioUrl(prevStop.linkAudioUrl, lang, effGuideId)
+      ? localizeAudioUrl(prevStop.linkAudioUrl, lang)
       : null
 
   const hearDirections =
@@ -353,12 +349,17 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
       ? () =>
           setMiniAudio({
             url: directionsUrl,
-            fallbackUrl: localizeAudioUrl(prevStop.linkAudioUrl, lang),
+            fallbackUrl: prevStop.linkAudioUrl,
             label: `Walk to ${nextStop.name}`,
           })
       : undefined
 
   const bankedCount = bankedStops.length
+
+  // The header portrait follows the walk: whoever owns the stop you're in
+  // or heading to. The host before the start and after the finale.
+  const pillStop = activeStory ?? nextStop
+  const guide: TourGuide = pillStop ? assignedGuide(pillStop) : host()
 
   return (
     <main>
@@ -372,12 +373,12 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
               same identity as the unlock flash. The ink ring around the
               portrait IS the progress bar; the numbers make it exact. */}
           <Link
-            href="/settings#guide"
-            aria-label={`${bankedCount} of ${sorted.length} stops done. Your guide: ${guide.name}. Change in settings.`}
+            href="/settings#guides"
+            aria-label={`${bankedCount} of ${sorted.length} stops done. This stop: ${guide.name}. Meet your guides.`}
             className="flex shrink-0 items-center gap-2.5 rounded-full bg-acid py-1.5 pl-1.5 pr-4 shadow-[0_0_24px_rgba(204,255,0,0.45)] ring-1 ring-black/15"
           >
             <GuideProgressRing
-              image={lang === 'en' ? guide.image : null}
+              image={guide.image}
               name={guide.name}
               progress={sorted.length > 0 ? bankedCount / sorted.length : 0}
             />
@@ -389,7 +390,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
                 </span>
               </span>
               <span className="mt-1 block max-w-[96px] truncate font-grotesk text-[8px] font-bold uppercase tracking-[0.2em] text-black/70">
-                {lang === 'en' ? guide.name : 'Stops done'}
+                {guide.name}
               </span>
             </span>
           </Link>
@@ -418,7 +419,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
             onStart={beginTour}
           />
           <p className="mt-4 text-center font-grotesk text-[10.5px] uppercase tracking-[0.18em] text-label-3">
-            {sorted.length} stops · a half-mile · about 90 minutes on foot
+            {sorted.length} stops · a half-mile · two Wolfie&apos;s on us
           </p>
           <Link
             href="/how-it-works"
@@ -577,6 +578,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
             <StopRow
               key={stop.position}
               stop={stop}
+              drink={drinkForStop(stop.position, positions)}
               banked={banked}
               unlocked={unlocked}
               isNext={isNext}
@@ -599,7 +601,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
                 Reset the tour
               </div>
               <p className="mt-1.5 text-[13px] leading-relaxed text-label-1">
-                Your progress will be lost. Unlocked stories and banked rewards
+                Your progress will be lost. Unlocked stories and earned drinks
                 go with it, and the tour starts again from the tube.
               </p>
               <div className="mt-3 flex gap-2">
@@ -633,6 +635,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         {selectedStop && (
           <StopSheet
             stop={selectedStop}
+            drink={drinkForStop(selectedStop.position, positions)}
             userPosition={geo.position}
             banked={bankedStops.includes(selectedStop.position)}
             unlocked={unlockedStops.includes(selectedStop.position)}
@@ -716,22 +719,20 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
         )}
       </AnimatePresence>
 
-      {/* Story player / paywall overlay */}
+      {/* Story player overlay */}
       <AnimatePresence>
         {activeStory && (
           <StoryPlayer
             key={activeStory.position}
             stop={activeStory}
-            paid={paid}
             banked={bankedStops.includes(activeStory.position)}
             onBank={bankStop}
-            onMarkPaid={markPaid}
             onClose={() => {
               setActiveStory(null)
               setAutoPlayStory(false)
             }}
-            bypassPaywall={simEnabled}
             autoPlay={autoPlayStory}
+            drinkInfo={drinkInfoFor(activeStory)}
             nextStopName={
               sorted.find((s) => s.position === activeStory.position + 1)?.name ?? null
             }
@@ -838,8 +839,8 @@ function StartGate({
 /**
  * Guide portrait wrapped in a circular progress ring. The ring fill is
  * banked stops over total: the header's only progress indicator, worn by
- * the voice walking you round. Falls back to an acid pin when the tour is
- * running in a language without guides.
+ * whoever owns the current stop. Guests without a cleared portrait yet
+ * show their monogram.
  */
 function GuideProgressRing({
   image,
@@ -882,6 +883,10 @@ function GuideProgressRing({
             style={{ filter: 'grayscale(15%) contrast(1.05)' }}
           />
         </span>
+      ) : name ? (
+        <span className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-black font-grotesk text-[11px] font-bold tracking-tight text-acid">
+          {monogram(name)}
+        </span>
       ) : (
         <span className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-black">
           <MapPin size={14} weight="fill" color="#CCFF00" />
@@ -891,11 +896,6 @@ function GuideProgressRing({
   )
 }
 
-/**
- * The moment before the walk begins is the one time the user is standing
- * still with headphones going in — the best moment to choose whose voice
- * they walk with. Shows the current guide and points at Settings to swap.
- */
 /* ------------------------------------------------------------------ */
 
 function miniClock(s: number): string {
@@ -1125,12 +1125,14 @@ function DistanceCard({
 
 function StopRow({
   stop,
+  drink,
   banked,
   unlocked,
   isNext,
   onOpen,
 }: {
   stop: TourStop
+  drink: DrinkMilestone | null
   banked: boolean
   unlocked: boolean
   isNext: boolean
@@ -1168,10 +1170,12 @@ function StopRow({
             {stop.name}
           </div>
           <div className="mt-0.5 truncate font-grotesk text-[11px] text-label-2">
-            {formatRuntime(stop.runtimeS)} story ·{' '}
-            <span className={locked ? undefined : 'text-acid/80'}>
-              {stop.rewardLabel}
-            </span>
+            {formatRuntime(stop.runtimeS)} story · {assignedGuide(stop).name}
+            {drink && (
+              <span className={locked ? undefined : 'text-acid/80'}>
+                {' '}· Wolfie&apos;s {drink.id === 1 ? 'one' : 'two'}
+              </span>
+            )}
           </div>
         </div>
         <div className="shrink-0">
@@ -1194,6 +1198,7 @@ function StopRow({
 
 function StopSheet({
   stop,
+  drink,
   userPosition,
   banked,
   unlocked,
@@ -1202,6 +1207,7 @@ function StopSheet({
   onPlay,
 }: {
   stop: TourStop
+  drink: DrinkMilestone | null
   userPosition: GeoPosition | null
   banked: boolean
   unlocked: boolean
@@ -1263,12 +1269,17 @@ function StopSheet({
           </h3>
           <p className="mt-0.5 text-[13px] text-label-2">{stop.subtitle}</p>
           <div className="mt-4 flex items-center gap-2 border-t border-white/10 pt-3 text-[13px] text-label-1">
-            <BeerStein size={18} weight="fill" color="#CCFF00" />
-            <span className="font-medium">{stop.rewardLabel}</span>
-            <span className="font-grotesk text-[11px] text-label-2">
-              {stop.rewardWindow}
-            </span>
+            <Headphones size={18} weight="bold" color="#CCFF00" />
+            <span className="font-medium">Told by {assignedGuide(stop).name}</span>
           </div>
+          {drink && (
+            <div className="mt-2 flex items-center gap-2 text-[13px] text-label-1">
+              <BeerStein size={18} weight="fill" color="#CCFF00" />
+              <span className="font-medium">
+                Earns your {drink.id === 1 ? 'first' : 'second'} Wolfie&apos;s
+              </span>
+            </div>
+          )}
           {distance !== null && (
             <div className="mt-2 font-grotesk text-[12px] text-label-2">
               {formatDistance(distance)}
