@@ -28,10 +28,11 @@ import {
 import { useActiveTour } from '@/lib/tour/tours'
 import Link from 'next/link'
 import { localizeAudioUrl, useLanguage } from '@/lib/tour/language'
-import { assignedGuide, host, monogram, type TourGuide } from '@/lib/tour/guides'
+import { GUIDES, assignedGuide, host, type TourGuide } from '@/lib/tour/guides'
 import { drinkForStop, nextDrink, type DrinkMilestone } from '@/lib/tour/drinks'
 import { arrivalSting, playSting, startSting } from '@/lib/tour/stings'
 import BrandLogo from './BrandLogo'
+import GuideAvatar from './GuideAvatar'
 import LanguageToggle from './LanguageToggle'
 import StoryPlayer, { type StopDrinkInfo } from './StoryPlayer'
 
@@ -297,6 +298,14 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
     }
   }, [geo.triggered, geo.distanceM, nextStop, arrive, isConfidentUnlock, tourId])
 
+  // Sim only: jump straight to any stop, in any order, to demo or test it.
+  const simArriveAt = (stop: TourStop) => {
+    setSelectedStop(null)
+    setOverride({ lat: stop.lat, lng: stop.lng, accuracy: 5 })
+    bankStop(stop.position)
+    arrive(stop)
+  }
+
   const simulateArrival = () => {
     if (!tourStarted) {
       beginTour()
@@ -378,8 +387,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
             className="flex shrink-0 items-center gap-2.5 rounded-full bg-acid py-1.5 pl-1.5 pr-4 shadow-[0_0_24px_rgba(204,255,0,0.45)] ring-1 ring-black/15"
           >
             <GuideProgressRing
-              image={guide.image}
-              name={guide.name}
+              guide={guide}
               progress={sorted.length > 0 ? bankedCount / sorted.length : 0}
             />
             <span className="leading-none">
@@ -427,6 +435,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
           >
             How it works
           </Link>
+          <GuestLineup stops={sorted} />
         </section>
       )}
 
@@ -548,6 +557,11 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
               <span className="font-grotesk text-[11px] text-label-2">All stops done</span>
             )}
           </div>
+          {tourStarted && (
+            <p className="mt-2 font-grotesk text-[10px] text-label-3">
+              Tap any stop below to arrive there, in any order.
+            </p>
+          )}
           {geo.position && (
             <p className="mt-2 font-mono text-[9.5px] text-label-3">
               {geo.position.lat.toFixed(6)}, {geo.position.lng.toFixed(6)} ±{Math.round(geo.position.accuracy)}m
@@ -584,6 +598,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
               isNext={isNext}
               onOpen={() => {
                 if (unlocked) setActiveStory(stop)
+                else if (simEnabled) simArriveAt(stop)
                 else setSelectedStop(stop)
               }}
             />
@@ -645,6 +660,7 @@ export default function TourScreen({ stops }: { stops: TourStop[] }) {
               setSelectedStop(null)
               setActiveStory(selectedStop)
             }}
+            onSimArrive={simEnabled ? () => simArriveAt(selectedStop) : undefined}
           />
         )}
       </AnimatePresence>
@@ -843,12 +859,10 @@ function StartGate({
  * show their monogram.
  */
 function GuideProgressRing({
-  image,
-  name,
+  guide,
   progress,
 }: {
-  image: string | null
-  name: string
+  guide: TourGuide
   progress: number
 }) {
   const R = 18
@@ -872,26 +886,7 @@ function GuideProgressRing({
           style={{ transition: 'stroke-dashoffset 0.7s ease' }}
         />
       </svg>
-      {image ? (
-        <span className="relative block h-[30px] w-[30px] overflow-hidden rounded-full ring-2 ring-black">
-          <Image
-            src={image}
-            alt={name}
-            fill
-            sizes="30px"
-            className="object-cover"
-            style={{ filter: 'grayscale(15%) contrast(1.05)' }}
-          />
-        </span>
-      ) : name ? (
-        <span className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-black font-grotesk text-[11px] font-bold tracking-tight text-acid">
-          {monogram(name)}
-        </span>
-      ) : (
-        <span className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-black">
-          <MapPin size={14} weight="fill" color="#CCFF00" />
-        </span>
-      )}
+      <GuideAvatar guide={guide} size={30} className="ring-2 ring-black" />
     </span>
   )
 }
@@ -1170,7 +1165,7 @@ function StopRow({
             {stop.name}
           </div>
           <div className="mt-0.5 truncate font-grotesk text-[11px] text-label-2">
-            {formatRuntime(stop.runtimeS)} story · {assignedGuide(stop).name}
+            {formatRuntime(stop.runtimeS)} story · {tellerLabel(stop)}
             {drink && (
               <span className={locked ? undefined : 'text-acid/80'}>
                 {' '}· Wolfie&apos;s {drink.id === 1 ? 'one' : 'two'}
@@ -1178,6 +1173,13 @@ function StopRow({
             )}
           </div>
         </div>
+        {assignedGuide(stop).role === 'guest' && (
+          <GuideAvatar
+            guide={assignedGuide(stop)}
+            size={34}
+            className={`ring-1 ring-acid/50 ${locked ? 'opacity-60' : ''}`}
+          />
+        )}
         <div className="shrink-0">
           {banked ? (
             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-acid">
@@ -1205,6 +1207,7 @@ function StopSheet({
   isNext,
   onClose,
   onPlay,
+  onSimArrive,
 }: {
   stop: TourStop
   drink: DrinkMilestone | null
@@ -1214,7 +1217,10 @@ function StopSheet({
   isNext: boolean
   onClose: () => void
   onPlay: () => void
+  /** Sim mode only: arrive here directly, out of order. */
+  onSimArrive?: () => void
 }) {
+  const owner = assignedGuide(stop)
   const distance = userPosition
     ? haversineDistance(userPosition.lat, userPosition.lng, stop.lat, stop.lng)
     : null
@@ -1268,9 +1274,19 @@ function StopSheet({
             {stop.name}
           </h3>
           <p className="mt-0.5 text-[13px] text-label-2">{stop.subtitle}</p>
-          <div className="mt-4 flex items-center gap-2 border-t border-white/10 pt-3 text-[13px] text-label-1">
-            <Headphones size={18} weight="bold" color="#CCFF00" />
-            <span className="font-medium">Told by {assignedGuide(stop).name}</span>
+          <div className="mt-4 flex items-center gap-3 border-t border-white/10 pt-3">
+            <GuideAvatar guide={owner} size={40} className="ring-1 ring-acid/50" />
+            <div className="min-w-0">
+              <div className="font-grotesk text-[9px] uppercase tracking-[0.25em] text-acid">
+                {owner.role === 'guest' ? 'Guest guide' : 'Your host'}
+              </div>
+              <div className="text-[13.5px] font-medium text-label-1">{owner.name}</div>
+              {owner.role === 'guest' && owner.status !== 'live' && (
+                <div className="font-grotesk text-[10.5px] text-label-2">
+                  Coming to this stop soon. Your host tells it for now.
+                </div>
+              )}
+            </div>
           </div>
           {drink && (
             <div className="mt-2 flex items-center gap-2 text-[13px] text-label-1">
@@ -1327,14 +1343,77 @@ function StopSheet({
               {banked ? 'Replay the story' : 'Play the story'}
             </button>
           ) : (
-            <p className="mt-5 border border-white/10 bg-night-3/80 px-4 py-3 font-grotesk text-[11px] leading-relaxed text-label-2">
-              {isNext
-                ? 'Walk to the venue and the story unlocks itself.'
-                : 'Locked until you arrive. The route knows the way.'}
-            </p>
+            <>
+              <p className="mt-5 border border-white/10 bg-night-3/80 px-4 py-3 font-grotesk text-[11px] leading-relaxed text-label-2">
+                {isNext
+                  ? 'Walk to the venue and the story unlocks itself.'
+                  : 'Locked until you arrive. The route knows the way.'}
+              </p>
+              {onSimArrive && (
+                <button
+                  onClick={onSimArrive}
+                  className="mt-3 w-full border border-dashed border-acid/50 py-3 font-grotesk text-[11px] font-bold uppercase tracking-[0.2em] text-acid"
+                >
+                  Sim: arrive here
+                </button>
+              )}
+            </>
           )}
         </div>
       </motion.div>
     </>
+  )
+}
+
+/** Who tells a stop, for the itinerary line. */
+function tellerLabel(stop: TourStop): string {
+  const owner = assignedGuide(stop)
+  if (owner.role !== 'guest') return owner.name
+  return owner.status === 'live' ? `with ${owner.name}` : `${owner.name}, coming soon`
+}
+
+/**
+ * Before the walk: which guest is coming to which stop. The host covers
+ * everything else, and every guest's stop until their story lands.
+ */
+function GuestLineup({ stops }: { stops: TourStop[] }) {
+  const lineup = GUIDES.filter((g) => g.role === 'guest')
+    .map((guide) => ({ guide, stop: stops.find((s) => s.voice === guide.id) }))
+    .filter((x): x is { guide: TourGuide; stop: TourStop } => !!x.stop)
+    .sort((a, b) => a.stop.position - b.stop.position)
+  if (lineup.length === 0) return null
+
+  return (
+    <div className="mt-7 border-t border-white/10 pt-5">
+      <div className="font-grotesk text-[10px] uppercase tracking-[0.3em] text-label-2">
+        Guests on the route
+      </div>
+      <ul className="mt-3 space-y-2.5">
+        {lineup.map(({ guide, stop }) => (
+          <li key={guide.id} className="flex items-center gap-3">
+            <GuideAvatar guide={guide} size={38} className="ring-1 ring-acid/50" />
+            <div className="min-w-0 flex-1">
+              <div className="truncate font-jost text-[14px] font-bold uppercase tracking-tight text-label-1">
+                {guide.name}
+              </div>
+              <div className="truncate font-grotesk text-[10.5px] text-label-2">
+                Stop {stop.position} · {stop.name}
+              </div>
+            </div>
+            {guide.status !== 'live' && (
+              <span className="shrink-0 rounded-full border border-white/15 px-2 py-0.5 font-grotesk text-[8px] uppercase tracking-[0.2em] text-label-2">
+                Coming soon
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
+      <Link
+        href="/settings#guides"
+        className="mt-3 block w-fit font-grotesk text-[10.5px] uppercase tracking-[0.18em] text-acid"
+      >
+        Meet your guides
+      </Link>
+    </div>
   )
 }

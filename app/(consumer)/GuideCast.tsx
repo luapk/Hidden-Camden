@@ -3,7 +3,8 @@
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { LAUNCH_ROUTE, type TourStop } from '@/lib/tour/launchRoute'
-import { GUIDES, host, monogram, type TourGuide } from '@/lib/tour/guides'
+import { GUIDES, host, type TourGuide } from '@/lib/tour/guides'
+import GuideAvatar from './GuideAvatar'
 
 /**
  * Meet your guides. Nothing to choose: one tour, one host who walks the
@@ -82,19 +83,11 @@ function GuestRow({
       transition={{ delay: 0.05 * index, type: 'spring', stiffness: 140, damping: 22 }}
       className="flex items-center gap-3 border border-white/10 bg-night-2 p-3"
     >
-      <span className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-black ring-1 ring-acid/40">
-        {guide.image ? (
-          <Image src={guide.image} alt={guide.name} fill sizes="48px" className="object-cover" />
-        ) : (
-          <span className="font-grotesk text-[15px] font-bold tracking-tight text-acid">
-            {monogram(guide.name)}
-          </span>
-        )}
-      </span>
+      <GuideAvatar guide={guide} size={48} className="ring-1 ring-acid/40" />
       <div className="min-w-0 flex-1">
         {stop && (
           <div className="font-grotesk text-[9px] uppercase tracking-[0.25em] text-acid">
-            Stop {stop.position} · {stop.name}
+            Coming to stop {stop.position} · {stop.name}
           </div>
         )}
         <div className="mt-0.5 flex items-center gap-2">
@@ -112,3 +105,4 @@ function GuestRow({
     </motion.li>
   )
 }
+

@@ -27,13 +27,17 @@ export interface TourGuide {
   tagline: string
   /** Short line on what they bring to the walk. */
   bio: string
-  /** Portrait, or null until a cleared press shot lands (monogram shown). */
+  /** Portrait, or null until one is available (monogram shown). */
   image: string | null
+  /** CSS object-position for cropping the portrait into a circle. */
+  imagePosition?: string
   /** 'live' once their recordings exist; until then the host covers them. */
   status: 'live' | 'coming-soon'
   role: 'host' | 'guest'
 }
 
+// Guest portraits are the acid-duotone shots from the promo site
+// (public/promo/assets/portraits). Any guest without one shows a monogram.
 export const GUIDES: TourGuide[] = [
   {
     id: 'sammie',
@@ -49,7 +53,7 @@ export const GUIDES: TourGuide[] = [
     name: 'Suggs',
     tagline: 'Madness. Camden royalty.',
     bio: 'Takes the Dublin Castle, the pub where Madness cut their teeth.',
-    image: null,
+    image: '/promo/assets/portraits/suggs.jpg',
     status: 'coming-soon',
     role: 'guest',
   },
@@ -58,7 +62,7 @@ export const GUIDES: TourGuide[] = [
     name: 'Yungblud',
     tagline: 'The new noise.',
     bio: 'Takes the Hawley Arms, the pub that never learned to whisper.',
-    image: null,
+    image: '/promo/assets/portraits/yungblud.jpg',
     status: 'coming-soon',
     role: 'guest',
   },
@@ -67,7 +71,7 @@ export const GUIDES: TourGuide[] = [
     name: 'Carl Barât',
     tagline: 'The Libertines.',
     bio: 'Takes the Barfly, the little room every band passes through on the way up.',
-    image: null,
+    image: '/promo/assets/portraits/carl-barat.jpg',
     status: 'coming-soon',
     role: 'guest',
   },
@@ -76,7 +80,7 @@ export const GUIDES: TourGuide[] = [
     name: 'The Camden Cat',
     tagline: 'Bluesman. Northern Line legend.',
     bio: "Takes the Marathon, where he played the back room till the small hours for more than a decade.",
-    image: null,
+    image: '/promo/assets/portraits/camden-cat.jpg',
     status: 'coming-soon',
     role: 'guest',
   },
@@ -85,7 +89,7 @@ export const GUIDES: TourGuide[] = [
     name: 'Little Simz',
     tagline: 'North London, all the way.',
     bio: 'Takes the Roundhouse and brings the walk home.',
-    image: null,
+    image: '/promo/assets/portraits/little-simz.jpg',
     status: 'coming-soon',
     role: 'guest',
   },
